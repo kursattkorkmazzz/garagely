@@ -1,5 +1,5 @@
 {
-  "name": "garagely-turbo",
+  "name": "garagely",
   "private": true,
   "scripts": {
     "build": "turbo run build",
