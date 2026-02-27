@@ -69,7 +69,6 @@ export class UserRepository implements IUserRepository {
     const userData = {
       fullName: data.fullName,
       email: data.email,
-      avatarUrl: data.avatarUrl ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -86,10 +85,6 @@ export class UserRepository implements IUserRepository {
 
     if (data.fullName !== undefined) {
       updateData.fullName = data.fullName;
-    }
-
-    if (data.avatarUrl !== undefined) {
-      updateData.avatarUrl = data.avatarUrl;
     }
 
     await db.collection(USERS_COLLECTION).doc(id).update(updateData);
@@ -110,7 +105,6 @@ export class UserRepository implements IUserRepository {
       id,
       fullName: data.fullName,
       email: data.email,
-      avatarUrl: data.avatarUrl,
       createdAt: data.createdAt?.toDate?.() ?? new Date(data.createdAt),
       updatedAt: data.updatedAt?.toDate?.() ?? new Date(data.updatedAt),
     };

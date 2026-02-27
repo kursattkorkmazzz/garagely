@@ -8,7 +8,6 @@ export const userModelValidator = yup.object({
   id: yup.string().required(),
   fullName: yup.string().min(2).max(100).required(),
   email: yup.string().email().required(),
-  avatarUrl: yup.string().url().nullable().defined(),
   createdAt: yup.date().required(),
   updatedAt: yup.date().required(),
 });

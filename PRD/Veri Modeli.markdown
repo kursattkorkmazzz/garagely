@@ -6,7 +6,6 @@ erDiagram
         string id PK
         string full_name
         string email
-        string avatar_url
         timestamp created_at
         timestamp updated_at
     }
