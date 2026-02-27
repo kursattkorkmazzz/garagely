@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { logger } from "./common/logger/logger";
+import { authRouter } from "./modules/auth";
 import { userRouter } from "./modules/user";
 import { errorHandler } from "./common/middleware/error.middleware";
 import { httpLogger } from "./common/middleware/http-logger.middleware";
@@ -17,6 +18,7 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.use("/auth", authRouter);
 app.use("/users", userRouter);
 
 app.use(errorHandler);

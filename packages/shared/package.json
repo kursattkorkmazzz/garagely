@@ -39,6 +39,10 @@
     "./payloads/user": {
       "types": "./src/payloads/user/index.ts",
       "default": "./src/payloads/user/index.ts"
+    },
+    "./payloads/auth": {
+      "types": "./src/payloads/auth/index.ts",
+      "default": "./src/payloads/auth/index.ts"
     }
   },
   "scripts": {
