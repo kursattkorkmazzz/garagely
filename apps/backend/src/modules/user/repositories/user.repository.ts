@@ -1,15 +1,15 @@
-import type {
-  UserModel,
-  UserWithPreferences,
+import {
+  userModelValidator,
+  type UserModel,
+  type UserWithPreferences,
 } from "@garagely/shared/models/user";
+import { userPreferencesModelValidator } from "@garagely/shared/models/user-preferences";
 import type {
   CreateUserPayload,
   UpdateUserPayload,
 } from "@garagely/shared/payloads/user";
 import type { IUserRepository } from "./user.repository.interface";
 import { db } from "../../../providers/firebase/firebase.provider";
-import { UserMapper } from "../mappers/user.mapper";
-import { UserPreferencesMapper } from "../mappers/user-preferences.mapper";
 
 const USERS_COLLECTION = "users";
 const USER_PREFERENCES_COLLECTION = "user_preferences";
@@ -22,7 +22,7 @@ export class UserRepository implements IUserRepository {
       return null;
     }
 
-    return UserMapper.toDomain(doc.id, doc.data()!);
+    return userModelValidator.cast({ id, ...doc.data() });
   }
 
   async findByIdWithPreferences(id: string): Promise<UserWithPreferences | null> {
@@ -40,10 +40,10 @@ export class UserRepository implements IUserRepository {
 
     const preferences = preferencesSnapshot.empty
       ? null
-      : UserPreferencesMapper.toDomain(
-          preferencesSnapshot.docs[0].id,
-          preferencesSnapshot.docs[0].data(),
-        );
+      : userPreferencesModelValidator.cast({
+          id: preferencesSnapshot.docs[0].id,
+          ...preferencesSnapshot.docs[0].data(),
+        });
 
     return { ...user, preferences };
   }
@@ -60,7 +60,7 @@ export class UserRepository implements IUserRepository {
     }
 
     const doc = snapshot.docs[0];
-    return UserMapper.toDomain(doc.id, doc.data());
+    return userModelValidator.cast({ id: doc.id, ...doc.data() });
   }
 
   async create(id: string, data: CreateUserPayload): Promise<UserModel> {
@@ -74,7 +74,7 @@ export class UserRepository implements IUserRepository {
 
     await db.collection(USERS_COLLECTION).doc(id).set(userData);
 
-    return UserMapper.toDomain(id, userData);
+    return userModelValidator.cast({ id, ...userData });
   }
 
   async update(id: string, data: UpdateUserPayload): Promise<UserModel> {

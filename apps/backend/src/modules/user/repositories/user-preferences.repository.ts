@@ -1,8 +1,10 @@
-import type { UserPreferencesModel } from "@garagely/shared/models/user-preferences";
+import {
+  userPreferencesModelValidator,
+  type UserPreferencesModel,
+} from "@garagely/shared/models/user-preferences";
 import type { UpdateUserPreferencesPayload } from "@garagely/shared/payloads/user";
 import type { IUserPreferencesRepository } from "./user.repository.interface";
 import { db } from "../../../providers/firebase/firebase.provider";
-import { UserPreferencesMapper } from "../mappers/user-preferences.mapper";
 
 const USER_PREFERENCES_COLLECTION = "user_preferences";
 
@@ -19,7 +21,7 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
     }
 
     const doc = snapshot.docs[0];
-    return UserPreferencesMapper.toDomain(doc.id, doc.data());
+    return userPreferencesModelValidator.cast({ id: doc.id, ...doc.data() });
   }
 
   async create(userId: string): Promise<UserPreferencesModel> {
@@ -36,7 +38,7 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
 
     const docRef = await db.collection(USER_PREFERENCES_COLLECTION).add(data);
 
-    return UserPreferencesMapper.toDomain(docRef.id, data);
+    return userPreferencesModelValidator.cast({ id: docRef.id, ...data });
   }
 
   async update(
