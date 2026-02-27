@@ -43,6 +43,22 @@
     "./payloads/auth": {
       "types": "./src/payloads/auth/index.ts",
       "default": "./src/payloads/auth/index.ts"
+    },
+    "./payloads/storage": {
+      "types": "./src/payloads/storage/index.ts",
+      "default": "./src/payloads/storage/index.ts"
+    },
+    "./models/entity-type": {
+      "types": "./src/models/entity-type/index.ts",
+      "default": "./src/models/entity-type/index.ts"
+    },
+    "./models/document": {
+      "types": "./src/models/document/index.ts",
+      "default": "./src/models/document/index.ts"
+    },
+    "./models/document-relation": {
+      "types": "./src/models/document-relation/index.ts",
+      "default": "./src/models/document-relation/index.ts"
     }
   },
   "scripts": {

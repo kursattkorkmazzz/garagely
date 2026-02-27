@@ -4,6 +4,7 @@ import {
   distanceUnitValidator,
 } from "../distance-unit/index";
 import { Theme, themeValidator } from "../theme/index";
+import { firestoreDate } from "../../validators/firestore-date";
 
 export const userPreferencesModelValidator = yup.object({
   id: yup.string().required(),
@@ -12,8 +13,8 @@ export const userPreferencesModelValidator = yup.object({
   preferredDistanceUnit: distanceUnitValidator,
   preferredCurrency: yup.string().min(2).max(10).required(),
   theme: themeValidator,
-  createdAt: yup.date().required(),
-  updatedAt: yup.date().required(),
+  createdAt: firestoreDate().required(),
+  updatedAt: firestoreDate().required(),
 });
 
 export type UserPreferencesModel = yup.InferType<

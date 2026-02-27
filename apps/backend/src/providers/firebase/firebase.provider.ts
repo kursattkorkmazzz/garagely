@@ -48,3 +48,4 @@ const app = initializeFirebase();
 export { app };
 export const auth = admin.auth();
 export const db = admin.firestore();
+export const storage = admin.storage();

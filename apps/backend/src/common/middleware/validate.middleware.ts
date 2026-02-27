@@ -25,10 +25,11 @@ export function validatePayload(schema: AnySchema) {
           details[path].push(error.message);
         }
 
-        throw new ValidationError('Validation failed', details);
+        next(new ValidationError('Validation failed', details));
+        return;
       }
 
-      throw err;
+      next(err);
     }
   };
 }

@@ -1,4 +1,4 @@
-export { app, auth, db } from "./firebase.provider";
+export { app, auth, db, storage } from "./firebase.provider";
 export { isFirebaseError, convertFirebaseError } from "./firebase-error.handler";
 export type {
   FirebaseAuthErrorCode,
