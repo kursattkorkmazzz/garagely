@@ -1,1 +1,1 @@
-export { Theme, themeValidator } from "./theme.model.js";
+export { Theme, themeValidator } from "./theme.model";

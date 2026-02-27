@@ -1,1 +1,1 @@
-export { DistanceUnit, distanceUnitValidator } from "./distance-unit.model.js";
+export { DistanceUnit, distanceUnitValidator } from "./distance-unit.model";

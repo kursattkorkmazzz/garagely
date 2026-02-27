@@ -2,7 +2,7 @@ import * as yup from "yup";
 import {
   userPreferencesModelValidator,
   type UserPreferencesModel,
-} from "../user-preferences/index.js";
+} from "../user-preferences/index";
 
 export const userModelValidator = yup.object({
   id: yup.string().required(),

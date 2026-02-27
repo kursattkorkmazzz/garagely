@@ -4,4 +4,4 @@ export {
   type UserModel,
   type UserWithPreferences,
   type UserPreferencesModel,
-} from "./user.model.js";
+} from "./user.model";

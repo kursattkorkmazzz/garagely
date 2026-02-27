@@ -1,6 +1,6 @@
 import * as yup from "yup";
-import { DistanceUnit } from "../../models/distance-unit/index.js";
-import { Theme } from "../../models/theme/index.js";
+import { DistanceUnit } from "../../models/distance-unit/index";
+import { Theme } from "../../models/theme/index";
 
 export const updateUserPreferencesPayloadValidator = yup.object({
   locale: yup.string().min(2).max(10).optional(),

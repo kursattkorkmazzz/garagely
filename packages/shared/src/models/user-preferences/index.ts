@@ -3,4 +3,4 @@ export {
   type UserPreferencesModel,
   DistanceUnit,
   Theme,
-} from "./user-preferences.model.js";
+} from "./user-preferences.model";

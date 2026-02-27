@@ -2,8 +2,8 @@ import * as yup from "yup";
 import {
   DistanceUnit,
   distanceUnitValidator,
-} from "../distance-unit/index.js";
-import { Theme, themeValidator } from "../theme/index.js";
+} from "../distance-unit/index";
+import { Theme, themeValidator } from "../theme/index";
 
 export const userPreferencesModelValidator = yup.object({
   id: yup.string().required(),
