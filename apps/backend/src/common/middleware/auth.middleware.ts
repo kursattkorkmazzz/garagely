@@ -1,6 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
-import { UnauthorizedError } from '@garagely/shared/error.types';
-import { auth } from '../../providers/firebase/firebase.provider';
+import type { Request, Response, NextFunction } from "express";
+import { UnauthorizedError } from "@garagely/shared/error.types";
+import { auth } from "../../providers/firebase/firebase.provider";
 
 declare global {
   namespace Express {
@@ -16,12 +16,12 @@ declare global {
 export async function authMiddleware(
   req: Request,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader?.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Missing or invalid authorization header');
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new UnauthorizedError("Missing or invalid authorization header");
   }
 
   const token = authHeader.substring(7);
@@ -36,6 +36,6 @@ export async function authMiddleware(
 
     next();
   } catch {
-    throw new UnauthorizedError('Invalid or expired token');
+    throw new UnauthorizedError("Invalid or expired token");
   }
 }

@@ -1,10 +1,8 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
 import { UserService } from '../services/user.service';
-import {
-  UserRepository,
-  UserPreferencesRepository,
-} from '../repositories/user.repository';
+import { UserRepository } from "../repositories/user.repository";
+import { UserPreferencesRepository } from "../repositories/user-preferences.repository";
 import { authMiddleware } from '../../../common/middleware/auth.middleware';
 import { validatePayload } from '../../../common/middleware/validate.middleware';
 import {

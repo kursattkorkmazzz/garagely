@@ -21,12 +21,24 @@
       "default": "./src/pagination.types.ts"
     },
     "./models/user": {
-      "types": "./src/models/user.model.ts",
-      "default": "./src/models/user.model.ts"
+      "types": "./src/models/user/index.ts",
+      "default": "./src/models/user/index.ts"
+    },
+    "./models/user-preferences": {
+      "types": "./src/models/user-preferences/index.ts",
+      "default": "./src/models/user-preferences/index.ts"
+    },
+    "./models/theme": {
+      "types": "./src/models/theme/index.ts",
+      "default": "./src/models/theme/index.ts"
+    },
+    "./models/distance-unit": {
+      "types": "./src/models/distance-unit/index.ts",
+      "default": "./src/models/distance-unit/index.ts"
     },
     "./payloads/user": {
-      "types": "./src/payloads/user.payload.ts",
-      "default": "./src/payloads/user.payload.ts"
+      "types": "./src/payloads/user/index.ts",
+      "default": "./src/payloads/user/index.ts"
     }
   },
   "scripts": {
