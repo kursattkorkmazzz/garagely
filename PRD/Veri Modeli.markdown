@@ -206,24 +206,15 @@ erDiagram
 
     %% Documents ─────────────────────
 
-    document_types {
-        string id PK
-        string type
-        string allowed_extensions
-        string category "document, image, excel etc."
-    }
-
     documents {
         string id PK
-        string vehicle_id FK
-        string type_id FK
+        string user_id FK
         string title
         string storage_path
         string url
         number document_size
         string mime_type
-        timestamp taken_at
-        timestamp created_at
+        timestamp uploaded_at
     }
 
     document_relations {

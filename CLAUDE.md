@@ -85,7 +85,7 @@ Cross-cutting pieces:
 - `common/errors/` — `AppError` base + `NotFoundError`, `UnauthorizedError`, `ConflictError`, etc.
 - `common/middleware/` — `authMiddleware`, `validatePayload(Schema)`, `errorHandler`, `subscriptionGuard`.
 - `common/utils/` — `sendSuccess()`, `sendPaginated()`, `pagination()`.
-- `providers/firebase/` — Firebase Admin SDK init, exports `db` (Firestore instance).
+- `providers/firebase/` — Firebase Admin SDK init, exports `db` (Firestore), `auth`, and `storage` (Firebase Storage).
 
 ### Mobile Structure (`apps/mobile/`)
 
@@ -121,6 +121,7 @@ Screen files import composites and call stores — no inline form logic, no busi
 
 - Contains Yup-first models, shared payloads, and enums consumed by both `api-sdk` and `backend`.
 - **No barrel `index.ts`.** Each file uses named `export` directly; consumers import from the specific file path.
+- Use `firestoreDate()` from `validators/firestore-date` instead of `yup.date()` for any date fields that come from Firestore (handles Timestamp conversion).
 
 ### Styling (mobile)
 
@@ -138,6 +139,13 @@ Screen files import composites and call stores — no inline form logic, no busi
 
 - Define the interface (`*.repository.interface.ts`) before the Firestore implementation.
 - Firestore implementation is injected into the service — swappable without touching business logic.
+
+### Storage module
+
+- Handles document uploads to Firebase Storage with metadata stored in Firestore.
+- Uses `EntityType` enum to categorize documents (e.g., `user_profile`, `vehicle`).
+- File size limits are configurable per entity type via environment variables: `STORAGE_MAX_SIZE_{ENTITY_TYPE}` (in MB).
+- Documents are linked to entities via `document_relations` collection — the relation is created by the calling module, not the storage module.
 
 ### API SDK usage pattern
 
