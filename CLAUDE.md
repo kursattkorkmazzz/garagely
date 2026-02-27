@@ -71,20 +71,24 @@ Component → Zustand store → @garagely/api-sdk → backend (Express)
 Each feature lives in `modules/{domain}/` with the same internal shape:
 
 ```
-modules/auth/
-  auth.routes.ts          ← Express Router, wires middleware + handler
-  auth.controller.ts      ← thin handler: validates, calls service, sends response
-  auth.service.ts         ← business logic
-  auth.repository.ts      ← Firestore queries (implements interface)
-  auth.repository.interface.ts
-  auth.payload.ts         ← Yup schemas for request bodies
+modules/{domain}/
+  routes/{domain}.routes.ts              ← Express Router, wires middleware + handler
+  controllers/{domain}.controller.ts     ← thin handler: validates, calls service, sends response
+  services/{domain}.service.ts           ← business logic
+  repositories/{domain}.repository.ts    ← Firestore queries (implements interface)
+  repositories/{domain}.repository.interface.ts
+  config/                                ← module-specific configuration (optional)
+  index.ts                               ← public exports
 ```
+
+Payloads (request body schemas) live in `@garagely/shared/payloads/{domain}/`.
 
 Cross-cutting pieces:
 
-- `common/errors/` — `AppError` base + `NotFoundError`, `UnauthorizedError`, `ConflictError`, etc.
-- `common/middleware/` — `authMiddleware`, `validatePayload(Schema)`, `errorHandler`, `subscriptionGuard`.
-- `common/utils/` — `sendSuccess()`, `sendPaginated()`, `pagination()`.
+- `common/errors/` — Centralized error handlers (`firebase-error.handler.ts`, `multer-error.handler.ts`) with `is*Error()` type guards and `convert*Error()` converters.
+- `common/middleware/` — `authMiddleware`, `validatePayload(Schema)`, `errorHandler`.
+- `common/utils/` — `sendSuccess()`, `sendPaginated()`, `asyncHandler()`.
+- `common/logger/` — Pino logger configuration.
 - `providers/firebase/` — Firebase Admin SDK init, exports `db` (Firestore), `auth`, and `storage` (Firebase Storage).
 
 ### Mobile Structure (`apps/mobile/`)
@@ -143,9 +147,21 @@ Screen files import composites and call stores — no inline form logic, no busi
 ### Storage module
 
 - Handles document uploads to Firebase Storage with metadata stored in Firestore.
-- Uses `EntityType` enum to categorize documents (e.g., `user_profile`, `vehicle`).
+- Uses `EntityType` enum to categorize documents (e.g., `USER_PROFILE`).
 - File size limits are configurable per entity type via environment variables: `STORAGE_MAX_SIZE_{ENTITY_TYPE}` (in MB).
-- Documents are linked to entities via `document_relations` collection — the relation is created by the calling module, not the storage module.
+- Documents are linked to entities via `document_relations` collection.
+- Use `uploadAndLinkDocument()` to upload and create relation in one call.
+- Use `deleteDocumentsByEntity()` to clean up all documents for an entity (e.g., when replacing avatar).
+
+### Error handling
+
+- All errors extend `AppError` from `@garagely/shared/error.types`.
+- Error handlers in `common/errors/` follow a consistent pattern:
+  - `is{X}Error(err)` — type guard to check error type
+  - `convert{X}Error(err)` — convert to `AppError` with proper code and message
+- Error codes are defined in `@garagely/shared/error.codes` with HTTP status mappings.
+- The `errorHandler` middleware catches all errors and converts them to JSON responses.
+- Async middleware must call `next(error)` instead of throwing — errors are not auto-caught in async Express handlers.
 
 ### API SDK usage pattern
 
