@@ -1,3 +1,4 @@
+import { AppError } from "@garagely/shared/error.types";
 import {
   ConflictError,
   ForbiddenError,
@@ -5,18 +6,28 @@ import {
   UnauthorizedError,
   ValidationError,
 } from "@garagely/shared/error.types";
-import type {
-  FirebaseAuthErrorCode,
-  FirebaseErrorMapping,
-} from "./firebase-error.types";
+
+/**
+ * Firebase error structure with code property
+ */
+export interface FirebaseError extends Error {
+  code: string;
+  codePrefix?: string;
+}
+
+/**
+ * Configuration for mapping a Firebase error code to an AppError
+ */
+interface FirebaseErrorMapping {
+  errorClass: new (message: string) => AppError;
+  message: string;
+}
 
 /**
  * Maps Firebase Auth error codes to AppError subclasses with user-friendly messages
+ * @see https://firebase.google.com/docs/auth/admin/errors
  */
-export const firebaseAuthErrorMappings: Record<
-  FirebaseAuthErrorCode,
-  FirebaseErrorMapping
-> = {
+const firebaseErrorMappings: Record<string, FirebaseErrorMapping> = {
   "auth/email-already-exists": {
     errorClass: ConflictError,
     message: "An account with this email already exists",
@@ -66,3 +77,21 @@ export const firebaseAuthErrorMappings: Record<
     message: "Too many requests. Please try again later",
   },
 };
+
+export function isFirebaseError(error: unknown): error is FirebaseError {
+  return (
+    error instanceof Error &&
+    "code" in error &&
+    typeof (error as FirebaseError).code === "string"
+  );
+}
+
+export function convertFirebaseError(error: FirebaseError): AppError | undefined {
+  const mapping = firebaseErrorMappings[error.code];
+
+  if (mapping) {
+    return new mapping.errorClass(mapping.message);
+  }
+
+  return undefined;
+}

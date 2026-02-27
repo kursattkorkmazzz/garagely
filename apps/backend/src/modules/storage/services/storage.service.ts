@@ -8,6 +8,9 @@ import type { IDocumentRepository } from "../repositories/document.repository.in
 import type { IDocumentRelationRepository } from "../repositories/document-relation.repository.interface";
 import { getStorageLimits } from "../config/storage.config";
 
+const useEmulator = process.env.FIREBASE_USE_EMULATOR === "true";
+const storageEmulatorHost = process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? "127.0.0.1:9199";
+
 export interface UploadedFile {
   buffer: Buffer;
   originalname: string;
@@ -47,8 +50,14 @@ export class StorageService {
       },
     });
 
-    await fileRef.makePublic();
-    const url = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+    let url: string;
+    if (useEmulator) {
+      const encodedPath = encodeURIComponent(storagePath);
+      url = `http://${storageEmulatorHost}/v0/b/${bucket.name}/o/${encodedPath}?alt=media`;
+    } else {
+      await fileRef.makePublic();
+      url = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+    }
 
     const document = await this.documentRepository.create({
       userId,
@@ -151,5 +160,37 @@ export class StorageService {
     }
 
     await this.documentRelationRepository.delete(id);
+  }
+
+  async deleteDocumentsByEntity(
+    entityId: string,
+    entityType: EntityType,
+    userId: string,
+  ): Promise<void> {
+    const relations = await this.documentRelationRepository.findByEntity(
+      entityId,
+      entityType,
+    );
+
+    for (const relation of relations) {
+      await this.deleteDocument(relation.documentId, userId);
+    }
+  }
+
+  async uploadAndLinkDocument(
+    userId: string,
+    file: UploadedFile,
+    payload: UploadDocumentPayload,
+    entityId: string,
+  ): Promise<DocumentModel> {
+    const document = await this.uploadDocument(userId, file, payload);
+
+    await this.documentRelationRepository.create({
+      documentId: document.id,
+      entityId,
+      entityType: payload.entityType,
+    });
+
+    return document;
   }
 }

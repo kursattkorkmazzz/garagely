@@ -18,6 +18,12 @@ export enum ErrorCode {
   EMAIL_ALREADY_EXISTS = 'EMAIL_ALREADY_EXISTS',
   TOKEN_EXPIRED = 'TOKEN_EXPIRED',
   TOKEN_INVALID = 'TOKEN_INVALID',
+
+  // File upload errors
+  FILE_TOO_LARGE = 'FILE_TOO_LARGE',
+  TOO_MANY_FILES = 'TOO_MANY_FILES',
+  INVALID_FILE_TYPE = 'INVALID_FILE_TYPE',
+  FILE_UPLOAD_ERROR = 'FILE_UPLOAD_ERROR',
 }
 
 export const ErrorCodeHttpStatus: Record<ErrorCode, number> = {
@@ -35,4 +41,8 @@ export const ErrorCodeHttpStatus: Record<ErrorCode, number> = {
   [ErrorCode.EMAIL_ALREADY_EXISTS]: 409,
   [ErrorCode.TOKEN_EXPIRED]: 401,
   [ErrorCode.TOKEN_INVALID]: 401,
+  [ErrorCode.FILE_TOO_LARGE]: 413,
+  [ErrorCode.TOO_MANY_FILES]: 400,
+  [ErrorCode.INVALID_FILE_TYPE]: 415,
+  [ErrorCode.FILE_UPLOAD_ERROR]: 400,
 };

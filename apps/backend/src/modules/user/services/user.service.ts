@@ -1,4 +1,6 @@
 import type { UserModel, UserWithPreferences } from '@garagely/shared/models/user';
+import type { DocumentModel } from '@garagely/shared/models/document';
+import { EntityType } from '@garagely/shared/models/entity-type';
 import type {
   CreateUserPayload,
   UpdateUserPayload,
@@ -9,11 +11,13 @@ import type {
   IUserRepository,
   IUserPreferencesRepository,
 } from '../repositories/user.repository.interface';
+import type { StorageService, UploadedFile } from '../../storage/services/storage.service';
 
 export class UserService {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly preferencesRepository: IUserPreferencesRepository
+    private readonly preferencesRepository: IUserPreferencesRepository,
+    private readonly storageService?: StorageService,
   ) {}
 
   async getUserById(id: string): Promise<UserModel> {
@@ -81,6 +85,58 @@ export class UserService {
       throw new NotFoundError('User not found');
     }
 
+    if (this.storageService) {
+      await this.storageService.deleteDocumentsByEntity(
+        id,
+        EntityType.USER_PROFILE,
+        id,
+      );
+    }
+
     await this.userRepository.delete(id);
+  }
+
+  async uploadAvatar(userId: string, file: UploadedFile): Promise<DocumentModel> {
+    if (!this.storageService) {
+      throw new Error('Storage service not configured');
+    }
+
+    await this.storageService.deleteDocumentsByEntity(
+      userId,
+      EntityType.USER_PROFILE,
+      userId,
+    );
+
+    return this.storageService.uploadAndLinkDocument(
+      userId,
+      file,
+      { entityType: EntityType.USER_PROFILE },
+      userId,
+    );
+  }
+
+  async getAvatar(userId: string): Promise<DocumentModel | null> {
+    if (!this.storageService) {
+      throw new Error('Storage service not configured');
+    }
+
+    const documents = await this.storageService.getDocumentsByEntity(
+      userId,
+      EntityType.USER_PROFILE,
+    );
+
+    return documents[0] ?? null;
+  }
+
+  async removeAvatar(userId: string): Promise<void> {
+    if (!this.storageService) {
+      throw new Error('Storage service not configured');
+    }
+
+    await this.storageService.deleteDocumentsByEntity(
+      userId,
+      EntityType.USER_PROFILE,
+      userId,
+    );
   }
 }

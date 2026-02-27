@@ -5,7 +5,9 @@ import { logger } from "../logger";
 import {
   isFirebaseError,
   convertFirebaseError,
-} from "../../providers/firebase";
+  isMulterError,
+  convertMulterError,
+} from "../errors";
 
 export function errorHandler(
   err: Error,
@@ -13,6 +15,13 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
+  // Handle Multer errors
+  if (isMulterError(err)) {
+    const appError = convertMulterError(err);
+    res.status(appError.statusCode).json(appError.toJSON());
+    return;
+  }
+
   // Handle Firebase errors globally
   if (isFirebaseError(err)) {
     const appError = convertFirebaseError(err);
