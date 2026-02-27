@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorCodeHttpStatus } from './error.codes';
+import { ErrorCode, ErrorCodeHttpStatus } from './error.codes.js';
 
 export interface AppErrorOptions {
   code: ErrorCode;

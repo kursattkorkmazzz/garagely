@@ -2,15 +2,39 @@
   "name": "@garagely/shared",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "exports": {
-    "./error.codes": "./src/error.codes.ts",
-    "./error.types": "./src/error.types.ts",
-    "./response.types": "./src/response.types.ts",
-    "./pagination.types": "./src/pagination.types.ts"
+    "./error.codes": {
+      "types": "./src/error.codes.ts",
+      "default": "./src/error.codes.ts"
+    },
+    "./error.types": {
+      "types": "./src/error.types.ts",
+      "default": "./src/error.types.ts"
+    },
+    "./response.types": {
+      "types": "./src/response.types.ts",
+      "default": "./src/response.types.ts"
+    },
+    "./pagination.types": {
+      "types": "./src/pagination.types.ts",
+      "default": "./src/pagination.types.ts"
+    },
+    "./models/user": {
+      "types": "./src/models/user.model.ts",
+      "default": "./src/models/user.model.ts"
+    },
+    "./payloads/user": {
+      "types": "./src/payloads/user.payload.ts",
+      "default": "./src/payloads/user.payload.ts"
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

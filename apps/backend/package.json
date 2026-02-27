@@ -10,9 +10,11 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@garagely/shared": "*",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "firebase-admin": "^13.0.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
