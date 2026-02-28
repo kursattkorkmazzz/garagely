@@ -59,6 +59,22 @@
     "./models/document-relation": {
       "types": "./src/models/document-relation/index.ts",
       "default": "./src/models/document-relation/index.ts"
+    },
+    "./models/unit-type": {
+      "types": "./src/models/unit-type/index.ts",
+      "default": "./src/models/unit-type/index.ts"
+    },
+    "./models/unit": {
+      "types": "./src/models/unit/index.ts",
+      "default": "./src/models/unit/index.ts"
+    },
+    "./models/currency": {
+      "types": "./src/models/currency/index.ts",
+      "default": "./src/models/currency/index.ts"
+    },
+    "./models/cost": {
+      "types": "./src/models/cost/index.ts",
+      "default": "./src/models/cost/index.ts"
     }
   },
   "scripts": {

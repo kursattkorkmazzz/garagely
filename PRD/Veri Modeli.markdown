@@ -231,7 +231,6 @@ erDiagram
     currency{
         string id PK
         string type "USD, TL etc"
-        boolean is_system
     }
 
     cost {
