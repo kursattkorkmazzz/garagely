@@ -1,3 +1,3 @@
-export function DesignSystem() {
+export default function DesignSystem() {
   return null;
 }
