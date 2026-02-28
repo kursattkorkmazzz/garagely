@@ -12,13 +12,17 @@ import { colors, Theme, ThemeType } from "./tokens/colors";
 // Context type
 export interface ThemeContextProps {
   theme: ThemeType;
+  themeName: Theme;
   changeTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 }
 
 // Default value for the context
 const ThemeContext = createContext<ThemeContextProps>({
   theme: colors.light,
+  themeName: "light",
   changeTheme: () => {},
+  toggleTheme: () => {},
 });
 
 // Theme Context Hook
@@ -35,20 +39,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // TODO: First load the theme from user_preferences, then fallback to system preference.
 
-  const [theme, setTheme] = useState<ThemeType>(
-    colorScheme === "dark" ? colors.dark : colors.light,
+  const [themeName, setThemeName] = useState<Theme>(
+    colorScheme === "dark" ? "dark" : "light",
   );
 
+  const theme = colors[themeName];
+
   useEffect(() => {
-    setTheme(colorScheme === "dark" ? colors.dark : colors.light);
+    setThemeName(colorScheme === "dark" ? "dark" : "light");
   }, [colorScheme]);
 
-  const changeTheme = (theme: Theme) => {
-    setTheme(colors[theme]);
+  const changeTheme = (newTheme: Theme) => {
+    setThemeName(newTheme);
+  };
+
+  const toggleTheme = () => {
+    setThemeName((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, changeTheme }}>
+    <ThemeContext.Provider value={{ theme, themeName, changeTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
