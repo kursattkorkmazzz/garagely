@@ -11,6 +11,7 @@ export default function App() {
       <Link href="/design-system/button">Button</Link>
       <Link href="/design-system/badge">Badge</Link>
       <Link href="/design-system/card">Card</Link>
+      <Link href="/design-system/toast">Toast</Link>
     </ScrollView>
   );
 }
