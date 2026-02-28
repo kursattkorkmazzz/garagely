@@ -14,6 +14,7 @@ export default function App() {
       <Link href="/design-system/toast">Toast</Link>
       <Link href="/design-system/switch">Switch</Link>
       <Link href="/design-system/spinner">Spinner</Link>
+      <Link href="/design-system/textarea">Textarea</Link>
     </ScrollView>
   );
 }
