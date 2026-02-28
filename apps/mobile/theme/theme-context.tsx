@@ -15,6 +15,7 @@ export interface ThemeContextProps {
   themeName: Theme;
   changeTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  withOpacity: (color: string, opacity: number) => string;
 }
 
 // Default value for the context
@@ -23,6 +24,9 @@ const ThemeContext = createContext<ThemeContextProps>({
   themeName: "light",
   changeTheme: () => {},
   toggleTheme: () => {},
+  withOpacity: () => {
+    return "";
+  },
 });
 
 // Theme Context Hook
@@ -57,8 +61,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setThemeName((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
+  const withOpacity = (color: string, opacity: number) => {
+    const opacityHex = Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return color + opacityHex;
+  };
   return (
-    <ThemeContext.Provider value={{ theme, themeName, changeTheme, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, themeName, changeTheme, toggleTheme, withOpacity }}
+    >
       {children}
     </ThemeContext.Provider>
   );

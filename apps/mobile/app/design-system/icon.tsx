@@ -3,9 +3,10 @@ import { AppText } from "@/components/ui/app-text";
 import { AppIcon } from "@/components/ui/app-icon";
 import { useTheme } from "@/theme/theme-context";
 import { spacing } from "@/theme/tokens/spacing";
+import { radius } from "@/theme/tokens/radius";
 
 export default function IconShowcase() {
-  const { theme } = useTheme();
+  const { theme, withOpacity } = useTheme();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -54,6 +55,58 @@ export default function IconShowcase() {
           <AppIcon icon="Circle" color={theme.color.cyan} />
           <AppIcon icon="Circle" color={theme.color.green} />
           <AppIcon icon="Circle" color={theme.color.purple} />
+        </View>
+      </View>
+
+      {/* Palette Colors With Background*/}
+      <View style={styles.section}>
+        <AppText variant="heading5">Palette Colors With Background</AppText>
+        <View style={styles.row}>
+          <AppIcon
+            icon="Circle"
+            color={theme.color.red}
+            style={{
+              backgroundColor: withOpacity(theme.color.red, 0.2),
+              borderRadius: radius,
+              padding: spacing.xs,
+            }}
+          />
+          <AppIcon
+            icon="Circle"
+            color={theme.color.orange}
+            style={{
+              backgroundColor: withOpacity(theme.color.orange, 0.2),
+              borderRadius: radius,
+              padding: spacing.xs,
+            }}
+          />
+          <AppIcon
+            icon="Circle"
+            color={theme.color.cyan}
+            style={{
+              backgroundColor: withOpacity(theme.color.cyan, 0.2),
+              borderRadius: radius,
+              padding: spacing.xs,
+            }}
+          />
+          <AppIcon
+            icon="Circle"
+            color={theme.color.green}
+            style={{
+              backgroundColor: withOpacity(theme.color.green, 0.2),
+              borderRadius: radius,
+              padding: spacing.xs,
+            }}
+          />
+          <AppIcon
+            icon="Circle"
+            color={theme.color.purple}
+            style={{
+              backgroundColor: withOpacity(theme.color.purple, 0.2),
+              borderRadius: radius,
+              padding: spacing.xs,
+            }}
+          />
         </View>
       </View>
 
