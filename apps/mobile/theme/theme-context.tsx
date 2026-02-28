@@ -4,12 +4,13 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  useMemo,
 } from "react";
-import { useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { colors, Theme, ThemeType } from "./tokens/colors";
 
 // Context type
-interface ThemeContextProps {
+export interface ThemeContextProps {
   theme: ThemeType;
   changeTheme: (theme: Theme) => void;
 }

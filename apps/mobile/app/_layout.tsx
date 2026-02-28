@@ -1,13 +1,20 @@
+import { ThemeProvider } from "@/theme/theme-context";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text } from "react-native";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function RootLayout() {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <SafeAreaView>
-      <Text>Hello World</Text>
-      <StatusBar animated />
-    </SafeAreaView>
+    <ThemeProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack>{children}</Stack>
+        <StatusBar animated />
+      </SafeAreaView>
+    </ThemeProvider>
   );
 }
