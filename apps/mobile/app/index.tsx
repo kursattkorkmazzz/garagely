@@ -1,14 +1,12 @@
-import { TypographyType, typography } from "@/theme/tokens/typography";
 import { Link } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
-
-const variants = Object.keys(typography) as TypographyType[];
 
 export default function App() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Link href="/design-system/typography">Typography</Link>
       <Link href="/design-system/input">Input</Link>
+      <Link href="/design-system/icon">Icon</Link>
     </ScrollView>
   );
 }
@@ -17,11 +15,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     gap: 12,
-  },
-  item: {
-    gap: 4,
-  },
-  preview: {
-    opacity: 0.8,
+    alignItems: "center",
+    columnGap: 16,
   },
 });
