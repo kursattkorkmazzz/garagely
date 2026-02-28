@@ -9,6 +9,7 @@ export default function App() {
       <Link href="/design-system/icon">Icon</Link>
       <Link href="/design-system/tabs">Tabs</Link>
       <Link href="/design-system/button">Button</Link>
+      <Link href="/design-system/badge">Badge</Link>
     </ScrollView>
   );
 }
