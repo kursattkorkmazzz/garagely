@@ -13,6 +13,7 @@ export default function App() {
       <Link href="/design-system/card">Card</Link>
       <Link href="/design-system/toast">Toast</Link>
       <Link href="/design-system/switch">Switch</Link>
+      <Link href="/design-system/spinner">Spinner</Link>
     </ScrollView>
   );
 }
