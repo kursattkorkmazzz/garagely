@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
     <ThemeProvider>
       <SafeAreaView style={{ flex: 1 }}>
-        <Stack>{children}</Stack>
+        <Stack screenOptions={{ headerShown: false }}>{children}</Stack>
         <StatusBar animated />
       </SafeAreaView>
     </ThemeProvider>

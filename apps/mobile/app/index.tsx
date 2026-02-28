@@ -1,21 +1,33 @@
 import { AppText } from "@/components/ui/app-text";
-import { Text, View } from "react-native";
+import { TypographyType, typography } from "@/theme/tokens/typography";
+import { ScrollView, StyleSheet, View } from "react-native";
+
+const variants = Object.keys(typography) as TypographyType[];
 
 export default function App() {
   return (
-    <View>
-      <AppText variant="heading1">Welcome to Garagely</AppText>
-      <AppText variant="bodyLarge">
-        This is a sample app to demonstrate the typography system.
-      </AppText>
-      <AppText variant="bodyMedium">
-        You can customize the font sizes using the typography tokens.
-      </AppText>
-      <AppText variant="bodySmall">
-        This is a smaller text for secondary information.
-      </AppText>
-
-      <AppText variant="kbd">CMD + A</AppText>
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      {variants.map((variant) => (
+        <View key={variant} style={styles.item}>
+          <AppText variant={variant}>{variant}</AppText>
+          <AppText variant={variant} style={styles.preview}>
+            The quick brown fox jumps over the lazy dog.
+          </AppText>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    gap: 12,
+  },
+  item: {
+    gap: 4,
+  },
+  preview: {
+    opacity: 0.8,
+  },
+});
