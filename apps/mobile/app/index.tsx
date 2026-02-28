@@ -8,6 +8,7 @@ export default function App() {
       <Link href="/design-system/input">Input</Link>
       <Link href="/design-system/icon">Icon</Link>
       <Link href="/design-system/tabs">Tabs</Link>
+      <Link href="/design-system/button">Button</Link>
     </ScrollView>
   );
 }
