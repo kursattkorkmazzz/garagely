@@ -17,6 +17,7 @@ export default function App() {
       <Link href="/design-system/textarea">Textarea</Link>
       <Link href="/design-system/avatar">Avatar</Link>
       <Link href="/design-system/skeleton">Skeleton</Link>
+      <Link href="/design-system/select">Select</Link>
     </ScrollView>
   );
 }
