@@ -1,0 +1,38 @@
+{
+  "tabs": {
+    "dashboard": "Panel",
+    "garage": "Garaj",
+    "alerts": "Bildirimler",
+    "profile": "Profil"
+  },
+  "buttons": {
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "submit": "Gönder",
+    "confirm": "Onayla",
+    "close": "Kapat",
+    "back": "Geri",
+    "next": "İleri",
+    "done": "Tamam",
+    "retry": "Tekrar Dene"
+  },
+  "labels": {
+    "email": "E-posta Adresi",
+    "password": "Şifre",
+    "fullName": "Ad Soyad",
+    "loading": "Yükleniyor..."
+  },
+  "errors": {
+    "generic": "Bir hata oluştu",
+    "network": "Ağ hatası. Lütfen tekrar deneyin.",
+    "required": "Bu alan zorunludur"
+  },
+  "dividers": {
+    "orContinueWith": "VEYA ŞUNUNLA DEVAM ET"
+  },
+  "toast": {
+    "comingSoon": "{{feature}} yakında"
+  }
+}

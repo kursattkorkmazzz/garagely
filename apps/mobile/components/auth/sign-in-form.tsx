@@ -17,6 +17,7 @@ import {
 import { appToast } from "@/components/ui/app-toast";
 import { useStore } from "@/stores";
 import { useTheme } from "@/theme/theme-context";
+import { useI18n } from "@/hooks/use-i18n";
 import { spacing } from "@/theme/tokens/spacing";
 import { useRouter } from "expo-router";
 
@@ -27,6 +28,7 @@ const initialValues: LoginPayload = {
 
 export function SignInForm() {
   const { theme } = useTheme();
+  const { t } = useI18n(["common", "auth"]);
   const router = useRouter();
   const { login, isLoading } = useStore((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +36,7 @@ export function SignInForm() {
   const handleSubmit = async (values: LoginPayload) => {
     await login(values, {
       onSuccess: () => {
-        appToast.success("Welcome back!");
+        appToast.success(t("auth:signIn.success"));
         router.replace("/(tabs)");
       },
       onError: (message) => {
@@ -62,14 +64,14 @@ export function SignInForm() {
             {/* Email */}
             <View style={styles.field}>
               <AppText style={styles.label} color="muted">
-                EMAIL ADDRESS
+                {t("common:labels.email").toUpperCase()}
               </AppText>
               <AppInput>
                 <InputLeftAction>
                   <Mail size={20} color={theme.mutedForeground} />
                 </InputLeftAction>
                 <InputField
-                  placeholder="john@example.com"
+                  placeholder={t("auth:placeholders.email")}
                   value={values.email}
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
@@ -88,14 +90,14 @@ export function SignInForm() {
             {/* Password */}
             <View style={styles.field}>
               <AppText style={styles.label} color="muted">
-                PASSWORD
+                {t("common:labels.password").toUpperCase()}
               </AppText>
               <AppInput>
                 <InputLeftAction>
                   <Lock size={20} color={theme.mutedForeground} />
                 </InputLeftAction>
                 <InputField
-                  placeholder="••••••••"
+                  placeholder={t("auth:placeholders.password")}
                   value={values.password}
                   onChangeText={handleChange("password")}
                   onBlur={handleBlur("password")}
@@ -121,7 +123,7 @@ export function SignInForm() {
 
             <Pressable style={styles.forgotPassword}>
               <AppText style={{ color: theme.primary, fontWeight: "500" }}>
-                Forgot Password?
+                {t("auth:signIn.forgotPassword")}
               </AppText>
             </Pressable>
           </View>
@@ -133,7 +135,7 @@ export function SignInForm() {
             size="lg"
             disabled={isLoading}
           >
-            {isLoading ? "SIGNING IN..." : "SIGN IN"}
+            {isLoading ? t("auth:signIn.buttonLoading") : t("auth:signIn.button")}
           </AppButton>
         </View>
       )}

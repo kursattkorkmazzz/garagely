@@ -18,6 +18,7 @@ import { AppCheckbox } from "@/components/ui/app-checkbox";
 import { appToast } from "@/components/ui/app-toast";
 import { useStore } from "@/stores";
 import { useTheme } from "@/theme/theme-context";
+import { useI18n } from "@/hooks/use-i18n";
 import { spacing } from "@/theme/tokens/spacing";
 import { useRouter } from "expo-router";
 
@@ -32,6 +33,7 @@ const initialValues: SignUpFormValues = {
 
 export function SignUpForm() {
   const { theme } = useTheme();
+  const { t } = useI18n(["common", "auth"]);
   const router = useRouter();
   const { register, isLoading } = useStore((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +42,7 @@ export function SignUpForm() {
     const { agreedToTerms, ...payload } = values;
     await register(payload, {
       onSuccess: () => {
-        appToast.success("Account created successfully!");
+        appToast.success(t("auth:signUp.success"));
         router.replace("/(tabs)");
       },
       onError: (message) => {
@@ -69,14 +71,14 @@ export function SignUpForm() {
             {/* Full Name */}
             <View style={styles.field}>
               <AppText style={styles.label} color="muted">
-                FULL NAME
+                {t("common:labels.fullName").toUpperCase()}
               </AppText>
               <AppInput>
                 <InputLeftAction>
                   <User size={20} color={theme.mutedForeground} />
                 </InputLeftAction>
                 <InputField
-                  placeholder="John Doe"
+                  placeholder={t("auth:placeholders.fullName")}
                   value={values.fullName}
                   onChangeText={handleChange("fullName")}
                   onBlur={handleBlur("fullName")}
@@ -93,14 +95,14 @@ export function SignUpForm() {
             {/* Email */}
             <View style={styles.field}>
               <AppText style={styles.label} color="muted">
-                EMAIL ADDRESS
+                {t("common:labels.email").toUpperCase()}
               </AppText>
               <AppInput>
                 <InputLeftAction>
                   <Mail size={20} color={theme.mutedForeground} />
                 </InputLeftAction>
                 <InputField
-                  placeholder="john@example.com"
+                  placeholder={t("auth:placeholders.email")}
                   value={values.email}
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
@@ -119,14 +121,14 @@ export function SignUpForm() {
             {/* Password */}
             <View style={styles.field}>
               <AppText style={styles.label} color="muted">
-                PASSWORD
+                {t("common:labels.password").toUpperCase()}
               </AppText>
               <AppInput>
                 <InputLeftAction>
                   <Lock size={20} color={theme.mutedForeground} />
                 </InputLeftAction>
                 <InputField
-                  placeholder="••••••••"
+                  placeholder={t("auth:placeholders.password")}
                   value={values.password}
                   onChangeText={handleChange("password")}
                   onBlur={handleBlur("password")}
@@ -157,15 +159,15 @@ export function SignUpForm() {
                 onChange={(checked) => setFieldValue("agreedToTerms", checked)}
               />
               <AppText style={styles.termsText}>
-                <AppText color="muted">I agree to the </AppText>
+                <AppText color="muted">{t("auth:signUp.terms.prefix")}</AppText>
                 <AppText style={{ color: theme.primary }}>
-                  Terms of Service
+                  {t("auth:signUp.terms.termsOfService")}
                 </AppText>
-                <AppText color="muted"> and </AppText>
+                <AppText color="muted">{t("auth:signUp.terms.and")}</AppText>
                 <AppText style={{ color: theme.primary }}>
-                  Privacy Policy
+                  {t("auth:signUp.terms.privacyPolicy")}
                 </AppText>
-                <AppText color="muted">.</AppText>
+                <AppText color="muted">{t("auth:signUp.terms.suffix")}</AppText>
               </AppText>
             </View>
           </View>
@@ -177,7 +179,7 @@ export function SignUpForm() {
             size="lg"
             disabled={isLoading || !values.agreedToTerms}
           >
-            {isLoading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+            {isLoading ? t("auth:signUp.buttonLoading") : t("auth:signUp.button")}
           </AppButton>
         </View>
       )}

@@ -1,0 +1,38 @@
+{
+  "tabs": {
+    "dashboard": "Dashboard",
+    "garage": "Garage",
+    "alerts": "Alerts",
+    "profile": "Profile"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "retry": "Retry"
+  },
+  "labels": {
+    "email": "Email Address",
+    "password": "Password",
+    "fullName": "Full Name",
+    "loading": "Loading..."
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Network error. Please try again.",
+    "required": "This field is required"
+  },
+  "dividers": {
+    "orContinueWith": "OR CONTINUE WITH"
+  },
+  "toast": {
+    "comingSoon": "{{feature}} coming soon"
+  }
+}

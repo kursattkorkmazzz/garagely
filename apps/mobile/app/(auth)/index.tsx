@@ -19,20 +19,22 @@ import {
 import { appToast } from "@/components/ui/app-toast";
 import { SignInForm, SignUpForm } from "@/components/auth";
 import { useTheme } from "@/theme/theme-context";
+import { useI18n } from "@/hooks/use-i18n";
 import { spacing } from "@/theme/tokens/spacing";
 import { radius } from "@/theme/tokens/radius";
 import { useState } from "react";
 
 export default function AuthScreen() {
   const { theme } = useTheme();
+  const { t } = useI18n(["common", "auth"]);
   const [tab, setTab] = useState("signin");
 
   const handleGoogleSignIn = () => {
-    appToast("Google Sign In coming soon");
+    appToast(t("common:toast.comingSoon", { feature: t("auth:social.google") }));
   };
 
   const handleAppleSignIn = () => {
-    appToast("Apple Sign In coming soon");
+    appToast(t("common:toast.comingSoon", { feature: t("auth:social.apple") }));
   };
 
   return (
@@ -63,14 +65,14 @@ export default function AuthScreen() {
           <AppTabContent value="signin">
             <View style={styles.header}>
               <AppText variant="heading2" style={styles.title}>
-                Welcome Back
+                {t("auth:signIn.title")}
               </AppText>
               <AppText
                 variant="bodyMedium"
                 color="muted"
                 style={styles.subtitle}
               >
-                Sign in to access your fleet and track performance.
+                {t("auth:signIn.subtitle")}
               </AppText>
             </View>
           </AppTabContent>
@@ -78,22 +80,22 @@ export default function AuthScreen() {
           <AppTabContent value="signup">
             <View style={styles.header}>
               <AppText variant="heading2" style={styles.title}>
-                Create Account
+                {t("auth:signUp.title")}
               </AppText>
               <AppText
                 variant="bodyMedium"
                 color="muted"
                 style={styles.subtitle}
               >
-                Manage your fleet and expenses with advanced real-time tracking.
+                {t("auth:signUp.subtitle")}
               </AppText>
             </View>
           </AppTabContent>
 
           {/* Tab Switcher */}
           <AppTabList style={styles.tabList}>
-            <AppTabTrigger value="signin">Sign In</AppTabTrigger>
-            <AppTabTrigger value="signup">Sign Up</AppTabTrigger>
+            <AppTabTrigger value="signin">{t("auth:signIn.tab")}</AppTabTrigger>
+            <AppTabTrigger value="signup">{t("auth:signUp.tab")}</AppTabTrigger>
           </AppTabList>
 
           {/* Forms */}
@@ -107,7 +109,7 @@ export default function AuthScreen() {
         </AppTabs>
 
         {/* Divider */}
-        <AppDivider text="OR CONTINUE WITH" />
+        <AppDivider text={t("common:dividers.orContinueWith")} />
 
         {/* Social Buttons */}
         <View style={styles.socialButtons}>
