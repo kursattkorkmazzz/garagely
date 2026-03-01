@@ -41,7 +41,7 @@ export function SignUpForm() {
     await register(payload, {
       onSuccess: () => {
         appToast.success("Account created successfully!");
-        router.replace("/design-system");
+        router.replace("/(tabs)");
       },
       onError: (message) => {
         appToast.error(message);

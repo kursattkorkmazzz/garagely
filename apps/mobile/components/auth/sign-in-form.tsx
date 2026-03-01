@@ -35,7 +35,7 @@ export function SignInForm() {
     await login(values, {
       onSuccess: () => {
         appToast.success("Welcome back!");
-        router.replace("/design-system");
+        router.replace("/(tabs)");
       },
       onError: (message) => {
         appToast.error(message);

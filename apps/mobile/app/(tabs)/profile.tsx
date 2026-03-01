@@ -1,27 +1,22 @@
 import { StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
 import { AppView } from "@/components/ui/app-view";
 import { useStore } from "@/stores";
 import { spacing } from "@/theme/tokens/spacing";
 
-export default function DashboardScreen() {
-  const router = useRouter();
+export default function ProfileScreen() {
   const user = useStore((state) => state.auth.user);
+  const logout = useStore((state) => state.auth.logout);
 
   return (
     <AppView style={styles.container}>
-      <AppText variant="heading2">Welcome, {user?.fullName}</AppText>
-      <AppText variant="bodyMedium" color="muted" style={styles.subtitle}>
-        Your dashboard overview
+      <AppText variant="heading2">{user?.fullName}</AppText>
+      <AppText variant="bodyMedium" color="muted" style={styles.email}>
+        {user?.email}
       </AppText>
-      <AppButton
-        variant="secondary"
-        onPress={() => router.push("/(tabs)/design-system")}
-        style={styles.button}
-      >
-        Design System
+      <AppButton variant="secondary" onPress={logout} style={styles.button}>
+        Logout
       </AppButton>
     </AppView>
   );
@@ -34,7 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  subtitle: {
+  email: {
     marginTop: spacing.xs,
   },
   button: {
