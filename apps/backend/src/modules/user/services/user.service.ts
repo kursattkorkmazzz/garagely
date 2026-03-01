@@ -27,7 +27,11 @@ export class UserService {
       throw new NotFoundError('User not found');
     }
 
-    return user;
+    const profilePhoto = this.storageService
+      ? await this.getAvatar(id)
+      : null;
+
+    return { ...user, profilePhoto };
   }
 
   async getUserWithPreferences(id: string): Promise<UserWithPreferences> {
@@ -37,7 +41,11 @@ export class UserService {
       throw new NotFoundError('User not found');
     }
 
-    return user;
+    const profilePhoto = this.storageService
+      ? await this.getAvatar(id)
+      : null;
+
+    return { ...user, profilePhoto };
   }
 
   async createUser(id: string, data: CreateUserPayload): Promise<UserModel> {
@@ -50,7 +58,7 @@ export class UserService {
     const user = await this.userRepository.create(id, data);
     await this.preferencesRepository.create(id);
 
-    return user;
+    return { ...user, profilePhoto: null };
   }
 
   async updateUser(id: string, data: UpdateUserPayload): Promise<UserModel> {
@@ -60,7 +68,12 @@ export class UserService {
       throw new NotFoundError('User not found');
     }
 
-    return this.userRepository.update(id, data);
+    const updatedUser = await this.userRepository.update(id, data);
+    const profilePhoto = this.storageService
+      ? await this.getAvatar(id)
+      : null;
+
+    return { ...updatedUser, profilePhoto };
   }
 
   async updateUserPreferences(

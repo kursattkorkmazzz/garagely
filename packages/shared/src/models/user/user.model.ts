@@ -3,12 +3,17 @@ import {
   userPreferencesModelValidator,
   type UserPreferencesModel,
 } from "../user-preferences/index";
+import {
+  documentModelValidator,
+  type DocumentModel,
+} from "../document/index";
 import { firestoreDate } from "../../validators/firestore-date";
 
 export const userModelValidator = yup.object({
   id: yup.string().required(),
   fullName: yup.string().min(2).max(100).required(),
   email: yup.string().email().required(),
+  profilePhoto: documentModelValidator.nullable().defined(),
   createdAt: firestoreDate().required(),
   updatedAt: firestoreDate().required(),
 });
@@ -23,4 +28,4 @@ export type UserWithPreferences = yup.InferType<
   typeof userWithPreferencesModelValidator
 >;
 
-export { UserPreferencesModel };
+export { UserPreferencesModel, DocumentModel };

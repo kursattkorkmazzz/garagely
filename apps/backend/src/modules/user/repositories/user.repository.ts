@@ -22,7 +22,7 @@ export class UserRepository implements IUserRepository {
       return null;
     }
 
-    return userModelValidator.cast({ id, ...doc.data() });
+    return userModelValidator.cast({ id, ...doc.data(), profilePhoto: null });
   }
 
   async findByIdWithPreferences(id: string): Promise<UserWithPreferences | null> {
@@ -60,7 +60,7 @@ export class UserRepository implements IUserRepository {
     }
 
     const doc = snapshot.docs[0];
-    return userModelValidator.cast({ id: doc.id, ...doc.data() });
+    return userModelValidator.cast({ id: doc.id, ...doc.data(), profilePhoto: null });
   }
 
   async create(id: string, data: CreateUserPayload): Promise<UserModel> {
@@ -74,7 +74,7 @@ export class UserRepository implements IUserRepository {
 
     await db.collection(USERS_COLLECTION).doc(id).set(userData);
 
-    return userModelValidator.cast({ id, ...userData });
+    return userModelValidator.cast({ id, ...userData, profilePhoto: null });
   }
 
   async update(id: string, data: UpdateUserPayload): Promise<UserModel> {

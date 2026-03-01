@@ -72,6 +72,14 @@ export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
   const { size, imageLoaded, setImageLoaded } = useAvatarContext();
   const avatarSize = sizeValues[size];
 
+  // Don't render image if src is empty or invalid
+  const isValidSrc =
+    typeof src === "string" ? src.trim().length > 0 : src != null;
+
+  if (!isValidSrc) {
+    return null;
+  }
+
   const imageSource = typeof src === "string" ? { uri: src } : src;
 
   return (
