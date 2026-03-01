@@ -29,9 +29,6 @@
     "network": "Network error. Please try again.",
     "required": "This field is required"
   },
-  "dividers": {
-    "orContinueWith": "OR CONTINUE WITH"
-  },
   "toast": {
     "comingSoon": "{{feature}} coming soon"
   }

@@ -30,7 +30,9 @@ export default function AuthScreen() {
   const [tab, setTab] = useState("signin");
 
   const handleGoogleSignIn = () => {
-    appToast(t("common:toast.comingSoon", { feature: t("auth:social.google") }));
+    appToast(
+      t("common:toast.comingSoon", { feature: t("auth:social.google") }),
+    );
   };
 
   const handleAppleSignIn = () => {
@@ -109,7 +111,7 @@ export default function AuthScreen() {
         </AppTabs>
 
         {/* Divider */}
-        <AppDivider text={t("common:dividers.orContinueWith")} />
+        <AppDivider text={t("auth:orContinueWith")} />
 
         {/* Social Buttons */}
         <View style={styles.socialButtons}>

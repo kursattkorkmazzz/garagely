@@ -29,9 +29,6 @@
     "network": "Ağ hatası. Lütfen tekrar deneyin.",
     "required": "Bu alan zorunludur"
   },
-  "dividers": {
-    "orContinueWith": "VEYA ŞUNUNLA DEVAM ET"
-  },
   "toast": {
     "comingSoon": "{{feature}} yakında"
   }
