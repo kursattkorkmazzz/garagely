@@ -24,23 +24,35 @@ function useTabsContext() {
 
 // AppTabs - Container component
 type AppTabsProps = ViewProps & {
-  defaultValue: string;
+  /** Initial value for uncontrolled mode */
+  defaultValue?: string;
   children: ReactNode;
+  /** Callback when active tab changes */
   onValueChange?: (value: string) => void;
+  /** Current value for controlled mode */
+  value?: string;
 };
 
 export function AppTabs({
   defaultValue,
   children,
   onValueChange,
+  value,
   style,
   ...rest
 }: AppTabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultValue);
+  const [internalTab, setInternalTab] = useState(defaultValue ?? "");
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    onValueChange?.(value);
+  // Controlled mode: value prop is provided
+  // Uncontrolled mode: use internal state
+  const isControlled = value !== undefined;
+  const activeTab = isControlled ? value : internalTab;
+
+  const handleTabChange = (_value: string) => {
+    if (!isControlled) {
+      setInternalTab(_value);
+    }
+    onValueChange?.(_value);
   };
 
   return (
