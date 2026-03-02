@@ -24,6 +24,10 @@ export enum ErrorCode {
   TOO_MANY_FILES = 'TOO_MANY_FILES',
   INVALID_FILE_TYPE = 'INVALID_FILE_TYPE',
   FILE_UPLOAD_ERROR = 'FILE_UPLOAD_ERROR',
+
+  // Network errors
+  REQUEST_TIMEOUT = 'REQUEST_TIMEOUT',
+  NETWORK_ERROR = 'NETWORK_ERROR',
 }
 
 export const ErrorCodeHttpStatus: Record<ErrorCode, number> = {
@@ -45,4 +49,6 @@ export const ErrorCodeHttpStatus: Record<ErrorCode, number> = {
   [ErrorCode.TOO_MANY_FILES]: 400,
   [ErrorCode.INVALID_FILE_TYPE]: 415,
   [ErrorCode.FILE_UPLOAD_ERROR]: 400,
+  [ErrorCode.REQUEST_TIMEOUT]: 408,
+  [ErrorCode.NETWORK_ERROR]: 0,
 };

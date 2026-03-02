@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { View, Image, StyleSheet, ImageSourcePropType } from "react-native";
 import { AppText } from "./app-text";
 import { useTheme } from "@/theme/theme-context";
@@ -72,6 +72,12 @@ export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
   const { size, imageLoaded, setImageLoaded } = useAvatarContext();
   const avatarSize = sizeValues[size];
 
+  // Reset imageLoaded state when src changes
+  const srcKey = typeof src === "string" ? src : "local";
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [srcKey, setImageLoaded]);
+
   // Don't render image if src is empty or invalid
   const isValidSrc =
     typeof src === "string" ? src.trim().length > 0 : src != null;
@@ -84,6 +90,7 @@ export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
 
   return (
     <Image
+      key={srcKey}
       source={imageSource}
       accessibilityLabel={alt}
       style={[

@@ -2,6 +2,8 @@ import type { ErrorCode } from "@garagely/shared/error.codes";
 
 export interface SdkConfig {
   baseUrl: string;
+  /** Request timeout in milliseconds. Default: 30000 (30 seconds) */
+  timeout?: number;
 }
 
 export interface SdkError {
@@ -21,5 +23,6 @@ export interface HttpClient {
   patch<T>(path: string, body?: unknown): Promise<T>;
   delete<T>(path: string): Promise<T>;
   postFormData<T>(path: string, formData: FormData): Promise<T>;
+  patchFormData<T>(path: string, formData: FormData): Promise<T>;
   setAuthToken(token: string | null): void;
 }

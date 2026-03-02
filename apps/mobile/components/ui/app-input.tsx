@@ -60,7 +60,12 @@ export function AppInput({ children, style, ...rest }: AppInputProps) {
 // InputField - The actual text input
 type InputFieldProps = TextInputProps;
 
-export function InputField({ style, onFocus, onBlur, ...rest }: InputFieldProps) {
+export function InputField({
+  style,
+  onFocus,
+  onBlur,
+  ...rest
+}: InputFieldProps) {
   const { theme } = useTheme();
   const { setIsFocused } = useInputContext();
 
@@ -70,6 +75,7 @@ export function InputField({ style, onFocus, onBlur, ...rest }: InputFieldProps)
       color: theme.foreground,
       fontSize: 16,
       paddingVertical: spacing.sm,
+      outline: "none",
     },
   });
 
@@ -95,7 +101,11 @@ type InputActionProps = ViewProps & {
   children: ReactNode;
 };
 
-export function InputLeftAction({ children, style, ...rest }: InputActionProps) {
+export function InputLeftAction({
+  children,
+  style,
+  ...rest
+}: InputActionProps) {
   const styles = StyleSheet.create({
     container: {
       marginRight: spacing.sm,
@@ -112,7 +122,11 @@ export function InputLeftAction({ children, style, ...rest }: InputActionProps) 
 }
 
 // InputRightAction - Container for right side content
-export function InputRightAction({ children, style, ...rest }: InputActionProps) {
+export function InputRightAction({
+  children,
+  style,
+  ...rest
+}: InputActionProps) {
   const styles = StyleSheet.create({
     container: {
       marginLeft: spacing.sm,

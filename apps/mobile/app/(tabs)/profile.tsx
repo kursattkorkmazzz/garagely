@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { ScrollView, View, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { useTheme } from "@/theme/theme-context";
 import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
@@ -12,6 +14,11 @@ import {
   AppAvatarFallback,
   AppAvatarBadge,
 } from "@/components/ui/app-avatar";
+import {
+  AppActionSheet,
+  ActionSheetOption,
+} from "@/components/ui/app-action-sheet";
+import { appToast } from "@/components/ui/app-toast";
 import { AppSettingsSection, AppSettingsItem } from "@/components/profile";
 import { spacing } from "@/theme/tokens/spacing";
 
@@ -20,15 +27,106 @@ export default function ProfileScreen() {
   const router = useRouter();
   const user = useStore((state) => state.auth.user);
   const logout = useStore((state) => state.auth.logout);
+  const { avatar, isUploadingAvatar, uploadAvatar, removeAvatar } = useStore(
+    (state) => state.user,
+  );
 
-  console.log(user);
+  useEffect(() => {
+    console.log("User is changed");
+    console.log(user);
+  }, [user]);
 
-  const handleEditAvatar = () => {
-    // TODO: Implement avatar edit
+  const [showActionSheet, setShowActionSheet] = useState(false);
+
+  const handleUploadAvatar = async (uri: string) => {
+    await uploadAvatar(uri, {
+      onSuccess: () => {
+        appToast.success("Photo updated");
+      },
+      onError: (message) => {
+        appToast.error(message);
+      },
+    });
   };
 
-  const handleSignOut = () => {
-    logout();
+  const pickImageFromCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      appToast.error("Camera permission is required to take a photo");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      await handleUploadAvatar(result.assets[0].uri);
+    }
+  };
+
+  const pickImageFromGallery = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      appToast.error("Gallery permission is required to select a photo");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      await handleUploadAvatar(result.assets[0].uri);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    await removeAvatar({
+      onSuccess: () => {
+        appToast.success("Photo removed");
+      },
+      onError: (message) => {
+        appToast.error(message);
+      },
+    });
+  };
+
+  const avatarOptions: ActionSheetOption[] = [
+    {
+      label: "Take Photo",
+      onPress: pickImageFromCamera,
+    },
+    {
+      label: "Choose from Gallery",
+      onPress: pickImageFromGallery,
+    },
+    ...(avatar
+      ? [
+          {
+            label: "Remove Photo",
+            onPress: handleRemoveAvatar,
+            destructive: true,
+          },
+        ]
+      : []),
+  ];
+
+  const handleEditAvatar = () => {
+    if (isUploadingAvatar) return;
+    setShowActionSheet(true);
+  };
+
+  const handleSignOut = async () => {
+    await logout();
     router.replace("/(auth)");
   };
 
@@ -40,13 +138,13 @@ export default function ProfileScreen() {
     >
       {/* Profile Header */}
       <View style={styles.header}>
-        <Pressable onPress={handleEditAvatar}>
+        <Pressable onPress={handleEditAvatar} disabled={isUploadingAvatar}>
           <AppAvatar size="xl">
-            <AppAvatarImage src="" alt={user?.fullName} />
+            <AppAvatarImage src={avatar?.url ?? ""} alt={user?.fullName} />
             <AppAvatarFallback fallbackText={user?.fullName} />
             <AppAvatarBadge>
               <AppIcon
-                icon="Pencil"
+                icon={isUploadingAvatar ? "Loader" : "Pencil"}
                 size={12}
                 color={theme.primaryForeground}
               />
@@ -176,7 +274,7 @@ export default function ProfileScreen() {
 
       {/* Sign Out */}
       <AppButton
-        variant="secondary"
+        variant="ghost"
         onPress={handleSignOut}
         style={styles.signOutButton}
       >
@@ -187,6 +285,14 @@ export default function ProfileScreen() {
           </AppText>
         </View>
       </AppButton>
+
+      {/* Avatar Action Sheet */}
+      <AppActionSheet
+        visible={showActionSheet}
+        onClose={() => setShowActionSheet(false)}
+        title="Profile Photo"
+        options={avatarOptions}
+      />
     </ScrollView>
   );
 }

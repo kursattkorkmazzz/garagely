@@ -1,6 +1,7 @@
 import type { RegisterPayload, LoginPayload } from "@garagely/shared/payloads/auth";
 import type { UserModel } from "@garagely/shared/models/user";
 import { auth } from "../../../providers/firebase";
+import { createToken } from "../../../common/utils/jwt.util";
 import { UserService } from "../../user/services/user.service";
 
 export interface AuthResult {
@@ -23,7 +24,7 @@ export class AuthService {
       fullName: data.fullName,
     });
 
-    const customToken = await auth.createCustomToken(firebaseUser.uid);
+    const customToken = createToken({ uid: firebaseUser.uid, email: data.email });
 
     return { user, customToken };
   }
@@ -32,13 +33,8 @@ export class AuthService {
     const firebaseUser = await auth.getUserByEmail(data.email);
 
     const user = await this.userService.getUserById(firebaseUser.uid);
-    const customToken = await auth.createCustomToken(firebaseUser.uid);
+    const customToken = createToken({ uid: firebaseUser.uid, email: user.email });
 
     return { user, customToken };
-  }
-
-  async verifyToken(idToken: string): Promise<UserModel> {
-    const decodedToken = await auth.verifyIdToken(idToken);
-    return this.userService.getUserById(decodedToken.uid);
   }
 }

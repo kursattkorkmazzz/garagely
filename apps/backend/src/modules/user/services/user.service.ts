@@ -1,17 +1,23 @@
-import type { UserModel, UserWithPreferences } from '@garagely/shared/models/user';
-import type { DocumentModel } from '@garagely/shared/models/document';
-import { EntityType } from '@garagely/shared/models/entity-type';
+import type {
+  UserModel,
+  UserWithPreferences,
+} from "@garagely/shared/models/user";
+import type { DocumentModel } from "@garagely/shared/models/document";
+import { EntityType } from "@garagely/shared/models/entity-type";
 import type {
   CreateUserPayload,
   UpdateUserPayload,
   UpdateUserPreferencesPayload,
-} from '@garagely/shared/payloads/user';
-import { NotFoundError, ConflictError } from '@garagely/shared/error.types';
+} from "@garagely/shared/payloads/user";
+import { NotFoundError, ConflictError } from "@garagely/shared/error.types";
 import type {
   IUserRepository,
   IUserPreferencesRepository,
-} from '../repositories/user.repository.interface';
-import type { StorageService, UploadedFile } from '../../storage/services/storage.service';
+} from "../repositories/user.repository.interface";
+import type {
+  StorageService,
+  UploadedFile,
+} from "../../storage/services/storage.service";
 
 export class UserService {
   constructor(
@@ -24,12 +30,10 @@ export class UserService {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
-    const profilePhoto = this.storageService
-      ? await this.getAvatar(id)
-      : null;
+    const profilePhoto = this.storageService ? await this.getAvatar(id) : null;
 
     return { ...user, profilePhoto };
   }
@@ -38,12 +42,10 @@ export class UserService {
     const user = await this.userRepository.findByIdWithPreferences(id);
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
-    const profilePhoto = this.storageService
-      ? await this.getAvatar(id)
-      : null;
+    const profilePhoto = this.storageService ? await this.getAvatar(id) : null;
 
     return { ...user, profilePhoto };
   }
@@ -52,7 +54,7 @@ export class UserService {
     const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (existingUser) {
-      throw new ConflictError('User with this email already exists');
+      throw new ConflictError("User with this email already exists");
     }
 
     const user = await this.userRepository.create(id, data);
@@ -65,25 +67,23 @@ export class UserService {
     const existingUser = await this.userRepository.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     const updatedUser = await this.userRepository.update(id, data);
-    const profilePhoto = this.storageService
-      ? await this.getAvatar(id)
-      : null;
+    const profilePhoto = this.storageService ? await this.getAvatar(id) : null;
 
     return { ...updatedUser, profilePhoto };
   }
 
   async updateUserPreferences(
     userId: string,
-    data: UpdateUserPreferencesPayload
+    data: UpdateUserPreferencesPayload,
   ): Promise<UserWithPreferences> {
     const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     await this.preferencesRepository.update(userId, data);
@@ -95,7 +95,7 @@ export class UserService {
     const existingUser = await this.userRepository.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     if (this.storageService) {
@@ -109,9 +109,12 @@ export class UserService {
     await this.userRepository.delete(id);
   }
 
-  async uploadAvatar(userId: string, file: UploadedFile): Promise<DocumentModel> {
+  async uploadAvatar(
+    userId: string,
+    file: UploadedFile,
+  ): Promise<DocumentModel> {
     if (!this.storageService) {
-      throw new Error('Storage service not configured');
+      throw new Error("Storage service not configured");
     }
 
     await this.storageService.deleteDocumentsByEntity(
@@ -130,7 +133,7 @@ export class UserService {
 
   async getAvatar(userId: string): Promise<DocumentModel | null> {
     if (!this.storageService) {
-      throw new Error('Storage service not configured');
+      throw new Error("Storage service not configured");
     }
 
     const documents = await this.storageService.getDocumentsByEntity(
@@ -143,7 +146,7 @@ export class UserService {
 
   async removeAvatar(userId: string): Promise<void> {
     if (!this.storageService) {
-      throw new Error('Storage service not configured');
+      throw new Error("Storage service not configured");
     }
 
     await this.storageService.deleteDocumentsByEntity(

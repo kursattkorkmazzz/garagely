@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "@garagely/shared/error.types";
-import { auth } from "../../providers/firebase/firebase.provider";
+import { verifyToken } from "../utils/jwt.util";
 
 declare global {
   namespace Express {
@@ -27,11 +27,11 @@ export async function authMiddleware(
 
     const token = authHeader.substring(7);
 
-    const decodedToken = await auth.verifyIdToken(token);
+    const decoded = verifyToken(token);
 
     req.user = {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
+      uid: decoded.uid,
+      email: decoded.email,
     };
 
     next();

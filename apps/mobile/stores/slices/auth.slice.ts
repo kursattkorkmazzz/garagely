@@ -1,7 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { LoginPayload, RegisterPayload } from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { SdkError } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
+
+const AUTH_TOKEN_KEY = "@garagely/auth_token";
 
 export interface AuthCallbacks {
   onSuccess?: () => void;
@@ -15,16 +18,42 @@ export interface AuthSlice {
   isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  isInitialized: boolean;
 
   // Actions
   login: (payload: LoginPayload, callbacks?: AuthCallbacks) => Promise<void>;
   register: (payload: RegisterPayload, callbacks?: AuthCallbacks) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  restoreSession: () => Promise<void>;
   clearError: () => void;
   setAuthToken: (token: string | null) => void;
 }
 
 type SetAuthState = (partial: Partial<AuthSlice>) => void;
+
+async function saveToken(token: string): Promise<void> {
+  try {
+    await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+async function clearToken(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+async function getStoredToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
 
 export const createAuthSlice = (set: SetAuthState): AuthSlice => ({
   // Initial state
@@ -33,13 +62,15 @@ export const createAuthSlice = (set: SetAuthState): AuthSlice => ({
   isLoading: false,
   error: null,
   isAuthenticated: false,
+  isInitialized: false,
 
   // Actions
   login: async (payload: LoginPayload, callbacks?: AuthCallbacks) => {
     set({ isLoading: true, error: null });
 
     await sdk.auth.login(payload, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        await saveToken(data.customToken);
         set({
           user: data.user,
           customToken: data.customToken,
@@ -64,7 +95,8 @@ export const createAuthSlice = (set: SetAuthState): AuthSlice => ({
     set({ isLoading: true, error: null });
 
     await sdk.auth.register(payload, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        await saveToken(data.customToken);
         set({
           user: data.user,
           customToken: data.customToken,
@@ -85,7 +117,8 @@ export const createAuthSlice = (set: SetAuthState): AuthSlice => ({
     });
   },
 
-  logout: () => {
+  logout: async () => {
+    await clearToken();
     set({
       user: null,
       customToken: null,
@@ -93,6 +126,34 @@ export const createAuthSlice = (set: SetAuthState): AuthSlice => ({
       error: null,
     });
     sdk.setAuthToken(null);
+  },
+
+  restoreSession: async () => {
+    const token = await getStoredToken();
+
+    if (!token) {
+      set({ isInitialized: true });
+      return;
+    }
+
+    sdk.setAuthToken(token);
+
+    await sdk.user.getMe({
+      onSuccess: (data) => {
+        set({
+          user: data,
+          customToken: token,
+          isAuthenticated: true,
+          isInitialized: true,
+        });
+      },
+      onError: async () => {
+        // Token is invalid or expired, clear it
+        await clearToken();
+        sdk.setAuthToken(null);
+        set({ isInitialized: true });
+      },
+    });
   },
 
   clearError: () => {
