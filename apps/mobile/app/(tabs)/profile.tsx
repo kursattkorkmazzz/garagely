@@ -21,7 +21,11 @@ import {
   ActionSheetOption,
 } from "@/components/ui/app-action-sheet";
 import { appToast } from "@/components/ui/app-toast";
-import { AppSettingsSection, AppSettingsItem } from "@/components/profile";
+import {
+  AppSettingsSection,
+  AppSettingsItem,
+  ChangePasswordModal,
+} from "@/components/profile";
 import { spacing } from "@/theme/tokens/spacing";
 
 export default function ProfileScreen() {
@@ -46,9 +50,14 @@ export default function ProfileScreen() {
   const [showDistanceUnitSheet, setShowDistanceUnitSheet] = useState(false);
   const [showVolumeUnitSheet, setShowVolumeUnitSheet] = useState(false);
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
-  const updatePreferences = useStore((state) => state.preferences.updatePreferences);
+  const updatePreferences = useStore(
+    (state) => state.preferences.updatePreferences,
+  );
   const setUser = useStore((state) => state.auth.setUser);
+  const changePassword = useStore((state) => state.auth.changePassword);
+  const isAuthLoading = useStore((state) => state.auth.isLoading);
 
   const handleUploadAvatar = async (uri: string) => {
     await uploadAvatar(uri, {
@@ -138,10 +147,12 @@ export default function ProfileScreen() {
   };
 
   // Language options
-  const languageOptions: ActionSheetOption[] = supportedLanguages.map((lang) => ({
-    label: lang.label,
-    onPress: () => changeLanguage(lang.code),
-  }));
+  const languageOptions: ActionSheetOption[] = supportedLanguages.map(
+    (lang) => ({
+      label: lang.label,
+      onPress: () => changeLanguage(lang.code),
+    }),
+  );
 
   const getCurrentLanguageLabel = () => {
     const lang = supportedLanguages.find((l) => l.code === language);
@@ -183,15 +194,17 @@ export default function ProfileScreen() {
     { id: "mi", label: t("profile.distanceUnits.mi") },
   ];
 
-  const distanceUnitOptions: ActionSheetOption[] = distanceUnits.map((unit) => ({
-    label: unit.label,
-    onPress: async () => {
-      await updatePreferences(
-        { preferredDistanceUnitId: unit.id },
-        { onSuccess: (updatedUser) => setUser(updatedUser) },
-      );
-    },
-  }));
+  const distanceUnitOptions: ActionSheetOption[] = distanceUnits.map(
+    (unit) => ({
+      label: unit.label,
+      onPress: async () => {
+        await updatePreferences(
+          { preferredDistanceUnitId: unit.id },
+          { onSuccess: (updatedUser) => setUser(updatedUser) },
+        );
+      },
+    }),
+  );
 
   const getCurrentDistanceUnitLabel = () => {
     const unitId = user?.preferences?.preferredDistanceUnitId;
@@ -243,6 +256,21 @@ export default function ProfileScreen() {
     const currencyId = user?.preferences?.preferredCurrencyId;
     const currency = currencies.find((c) => c.id === currencyId);
     return currency?.label || t("profile.currencies.usd");
+  };
+
+  const handleChangePassword = async (data: {
+    currentPassword: string;
+    newPassword: string;
+  }) => {
+    await changePassword(data, {
+      onSuccess: () => {
+        setShowChangePasswordModal(false);
+        appToast.success(t("toast.passwordChanged"));
+      },
+      onError: (message) => {
+        appToast.error(message);
+      },
+    });
   };
 
   const handleSignOut = async () => {
@@ -349,13 +377,6 @@ export default function ProfileScreen() {
           title={t("profile.settings.pushNotifications")}
           onPress={() => {}}
         />
-        <AppSettingsItem
-          icon="Mail"
-          iconColor="#10B981"
-          iconBackgroundColor={withOpacity("#10B981", 0.15)}
-          title={t("profile.settings.emailAlerts")}
-          onPress={() => {}}
-        />
       </AppSettingsSection>
 
       {/* Security */}
@@ -365,18 +386,7 @@ export default function ProfileScreen() {
           iconColor="#F97316"
           iconBackgroundColor={withOpacity("#F97316", 0.15)}
           title={t("profile.settings.changePassword")}
-          onPress={() => {}}
-        />
-        <AppSettingsItem
-          icon="Fingerprint"
-          iconColor="#06B6D4"
-          iconBackgroundColor={withOpacity("#06B6D4", 0.15)}
-          title={t("profile.settings.biometricAuth")}
-          accessory="switch"
-          switchValue={false}
-          onSwitchChange={() => {
-            console.log("Clicked");
-          }}
+          onPress={() => setShowChangePasswordModal(true)}
         />
       </AppSettingsSection>
 
@@ -476,6 +486,14 @@ export default function ProfileScreen() {
         onClose={() => setShowCurrencySheet(false)}
         title={t("profile.actionSheets.selectCurrency")}
         options={currencyOptions}
+      />
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        visible={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        onSubmit={handleChangePassword}
+        isLoading={isAuthLoading}
       />
     </ScrollView>
   );

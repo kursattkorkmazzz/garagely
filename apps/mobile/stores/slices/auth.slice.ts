@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { LoginPayload, RegisterPayload } from "@garagely/shared/payloads/auth";
+import type { LoginPayload, RegisterPayload, ChangePasswordPayload } from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { SdkError } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
@@ -25,6 +25,7 @@ export interface AuthSlice {
   register: (payload: RegisterPayload, callbacks?: AuthCallbacks) => Promise<void>;
   logout: () => Promise<void>;
   restoreSession: () => Promise<void>;
+  changePassword: (payload: ChangePasswordPayload, callbacks?: AuthCallbacks) => Promise<void>;
   clearError: () => void;
   setAuthToken: (token: string | null) => void;
   setUser: (user: UserWithPreferences) => void;
@@ -154,6 +155,27 @@ export const createAuthSlice = (set: SetAuthState, get: GetAuthState): AuthSlice
         await clearToken();
         sdk.setAuthToken(null);
         set({ isInitialized: true });
+      },
+    });
+  },
+
+  changePassword: async (payload: ChangePasswordPayload, callbacks?: AuthCallbacks) => {
+    set({ isLoading: true, error: null });
+
+    await sdk.auth.changePassword(payload, {
+      onSuccess: () => {
+        set({
+          isLoading: false,
+          error: null,
+        });
+        callbacks?.onSuccess?.();
+      },
+      onError: (err: SdkError) => {
+        set({
+          isLoading: false,
+          error: err.message,
+        });
+        callbacks?.onError?.(err.message);
       },
     });
   },

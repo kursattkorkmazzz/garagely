@@ -34,7 +34,8 @@
     "photoUpdated": "Fotoğraf güncellendi",
     "photoRemoved": "Fotoğraf kaldırıldı",
     "cameraPermissionRequired": "Fotoğraf çekmek için kamera izni gerekli",
-    "galleryPermissionRequired": "Fotoğraf seçmek için galeri izni gerekli"
+    "galleryPermissionRequired": "Fotoğraf seçmek için galeri izni gerekli",
+    "passwordChanged": "Şifre başarıyla değiştirildi"
   },
   "profile": {
     "fleetPlan": "FİLO PLANI",
@@ -56,9 +57,7 @@
       "volumeUnit": "Hacim Birimi",
       "currency": "Para Birimi",
       "pushNotifications": "Anlık Bildirimler",
-      "emailAlerts": "E-posta Uyarıları",
       "changePassword": "Şifre Değiştir",
-      "biometricAuth": "Biyometrik Kimlik",
       "privacyPolicy": "Gizlilik Politikası",
       "dataUsage": "Veri Kullanımı",
       "helpCenter": "Yardım Merkezi",
@@ -93,6 +92,24 @@
       "light": "Açık",
       "dark": "Koyu",
       "system": "Sistem"
+    },
+    "changePassword": {
+      "title": "Şifre Değiştir",
+      "currentPassword": "Mevcut Şifre",
+      "currentPasswordPlaceholder": "Mevcut şifrenizi girin",
+      "newPassword": "Yeni Şifre",
+      "newPasswordPlaceholder": "Yeni şifrenizi girin",
+      "confirmPassword": "Yeni Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Yeni şifrenizi tekrar girin",
+      "changeButton": "Şifreyi Değiştir",
+      "cancelButton": "İptal",
+      "errors": {
+        "currentPasswordRequired": "Mevcut şifre gerekli",
+        "newPasswordRequired": "Yeni şifre gerekli",
+        "confirmPasswordRequired": "Lütfen yeni şifrenizi onaylayın",
+        "passwordsMismatch": "Şifreler eşleşmiyor",
+        "passwordTooShort": "Şifre en az 8 karakter olmalı"
+      }
     }
   }
 }

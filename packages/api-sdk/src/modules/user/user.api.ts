@@ -33,9 +33,6 @@ export function createUserApi(client: HttpClient): UserApi {
     async getMe(callbacks?: SdkCallbacks<UserWithPreferences>): Promise<void> {
       try {
         const data = await client.get<UserWithPreferences>("/users/me");
-        console.log("Get Me");
-        console.log(data);
-
         callbacks?.onSuccess?.(data);
       } catch (error) {
         callbacks?.onError?.(error as SdkError);

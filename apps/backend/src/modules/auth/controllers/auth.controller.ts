@@ -14,4 +14,10 @@ export class AuthController {
     const result = await this.authService.login(req.body);
     sendSuccess(res, result);
   };
+
+  changePassword = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user!.uid;
+    await this.authService.changePassword(userId, req.body);
+    sendSuccess(res, { message: "Password changed successfully" });
+  };
 }

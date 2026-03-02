@@ -10,6 +10,7 @@ import { AppText } from "./app-text";
 import { useTheme } from "@/theme/theme-context";
 import { spacing } from "@/theme/tokens/spacing";
 import { radius } from "@/theme/tokens/radius";
+import { useI18n } from "@/hooks/use-i18n";
 
 export type ActionSheetOption = {
   label: string;
@@ -32,9 +33,12 @@ export function AppActionSheet({
   title,
   message,
   options,
-  cancelLabel = "Cancel",
+  cancelLabel,
 }: AppActionSheetProps) {
   const { theme, withOpacity } = useTheme();
+  const { t } = useI18n();
+
+  const _cancelLabel = cancelLabel || t("common:buttons.cancel");
 
   const handleOptionPress = (option: ActionSheetOption) => {
     onClose();
@@ -70,10 +74,7 @@ export function AppActionSheet({
                 {/* Header */}
                 {(title || message) && (
                   <View
-                    style={[
-                      styles.header,
-                      { borderBottomColor: theme.border },
-                    ]}
+                    style={[styles.header, { borderBottomColor: theme.border }]}
                   >
                     {title && (
                       <AppText
@@ -103,7 +104,9 @@ export function AppActionSheet({
                         borderBottomWidth: 1,
                         borderBottomColor: theme.border,
                       },
-                      pressed && { backgroundColor: withOpacity(theme.muted, 0.1) },
+                      pressed && {
+                        backgroundColor: withOpacity(theme.muted, 0.1),
+                      },
                     ]}
                   >
                     <AppText
@@ -132,7 +135,7 @@ export function AppActionSheet({
                   variant="bodyMedium"
                   style={[styles.cancelText, { color: theme.primary }]}
                 >
-                  {cancelLabel}
+                  {_cancelLabel}
                 </AppText>
               </Pressable>
             </View>

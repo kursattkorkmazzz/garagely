@@ -34,7 +34,8 @@
     "photoUpdated": "Photo updated",
     "photoRemoved": "Photo removed",
     "cameraPermissionRequired": "Camera permission is required to take a photo",
-    "galleryPermissionRequired": "Gallery permission is required to select a photo"
+    "galleryPermissionRequired": "Gallery permission is required to select a photo",
+    "passwordChanged": "Password changed successfully"
   },
   "profile": {
     "fleetPlan": "FLEET PLAN",
@@ -56,9 +57,7 @@
       "volumeUnit": "Volume Unit",
       "currency": "Currency",
       "pushNotifications": "Push Notifications",
-      "emailAlerts": "Email Alerts",
       "changePassword": "Change Password",
-      "biometricAuth": "Biometric Auth",
       "privacyPolicy": "Privacy Policy",
       "dataUsage": "Data Usage",
       "helpCenter": "Help Center",
@@ -93,6 +92,24 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "changeButton": "Change Password",
+      "cancelButton": "Cancel",
+      "errors": {
+        "currentPasswordRequired": "Current password is required",
+        "newPasswordRequired": "New password is required",
+        "confirmPasswordRequired": "Please confirm your new password",
+        "passwordsMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters"
+      }
     }
   }
 }
