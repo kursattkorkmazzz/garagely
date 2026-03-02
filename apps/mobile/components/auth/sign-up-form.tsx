@@ -21,6 +21,7 @@ import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
 import { spacing } from "@/theme/tokens/spacing";
 import { useRouter } from "expo-router";
+import { AppSpinner } from "../ui/app-spinner";
 
 type SignUpFormValues = RegisterPayload & { agreedToTerms: boolean };
 
@@ -179,7 +180,20 @@ export function SignUpForm() {
             size="lg"
             disabled={isLoading || !values.agreedToTerms}
           >
-            {isLoading ? t("auth:signUp.buttonLoading") : t("auth:signUp.button")}
+            {isLoading ? (
+              <>
+                <AppText
+                  style={{
+                    color: theme.primaryForeground,
+                  }}
+                >
+                  {t("auth:signUp.buttonLoading")}
+                </AppText>
+                <AppSpinner size="sm" color={theme.primaryForeground} />
+              </>
+            ) : (
+              t("auth:signUp.button")
+            )}
           </AppButton>
         </View>
       )}
@@ -219,5 +233,9 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginBottom: spacing.lg,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.sm,
   },
 });

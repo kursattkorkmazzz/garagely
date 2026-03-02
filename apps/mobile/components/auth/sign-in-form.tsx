@@ -20,6 +20,7 @@ import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
 import { spacing } from "@/theme/tokens/spacing";
 import { useRouter } from "expo-router";
+import { AppSpinner } from "../ui/app-spinner";
 
 const initialValues: LoginPayload = {
   email: "",
@@ -135,7 +136,20 @@ export function SignInForm() {
             size="lg"
             disabled={isLoading}
           >
-            {isLoading ? t("auth:signIn.buttonLoading") : t("auth:signIn.button")}
+            {isLoading ? (
+              <>
+                <AppText
+                  style={{
+                    color: theme.primaryForeground,
+                  }}
+                >
+                  {t("auth:signIn.buttonLoading")}
+                </AppText>
+                <AppSpinner size="sm" color={theme.primaryForeground} />
+              </>
+            ) : (
+              t("auth:signIn.button")
+            )}
           </AppButton>
         </View>
       )}
@@ -167,6 +181,10 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   submitButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.sm,
     marginBottom: spacing.lg,
   },
 });
