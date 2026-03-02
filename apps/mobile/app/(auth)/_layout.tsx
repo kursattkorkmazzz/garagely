@@ -35,7 +35,14 @@ export default function AuthLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: theme.background,
+        },
+      }}
+    >
       <Stack.Screen name="index" />
     </Stack>
   );

@@ -14,7 +14,12 @@ function RootLayoutInner() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
         <AppToastProvider>
-          <Stack screenOptions={{ headerShown: false }} />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: theme.background },
+            }}
+          />
           <StatusBar
             style={themeName === "dark" ? "light" : "dark"}
             animated
