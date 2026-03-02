@@ -3,7 +3,7 @@ import {
   View,
   Modal,
   StyleSheet,
-  TouchableWithoutFeedback,
+  Pressable,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -49,65 +49,68 @@ export function AppModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={handleBackdropPress}>
-        <View
-          style={[
-            styles.overlay,
-            { backgroundColor: withOpacity("#000000", 0.5) },
-          ]}
-        >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.keyboardView}
-          >
-            <TouchableWithoutFeedback>
-              <View
-                style={[
-                  styles.modalContainer,
-                  {
-                    backgroundColor: theme.card,
-                    borderColor: theme.border,
-                    marginBottom: insets.bottom + spacing.md,
-                  },
-                ]}
-              >
-                {/* Header */}
-                {(title || showCloseButton) && (
-                  <View
-                    style={[styles.header, { borderBottomColor: theme.border }]}
-                  >
-                    {title && (
-                      <AppText variant="heading4" style={styles.title}>
-                        {title}
-                      </AppText>
-                    )}
-                    {showCloseButton && (
-                      <AppButton
-                        variant="ghost"
-                        size="icon"
-                        onPress={onClose}
-                        style={styles.closeButton}
-                      >
-                        <AppIcon icon="X" size={20} color={theme.foreground} />
-                      </AppButton>
-                    )}
-                  </View>
-                )}
+      <View
+        style={[
+          styles.overlay,
+          { backgroundColor: withOpacity("#000000", 0.5) },
+        ]}
+      >
+        {/* Backdrop - catches taps outside the modal */}
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={handleBackdropPress}
+        />
 
-                {/* Content */}
-                <ScrollView
-                  style={styles.content}
-                  contentContainerStyle={styles.contentContainer}
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  {children}
-                </ScrollView>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardView}
+          pointerEvents="box-none"
+        >
+          <Pressable
+            style={[
+              styles.modalContainer,
+              {
+                backgroundColor: theme.card,
+                borderColor: theme.border,
+                marginBottom: insets.bottom + spacing.md,
+              },
+            ]}
+          >
+            {/* Header */}
+            {(title || showCloseButton) && (
+              <View
+                style={[styles.header, { borderBottomColor: theme.border }]}
+              >
+                {title && (
+                  <AppText variant="heading4" style={styles.title}>
+                    {title}
+                  </AppText>
+                )}
+                {showCloseButton && (
+                  <AppButton
+                    variant="ghost"
+                    size="icon"
+                    onPress={onClose}
+                    style={styles.closeButton}
+                  >
+                    <AppIcon icon="X" size={20} color={theme.foreground} />
+                  </AppButton>
+                )}
               </View>
-            </TouchableWithoutFeedback>
-          </KeyboardAvoidingView>
-        </View>
-      </TouchableWithoutFeedback>
+            )}
+
+            {/* Content */}
+            <ScrollView
+              style={styles.content}
+              contentContainerStyle={styles.contentContainer}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {children}
+            </ScrollView>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
