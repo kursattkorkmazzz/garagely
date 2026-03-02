@@ -1,0 +1,250 @@
+import type {
+  VehicleModel,
+  VehicleBrandModel,
+  VehicleModelModel,
+  VehicleTransmissionTypeModel,
+  VehicleBodyTypeModel,
+  VehicleFuelTypeModel,
+} from "@garagely/shared/models/vehicle";
+import type { DocumentModel } from "@garagely/shared/models/document";
+import type {
+  CreateVehiclePayload,
+  UpdateVehiclePayload,
+  CreateVehicleModelPayload,
+} from "@garagely/shared/payloads/vehicle";
+import type { HttpClient, SdkCallbacks, SdkError } from "../../types";
+
+export interface VehicleApi {
+  // Lookup methods
+  getBrands(callbacks?: SdkCallbacks<VehicleBrandModel[]>): Promise<void>;
+  getModelsByBrand(
+    brandId: string,
+    callbacks?: SdkCallbacks<VehicleModelModel[]>,
+  ): Promise<void>;
+  getTransmissionTypes(
+    callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
+  ): Promise<void>;
+  getBodyTypes(callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>): Promise<void>;
+  getFuelTypes(callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>): Promise<void>;
+
+  // User model creation
+  createModel(
+    payload: CreateVehicleModelPayload,
+    callbacks?: SdkCallbacks<VehicleModelModel>,
+  ): Promise<void>;
+
+  // Vehicle CRUD
+  getVehicles(callbacks?: SdkCallbacks<VehicleModel[]>): Promise<void>;
+  getVehicleById(
+    vehicleId: string,
+    callbacks?: SdkCallbacks<VehicleModel>,
+  ): Promise<void>;
+  createVehicle(
+    payload: CreateVehiclePayload,
+    callbacks?: SdkCallbacks<VehicleModel>,
+  ): Promise<void>;
+  updateVehicle(
+    vehicleId: string,
+    payload: UpdateVehiclePayload,
+    callbacks?: SdkCallbacks<VehicleModel>,
+  ): Promise<void>;
+  deleteVehicle(vehicleId: string, callbacks?: SdkCallbacks<void>): Promise<void>;
+
+  // Cover photo
+  uploadCover(
+    vehicleId: string,
+    file: File | Blob,
+    callbacks?: SdkCallbacks<DocumentModel>,
+  ): Promise<void>;
+  getCover(
+    vehicleId: string,
+    callbacks?: SdkCallbacks<DocumentModel | null>,
+  ): Promise<void>;
+  removeCover(vehicleId: string, callbacks?: SdkCallbacks<void>): Promise<void>;
+}
+
+export function createVehicleApi(client: HttpClient): VehicleApi {
+  return {
+    // Lookup methods
+    async getBrands(callbacks?: SdkCallbacks<VehicleBrandModel[]>): Promise<void> {
+      try {
+        const data = await client.get<VehicleBrandModel[]>("/vehicles/brands");
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getModelsByBrand(
+      brandId: string,
+      callbacks?: SdkCallbacks<VehicleModelModel[]>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<VehicleModelModel[]>(
+          `/vehicles/brands/${brandId}/models`,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getTransmissionTypes(
+      callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<VehicleTransmissionTypeModel[]>(
+          "/vehicles/transmission-types",
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getBodyTypes(
+      callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<VehicleBodyTypeModel[]>("/vehicles/body-types");
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getFuelTypes(
+      callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<VehicleFuelTypeModel[]>("/vehicles/fuel-types");
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    // User model creation
+    async createModel(
+      payload: CreateVehicleModelPayload,
+      callbacks?: SdkCallbacks<VehicleModelModel>,
+    ): Promise<void> {
+      try {
+        const data = await client.post<VehicleModelModel>(
+          "/vehicles/models",
+          payload,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    // Vehicle CRUD
+    async getVehicles(callbacks?: SdkCallbacks<VehicleModel[]>): Promise<void> {
+      try {
+        const data = await client.get<VehicleModel[]>("/vehicles");
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getVehicleById(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<VehicleModel>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<VehicleModel>(`/vehicles/${vehicleId}`);
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async createVehicle(
+      payload: CreateVehiclePayload,
+      callbacks?: SdkCallbacks<VehicleModel>,
+    ): Promise<void> {
+      try {
+        const data = await client.post<VehicleModel>("/vehicles", payload);
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async updateVehicle(
+      vehicleId: string,
+      payload: UpdateVehiclePayload,
+      callbacks?: SdkCallbacks<VehicleModel>,
+    ): Promise<void> {
+      try {
+        const data = await client.patch<VehicleModel>(
+          `/vehicles/${vehicleId}`,
+          payload,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async deleteVehicle(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<void>,
+    ): Promise<void> {
+      try {
+        await client.delete<void>(`/vehicles/${vehicleId}`);
+        callbacks?.onSuccess?.(undefined);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    // Cover photo
+    async uploadCover(
+      vehicleId: string,
+      file: File | Blob,
+      callbacks?: SdkCallbacks<DocumentModel>,
+    ): Promise<void> {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const data = await client.postFormData<DocumentModel>(
+          `/vehicles/${vehicleId}/cover`,
+          formData,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getCover(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<DocumentModel | null>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<DocumentModel | null>(
+          `/vehicles/${vehicleId}/cover`,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async removeCover(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<void>,
+    ): Promise<void> {
+      try {
+        await client.delete<void>(`/vehicles/${vehicleId}/cover`);
+        callbacks?.onSuccess?.(undefined);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+  };
+}

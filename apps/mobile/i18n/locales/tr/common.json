@@ -111,5 +111,47 @@
       }
     },
     "version": "Versiyon {{version}}"
+  },
+  "vehicles": {
+    "title": "Araçlarım",
+    "total": "TOPLAM: {{count}}",
+    "add": "Ekle",
+    "card": {
+      "modelYear": "MODEL YILI",
+      "mileage": "KİLOMETRE",
+      "costPerKm": "MALİYET/KM",
+      "lastService": "SON SERVİS",
+      "overdue": "GECİKMİŞ"
+    }
+  },
+  "garage": {
+    "title": "Garaj",
+    "selectVehicle": "Araç Seçin",
+    "sections": {
+      "vehicleManagement": "ARAÇ YÖNETİMİ",
+      "financial": "FİNANSAL",
+      "maintenance": "BAKIM",
+      "documents": "BELGELER"
+    },
+    "items": {
+      "vehicleDetails": "Araç Detayları",
+      "vehicleDetailsSubtitle": "Özellikler, VIN, Plaka",
+      "ownershipHistory": "Sahiplik Geçmişi",
+      "ownershipHistorySubtitle": "Önceki sahipler, kayıtlar",
+      "fuelRecords": "Yakıt Kayıtları",
+      "fuelRecordsSubtitle": "Tüketim takibi",
+      "taxTolls": "Vergi & Geçişler",
+      "taxTollsSubtitle": "Yıllık ödemeler",
+      "expenseReports": "Gider Raporları",
+      "expenseReportsSubtitle": "Aylık dökümler",
+      "serviceLog": "Servis Kaydı",
+      "serviceLogSubtitle": "Geçmiş bakımlar",
+      "upcomingTasks": "Yaklaşan Görevler",
+      "upcomingTasksSubtitle": "Planlı hatırlatmalar",
+      "insurancePolicy": "Sigorta Poliçesi",
+      "insurancePolicySubtitle": "{{days}} gün içinde sona eriyor",
+      "digitalVault": "Dijital Kasa",
+      "digitalVaultSubtitle": "Kılavuzlar, PDF dışa aktarımlar"
+    }
   }
 }

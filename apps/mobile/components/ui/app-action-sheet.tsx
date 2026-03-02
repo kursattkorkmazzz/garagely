@@ -1,5 +1,10 @@
 import React from "react";
-import { View, Modal, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Modal,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { AppText } from "./app-text";
 import { AppButton } from "./app-button";
 import { useTheme } from "@/theme/theme-context";

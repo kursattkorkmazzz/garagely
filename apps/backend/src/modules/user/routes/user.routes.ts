@@ -22,7 +22,7 @@ const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: getStorageLimits(EntityType.USER_PROFILE).maxFileSize,
+    fileSize: getStorageLimits(EntityType.USER_PROFILE).fileSize,
   },
 });
 

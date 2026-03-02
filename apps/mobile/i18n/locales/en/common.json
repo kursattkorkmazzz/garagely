@@ -111,5 +111,47 @@
       }
     },
     "version": "Version {{version}}"
+  },
+  "vehicles": {
+    "title": "My Vehicles",
+    "total": "TOTAL: {{count}}",
+    "add": "Add",
+    "card": {
+      "modelYear": "MODEL YEAR",
+      "mileage": "MILEAGE",
+      "costPerKm": "COST/KM",
+      "lastService": "LAST SERVICE",
+      "overdue": "OVERDUE"
+    }
+  },
+  "garage": {
+    "title": "Garage",
+    "selectVehicle": "Select Vehicle",
+    "sections": {
+      "vehicleManagement": "VEHICLE MANAGEMENT",
+      "financial": "FINANCIAL",
+      "maintenance": "MAINTENANCE",
+      "documents": "DOCUMENTS"
+    },
+    "items": {
+      "vehicleDetails": "Vehicle Details",
+      "vehicleDetailsSubtitle": "Specs, VIN, Plate",
+      "ownershipHistory": "Ownership History",
+      "ownershipHistorySubtitle": "Past owners, records",
+      "fuelRecords": "Fuel Records",
+      "fuelRecordsSubtitle": "Consumption tracking",
+      "taxTolls": "Tax & Tolls",
+      "taxTollsSubtitle": "Annual payments",
+      "expenseReports": "Expense Reports",
+      "expenseReportsSubtitle": "Monthly breakdowns",
+      "serviceLog": "Service Log",
+      "serviceLogSubtitle": "Past maintenance",
+      "upcomingTasks": "Upcoming Tasks",
+      "upcomingTasksSubtitle": "Scheduled reminders",
+      "insurancePolicy": "Insurance Policy",
+      "insurancePolicySubtitle": "Expires in {{days}} days",
+      "digitalVault": "Digital Vault",
+      "digitalVaultSubtitle": "Manuals, PDF exports"
+    }
   }
 }

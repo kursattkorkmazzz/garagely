@@ -75,6 +75,14 @@
     "./models/cost": {
       "types": "./src/models/cost/index.ts",
       "default": "./src/models/cost/index.ts"
+    },
+    "./models/vehicle": {
+      "types": "./src/models/vehicle/index.ts",
+      "default": "./src/models/vehicle/index.ts"
+    },
+    "./payloads/vehicle": {
+      "types": "./src/payloads/vehicle/index.ts",
+      "default": "./src/payloads/vehicle/index.ts"
     }
   },
   "scripts": {

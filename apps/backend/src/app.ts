@@ -5,6 +5,7 @@ import { logger } from "./common/logger/logger";
 import { authRouter } from "./modules/auth";
 import { userRouter } from "./modules/user";
 import { storageRouter } from "./modules/storage";
+import { vehicleRouter } from "./modules/vehicle";
 import { errorHandler } from "./common/middleware/error.middleware";
 import { httpLogger } from "./common/middleware/http-logger.middleware";
 
@@ -22,6 +23,7 @@ app.get("/health", (_req, res) => {
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/storage", storageRouter);
+app.use("/vehicles", vehicleRouter);
 
 app.use(errorHandler);
 

@@ -9,6 +9,7 @@ const MB = 1024 * 1024;
 
 const defaultLimits: Record<EntityType, StorageLimits> = {
   [EntityType.USER_PROFILE]: { fileSize: 10 * MB, files: 1 },
+  [EntityType.VEHICLE_COVER]: { fileSize: 15 * MB, files: 1 },
 };
 
 function parseEnvSize(envVar: string | undefined, defaultSize: number): number {
