@@ -11,16 +11,10 @@ import {
   uploadDocumentPayloadValidator,
 } from "@garagely/shared/payloads/storage";
 import { asyncHandler } from "../../../common/utils/async-handler.util";
-import { getMaxUploadSize } from "../config/storage.config";
+import { multerRestricton } from "../utils/multer";
+import { EntityType } from "@garagely/shared/models/entity-type";
 
 const router = Router();
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: getMaxUploadSize(),
-  },
-});
 
 const documentRepository = new DocumentRepository();
 const documentRelationRepository = new DocumentRelationRepository();
@@ -34,7 +28,7 @@ router.use(authMiddleware);
 
 router.post(
   "/upload",
-  upload.single("file"),
+  multerRestricton(EntityType.USER_PROFILE),
   validatePayload(uploadDocumentPayloadValidator),
   asyncHandler(storageController.upload),
 );

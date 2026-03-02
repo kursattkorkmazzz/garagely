@@ -1,13 +1,14 @@
 import { EntityType } from "@garagely/shared/models/entity-type";
 
-interface StorageLimits {
-  maxFileSize: number;
-}
+type StorageLimits = {
+  fileSize: number; // in bytes
+  files: number; // max number of files
+};
 
 const MB = 1024 * 1024;
 
 const defaultLimits: Record<EntityType, StorageLimits> = {
-  [EntityType.USER_PROFILE]: { maxFileSize: 10 * MB },
+  [EntityType.USER_PROFILE]: { fileSize: 10 * MB, files: 1 },
 };
 
 function parseEnvSize(envVar: string | undefined, defaultSize: number): number {
@@ -17,17 +18,17 @@ function parseEnvSize(envVar: string | undefined, defaultSize: number): number {
 }
 
 export function getStorageLimits(entityType: EntityType): StorageLimits {
-  const envKey = `STORAGE_MAX_SIZE_${entityType.toUpperCase()}`;
-  const envValue = process.env[envKey];
+  const sizeEnvKey = `STORAGE_MAX_SIZE_${entityType.toUpperCase()}`;
+  const fileCountEnvKey = `STORAGE_MAX_FILE_COUNT_${entityType.toUpperCase()}`;
+  const envValue = process.env[sizeEnvKey];
+  const fileCountEnvValue = process.env[fileCountEnvKey];
 
   return {
-    maxFileSize: parseEnvSize(envValue, defaultLimits[entityType].maxFileSize),
+    fileSize: parseEnvSize(envValue, defaultLimits[entityType].fileSize),
+    files: parseEnvSize(fileCountEnvValue, defaultLimits[entityType].files),
   };
 }
 
-export function getMaxUploadSize(): number {
-  const allLimits = Object.values(EntityType).map(
-    (type) => getStorageLimits(type).maxFileSize,
-  );
-  return Math.max(...allLimits);
+export function getFileUploadLimit(entityType: EntityType): StorageLimits {
+  return defaultLimits[entityType];
 }
