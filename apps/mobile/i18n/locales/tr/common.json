@@ -30,6 +30,49 @@
     "required": "Bu alan zorunludur"
   },
   "toast": {
-    "comingSoon": "{{feature}} yakında"
+    "comingSoon": "{{feature}} yakında",
+    "photoUpdated": "Fotoğraf güncellendi",
+    "photoRemoved": "Fotoğraf kaldırıldı",
+    "cameraPermissionRequired": "Fotoğraf çekmek için kamera izni gerekli",
+    "galleryPermissionRequired": "Fotoğraf seçmek için galeri izni gerekli"
+  },
+  "profile": {
+    "fleetPlan": "FİLO PLANI",
+    "signOut": "ÇIKIŞ YAP",
+    "sections": {
+      "subscription": "ABONELİK",
+      "appSettings": "UYGULAMA AYARLARI",
+      "notifications": "BİLDİRİMLER",
+      "security": "GÜVENLİK",
+      "dataPrivacy": "VERİ VE GİZLİLİK",
+      "support": "DESTEK"
+    },
+    "settings": {
+      "managePlan": "Planı Yönet",
+      "nextBilling": "Sonraki fatura: {{date}}",
+      "language": "Dil",
+      "appearance": "Görünüm",
+      "pushNotifications": "Anlık Bildirimler",
+      "emailAlerts": "E-posta Uyarıları",
+      "changePassword": "Şifre Değiştir",
+      "biometricAuth": "Biyometrik Kimlik",
+      "privacyPolicy": "Gizlilik Politikası",
+      "dataUsage": "Veri Kullanımı",
+      "helpCenter": "Yardım Merkezi",
+      "contactSupport": "Destek ile İletişim"
+    },
+    "actionSheets": {
+      "profilePhoto": "Profil Fotoğrafı",
+      "takePhoto": "Fotoğraf Çek",
+      "chooseFromGallery": "Galeriden Seç",
+      "removePhoto": "Fotoğrafı Kaldır",
+      "selectLanguage": "Dil Seçin",
+      "selectTheme": "Tema Seçin"
+    },
+    "theme": {
+      "light": "Açık",
+      "dark": "Koyu",
+      "system": "Sistem"
+    }
   }
 }

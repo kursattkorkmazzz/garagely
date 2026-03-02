@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useTheme } from "@/theme/theme-context";
 import { useI18nContext } from "@/context/i18n-context";
+import { useI18n } from "@/hooks/use-i18n";
 import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
@@ -26,6 +27,7 @@ import { spacing } from "@/theme/tokens/spacing";
 export default function ProfileScreen() {
   const { theme, withOpacity, themePreference, changeTheme } = useTheme();
   const { language, changeLanguage, supportedLanguages } = useI18nContext();
+  const { t } = useI18n();
   const router = useRouter();
   const user = useStore((state) => state.auth.user);
   const logout = useStore((state) => state.auth.logout);
@@ -45,7 +47,7 @@ export default function ProfileScreen() {
   const handleUploadAvatar = async (uri: string) => {
     await uploadAvatar(uri, {
       onSuccess: () => {
-        appToast.success("Photo updated");
+        appToast.success(t("toast.photoUpdated"));
       },
       onError: (message) => {
         appToast.error(message);
@@ -57,7 +59,7 @@ export default function ProfileScreen() {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
     if (!permissionResult.granted) {
-      appToast.error("Camera permission is required to take a photo");
+      appToast.error(t("toast.cameraPermissionRequired"));
       return;
     }
 
@@ -77,7 +79,7 @@ export default function ProfileScreen() {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
-      appToast.error("Gallery permission is required to select a photo");
+      appToast.error(t("toast.galleryPermissionRequired"));
       return;
     }
 
@@ -96,7 +98,7 @@ export default function ProfileScreen() {
   const handleRemoveAvatar = async () => {
     await removeAvatar({
       onSuccess: () => {
-        appToast.success("Photo removed");
+        appToast.success(t("toast.photoRemoved"));
       },
       onError: (message) => {
         appToast.error(message);
@@ -106,17 +108,17 @@ export default function ProfileScreen() {
 
   const avatarOptions: ActionSheetOption[] = [
     {
-      label: "Take Photo",
+      label: t("profile.actionSheets.takePhoto"),
       onPress: pickImageFromCamera,
     },
     {
-      label: "Choose from Gallery",
+      label: t("profile.actionSheets.chooseFromGallery"),
       onPress: pickImageFromGallery,
     },
     ...(avatar
       ? [
           {
-            label: "Remove Photo",
+            label: t("profile.actionSheets.removePhoto"),
             onPress: handleRemoveAvatar,
             destructive: true,
           },
@@ -143,15 +145,15 @@ export default function ProfileScreen() {
   // Theme options
   const themeOptions: ActionSheetOption[] = [
     {
-      label: "Light",
+      label: t("profile.theme.light"),
       onPress: () => changeTheme("light"),
     },
     {
-      label: "Dark",
+      label: t("profile.theme.dark"),
       onPress: () => changeTheme("dark"),
     },
     {
-      label: "System",
+      label: t("profile.theme.system"),
       onPress: () => changeTheme("system"),
     },
   ];
@@ -159,13 +161,13 @@ export default function ProfileScreen() {
   const getCurrentThemeLabel = () => {
     switch (themePreference) {
       case "light":
-        return "Light";
+        return t("profile.theme.light");
       case "dark":
-        return "Dark";
+        return t("profile.theme.dark");
       case "system":
-        return "System";
+        return t("profile.theme.system");
       default:
-        return "System";
+        return t("profile.theme.system");
     }
   };
 
@@ -204,29 +206,29 @@ export default function ProfileScreen() {
         </AppText>
 
         <AppBadge variant="default" style={styles.badge}>
-          FLEET PLAN
+          {t("profile.fleetPlan")}
         </AppBadge>
       </View>
 
       {/* Subscription */}
-      <AppSettingsSection title="SUBSCRIPTION">
+      <AppSettingsSection title={t("profile.sections.subscription")}>
         <AppSettingsItem
           icon="Star"
           iconColor="#F59E0B"
           iconBackgroundColor={withOpacity("#F59E0B", 0.15)}
-          title="Manage Plan"
-          subtitle="Next billing on Nov 12, 2023"
+          title={t("profile.settings.managePlan")}
+          subtitle={t("profile.settings.nextBilling", { date: "Nov 12, 2023" })}
           onPress={() => {}}
         />
       </AppSettingsSection>
 
       {/* App Settings */}
-      <AppSettingsSection title="APP SETTINGS">
+      <AppSettingsSection title={t("profile.sections.appSettings")}>
         <AppSettingsItem
           icon="Globe"
           iconColor="#3B82F6"
           iconBackgroundColor={withOpacity("#3B82F6", 0.15)}
-          title="Language"
+          title={t("profile.settings.language")}
           value={getCurrentLanguageLabel()}
           onPress={() => setShowLanguageSheet(true)}
         />
@@ -234,44 +236,44 @@ export default function ProfileScreen() {
           icon="Moon"
           iconColor="#8B5CF6"
           iconBackgroundColor={withOpacity("#8B5CF6", 0.15)}
-          title="Appearance"
+          title={t("profile.settings.appearance")}
           value={getCurrentThemeLabel()}
           onPress={() => setShowThemeSheet(true)}
         />
       </AppSettingsSection>
 
       {/* Notifications */}
-      <AppSettingsSection title="NOTIFICATIONS">
+      <AppSettingsSection title={t("profile.sections.notifications")}>
         <AppSettingsItem
           icon="Bell"
           iconColor="#EF4444"
           iconBackgroundColor={withOpacity("#EF4444", 0.15)}
-          title="Push Notifications"
+          title={t("profile.settings.pushNotifications")}
           onPress={() => {}}
         />
         <AppSettingsItem
           icon="Mail"
           iconColor="#10B981"
           iconBackgroundColor={withOpacity("#10B981", 0.15)}
-          title="Email Alerts"
+          title={t("profile.settings.emailAlerts")}
           onPress={() => {}}
         />
       </AppSettingsSection>
 
       {/* Security */}
-      <AppSettingsSection title="SECURITY">
+      <AppSettingsSection title={t("profile.sections.security")}>
         <AppSettingsItem
           icon="KeyRound"
           iconColor="#F97316"
           iconBackgroundColor={withOpacity("#F97316", 0.15)}
-          title="Change Password"
+          title={t("profile.settings.changePassword")}
           onPress={() => {}}
         />
         <AppSettingsItem
           icon="Fingerprint"
           iconColor="#06B6D4"
           iconBackgroundColor={withOpacity("#06B6D4", 0.15)}
-          title="Biometric Auth"
+          title={t("profile.settings.biometricAuth")}
           accessory="switch"
           switchValue={false}
           onSwitchChange={() => {
@@ -281,37 +283,37 @@ export default function ProfileScreen() {
       </AppSettingsSection>
 
       {/* Data & Privacy */}
-      <AppSettingsSection title="DATA & PRIVACY">
+      <AppSettingsSection title={t("profile.sections.dataPrivacy")}>
         <AppSettingsItem
           icon="Shield"
           iconColor="#6366F1"
           iconBackgroundColor={withOpacity("#6366F1", 0.15)}
-          title="Privacy Policy"
+          title={t("profile.settings.privacyPolicy")}
           onPress={() => {}}
         />
         <AppSettingsItem
           icon="BarChart3"
           iconColor="#EC4899"
           iconBackgroundColor={withOpacity("#EC4899", 0.15)}
-          title="Data Usage"
+          title={t("profile.settings.dataUsage")}
           onPress={() => {}}
         />
       </AppSettingsSection>
 
       {/* Support */}
-      <AppSettingsSection title="SUPPORT">
+      <AppSettingsSection title={t("profile.sections.support")}>
         <AppSettingsItem
           icon="CircleHelp"
           iconColor="#3B82F6"
           iconBackgroundColor={withOpacity("#3B82F6", 0.15)}
-          title="Help Center"
+          title={t("profile.settings.helpCenter")}
           onPress={() => {}}
         />
         <AppSettingsItem
           icon="MessageSquare"
           iconColor="#3B82F6"
           iconBackgroundColor={withOpacity("#3B82F6", 0.15)}
-          title="Contact Support"
+          title={t("profile.settings.contactSupport")}
           onPress={() => {}}
         />
       </AppSettingsSection>
@@ -325,7 +327,7 @@ export default function ProfileScreen() {
         <View style={styles.signOutContent}>
           <AppIcon icon="LogOut" size={18} color={theme.destructive} />
           <AppText style={{ color: theme.destructive, fontWeight: "600" }}>
-            SIGN OUT
+            {t("profile.signOut")}
           </AppText>
         </View>
       </AppButton>
@@ -334,7 +336,7 @@ export default function ProfileScreen() {
       <AppActionSheet
         visible={showActionSheet}
         onClose={() => setShowActionSheet(false)}
-        title="Profile Photo"
+        title={t("profile.actionSheets.profilePhoto")}
         options={avatarOptions}
       />
 
@@ -342,7 +344,7 @@ export default function ProfileScreen() {
       <AppActionSheet
         visible={showLanguageSheet}
         onClose={() => setShowLanguageSheet(false)}
-        title="Select Language"
+        title={t("profile.actionSheets.selectLanguage")}
         options={languageOptions}
       />
 
@@ -350,7 +352,7 @@ export default function ProfileScreen() {
       <AppActionSheet
         visible={showThemeSheet}
         onClose={() => setShowThemeSheet(false)}
-        title="Select Theme"
+        title={t("profile.actionSheets.selectTheme")}
         options={themeOptions}
       />
     </ScrollView>
