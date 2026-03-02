@@ -1,18 +1,25 @@
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/theme/theme-context";
+import { useI18n } from "@/hooks/use-i18n";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
-import { AppView } from "@/components/ui/app-view";
-import { useStore } from "@/stores";
+import { AppHeader } from "@/components/ui/app-header";
 import { spacing } from "@/theme/tokens/spacing";
 
 export default function DashboardScreen() {
+  const { theme } = useTheme();
+  const { t } = useI18n();
   const router = useRouter();
-  const user = useStore((state) => state.auth.user);
 
   return (
-    <AppView style={styles.container}>
-      <AppText variant="heading2">Welcome, {user?.fullName}</AppText>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <AppHeader title={t("common:tabs.dashboard")} />
+
       <AppText variant="bodyMedium" color="muted" style={styles.subtitle}>
         Your dashboard overview
       </AppText>
@@ -23,16 +30,17 @@ export default function DashboardScreen() {
       >
         Design System
       </AppButton>
-    </AppView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
     padding: spacing.lg,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingBottom: spacing.xl * 2,
   },
   subtitle: {
     marginTop: spacing.xs,
