@@ -3,6 +3,7 @@ import { ScrollView, View, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useTheme } from "@/theme/theme-context";
+import { useI18nContext } from "@/context/i18n-context";
 import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
@@ -23,7 +24,8 @@ import { AppSettingsSection, AppSettingsItem } from "@/components/profile";
 import { spacing } from "@/theme/tokens/spacing";
 
 export default function ProfileScreen() {
-  const { theme, withOpacity } = useTheme();
+  const { theme, withOpacity, themePreference, changeTheme } = useTheme();
+  const { language, changeLanguage, supportedLanguages } = useI18nContext();
   const router = useRouter();
   const user = useStore((state) => state.auth.user);
   const logout = useStore((state) => state.auth.logout);
@@ -37,6 +39,8 @@ export default function ProfileScreen() {
   }, [user]);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  const [showThemeSheet, setShowThemeSheet] = useState(false);
 
   const handleUploadAvatar = async (uri: string) => {
     await uploadAvatar(uri, {
@@ -125,6 +129,46 @@ export default function ProfileScreen() {
     setShowActionSheet(true);
   };
 
+  // Language options
+  const languageOptions: ActionSheetOption[] = supportedLanguages.map((lang) => ({
+    label: lang.label,
+    onPress: () => changeLanguage(lang.code),
+  }));
+
+  const getCurrentLanguageLabel = () => {
+    const lang = supportedLanguages.find((l) => l.code === language);
+    return lang?.label || "English";
+  };
+
+  // Theme options
+  const themeOptions: ActionSheetOption[] = [
+    {
+      label: "Light",
+      onPress: () => changeTheme("light"),
+    },
+    {
+      label: "Dark",
+      onPress: () => changeTheme("dark"),
+    },
+    {
+      label: "System",
+      onPress: () => changeTheme("system"),
+    },
+  ];
+
+  const getCurrentThemeLabel = () => {
+    switch (themePreference) {
+      case "light":
+        return "Light";
+      case "dark":
+        return "Dark";
+      case "system":
+        return "System";
+      default:
+        return "System";
+    }
+  };
+
   const handleSignOut = async () => {
     await logout();
     router.replace("/(auth)");
@@ -183,16 +227,16 @@ export default function ProfileScreen() {
           iconColor="#3B82F6"
           iconBackgroundColor={withOpacity("#3B82F6", 0.15)}
           title="Language"
-          value="English (US)"
-          onPress={() => {}}
+          value={getCurrentLanguageLabel()}
+          onPress={() => setShowLanguageSheet(true)}
         />
         <AppSettingsItem
           icon="Moon"
           iconColor="#8B5CF6"
           iconBackgroundColor={withOpacity("#8B5CF6", 0.15)}
           title="Appearance"
-          value="System"
-          onPress={() => {}}
+          value={getCurrentThemeLabel()}
+          onPress={() => setShowThemeSheet(true)}
         />
       </AppSettingsSection>
 
@@ -292,6 +336,22 @@ export default function ProfileScreen() {
         onClose={() => setShowActionSheet(false)}
         title="Profile Photo"
         options={avatarOptions}
+      />
+
+      {/* Language Action Sheet */}
+      <AppActionSheet
+        visible={showLanguageSheet}
+        onClose={() => setShowLanguageSheet(false)}
+        title="Select Language"
+        options={languageOptions}
+      />
+
+      {/* Theme Action Sheet */}
+      <AppActionSheet
+        visible={showThemeSheet}
+        onClose={() => setShowThemeSheet(false)}
+        title="Select Theme"
+        options={themeOptions}
       />
     </ScrollView>
   );

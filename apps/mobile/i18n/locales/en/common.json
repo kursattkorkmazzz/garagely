@@ -30,6 +30,49 @@
     "required": "This field is required"
   },
   "toast": {
-    "comingSoon": "{{feature}} coming soon"
+    "comingSoon": "{{feature}} coming soon",
+    "photoUpdated": "Photo updated",
+    "photoRemoved": "Photo removed",
+    "cameraPermissionRequired": "Camera permission is required to take a photo",
+    "galleryPermissionRequired": "Gallery permission is required to select a photo"
+  },
+  "profile": {
+    "fleetPlan": "FLEET PLAN",
+    "signOut": "SIGN OUT",
+    "sections": {
+      "subscription": "SUBSCRIPTION",
+      "appSettings": "APP SETTINGS",
+      "notifications": "NOTIFICATIONS",
+      "security": "SECURITY",
+      "dataPrivacy": "DATA & PRIVACY",
+      "support": "SUPPORT"
+    },
+    "settings": {
+      "managePlan": "Manage Plan",
+      "nextBilling": "Next billing on {{date}}",
+      "language": "Language",
+      "appearance": "Appearance",
+      "pushNotifications": "Push Notifications",
+      "emailAlerts": "Email Alerts",
+      "changePassword": "Change Password",
+      "biometricAuth": "Biometric Auth",
+      "privacyPolicy": "Privacy Policy",
+      "dataUsage": "Data Usage",
+      "helpCenter": "Help Center",
+      "contactSupport": "Contact Support"
+    },
+    "actionSheets": {
+      "profilePhoto": "Profile Photo",
+      "takePhoto": "Take Photo",
+      "chooseFromGallery": "Choose from Gallery",
+      "removePhoto": "Remove Photo",
+      "selectLanguage": "Select Language",
+      "selectTheme": "Select Theme"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   }
 }
