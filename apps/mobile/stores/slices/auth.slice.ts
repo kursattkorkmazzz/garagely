@@ -8,7 +8,7 @@ const AUTH_TOKEN_KEY = "@garagely/auth_token";
 
 export interface AuthCallbacks {
   onSuccess?: () => void;
-  onError?: (message: string) => void;
+  onError?: (error: SdkError) => void;
 }
 
 export interface AuthSlice {
@@ -89,7 +89,7 @@ export const createAuthSlice = (set: SetAuthState, get: GetAuthState): AuthSlice
           isLoading: false,
           error: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },
@@ -115,7 +115,7 @@ export const createAuthSlice = (set: SetAuthState, get: GetAuthState): AuthSlice
           isLoading: false,
           error: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },
@@ -175,7 +175,7 @@ export const createAuthSlice = (set: SetAuthState, get: GetAuthState): AuthSlice
           isLoading: false,
           error: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },

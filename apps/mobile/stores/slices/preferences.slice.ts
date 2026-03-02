@@ -5,7 +5,7 @@ import { sdk } from "../sdk";
 
 export interface PreferencesCallbacks {
   onSuccess?: (user: UserWithPreferences) => void;
-  onError?: (message: string) => void;
+  onError?: (error: SdkError) => void;
 }
 
 export interface PreferencesSlice {
@@ -50,7 +50,7 @@ export const createPreferencesSlice = (
           isUpdating: false,
           error: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },

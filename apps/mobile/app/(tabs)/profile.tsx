@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useTheme } from "@/theme/theme-context";
 import { useI18nContext } from "@/context/i18n-context";
 import { useI18n } from "@/hooks/use-i18n";
+import { useErrorHandler } from "@/hooks/use-error-handler";
 import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
@@ -33,6 +34,7 @@ export default function ProfileScreen() {
   const { theme, withOpacity, themePreference, changeTheme } = useTheme();
   const { language, changeLanguage, supportedLanguages } = useI18nContext();
   const { t } = useI18n();
+  const { handleError } = useErrorHandler();
   const router = useRouter();
   const user = useStore((state) => state.auth.user);
   const logout = useStore((state) => state.auth.logout);
@@ -66,9 +68,7 @@ export default function ProfileScreen() {
       onSuccess: () => {
         appToast.success(t("toast.photoUpdated"));
       },
-      onError: (message) => {
-        appToast.error(message);
-      },
+      onError: handleError,
     });
   };
 
@@ -117,9 +117,7 @@ export default function ProfileScreen() {
       onSuccess: () => {
         appToast.success(t("toast.photoRemoved"));
       },
-      onError: (message) => {
-        appToast.error(message);
-      },
+      onError: handleError,
     });
   };
 
@@ -269,9 +267,7 @@ export default function ProfileScreen() {
         setShowChangePasswordModal(false);
         appToast.success(t("toast.passwordChanged"));
       },
-      onError: (message) => {
-        appToast.error(message);
-      },
+      onError: handleError,
     });
   };
 

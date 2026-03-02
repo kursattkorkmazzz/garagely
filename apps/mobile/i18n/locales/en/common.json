@@ -26,7 +26,6 @@
   },
   "errors": {
     "generic": "Something went wrong",
-    "network": "Network error. Please try again.",
     "required": "This field is required"
   },
   "toast": {

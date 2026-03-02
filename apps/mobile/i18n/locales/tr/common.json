@@ -26,7 +26,6 @@
   },
   "errors": {
     "generic": "Bir hata oluştu",
-    "network": "Ağ hatası. Lütfen tekrar deneyin.",
     "required": "Bu alan zorunludur"
   },
   "toast": {

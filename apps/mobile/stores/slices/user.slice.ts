@@ -4,7 +4,7 @@ import { sdk } from "../sdk";
 
 export interface UserCallbacks {
   onSuccess?: () => void;
-  onError?: (message: string) => void;
+  onError?: (error: SdkError) => void;
 }
 
 export interface UserSlice {
@@ -61,7 +61,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
           isUploadingAvatar: false,
           avatarError: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },
@@ -75,7 +75,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
       onError: (err: SdkError) => {
         // If no avatar found, it's not an error - just no avatar
         set({ avatar: null });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },
@@ -97,7 +97,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
           isUploadingAvatar: false,
           avatarError: err.message,
         });
-        callbacks?.onError?.(err.message);
+        callbacks?.onError?.(err);
       },
     });
   },

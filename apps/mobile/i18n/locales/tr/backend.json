@@ -1,0 +1,22 @@
+{
+  "BAD_REQUEST": "Geçersiz istek. Lütfen girdinizi kontrol edin.",
+  "VALIDATION_ERROR": "Lütfen girdinizi kontrol edip tekrar deneyin.",
+  "UNAUTHORIZED": "Devam etmek için giriş yapın.",
+  "FORBIDDEN": "Bu işlemi gerçekleştirme yetkiniz yok.",
+  "NOT_FOUND": "İstenen kaynak bulunamadı.",
+  "CONFLICT": "Bu işlem mevcut verilerle çakışıyor.",
+  "UNPROCESSABLE_ENTITY": "İsteğiniz işlenemiyor.",
+  "TOO_MANY_REQUESTS": "Çok fazla istek. Lütfen daha sonra tekrar deneyin.",
+  "INTERNAL_ERROR": "Bir hata oluştu. Lütfen tekrar deneyin.",
+  "SERVICE_UNAVAILABLE": "Hizmet geçici olarak kullanılamıyor.",
+  "INVALID_CREDENTIALS": "Geçersiz e-posta veya şifre.",
+  "EMAIL_ALREADY_EXISTS": "Bu e-posta ile bir hesap zaten mevcut.",
+  "TOKEN_EXPIRED": "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.",
+  "TOKEN_INVALID": "Geçersiz oturum. Lütfen tekrar giriş yapın.",
+  "FILE_TOO_LARGE": "Dosya çok büyük. Lütfen daha küçük bir dosya seçin.",
+  "TOO_MANY_FILES": "Çok fazla dosya. Lütfen daha az dosya seçin.",
+  "INVALID_FILE_TYPE": "Geçersiz dosya türü. Lütfen desteklenen bir format seçin.",
+  "FILE_UPLOAD_ERROR": "Dosya yüklenemedi. Lütfen tekrar deneyin.",
+  "REQUEST_TIMEOUT": "İstek zaman aşımına uğradı. Lütfen tekrar deneyin.",
+  "NETWORK_ERROR": "Ağ hatası. Lütfen bağlantınızı kontrol edin."
+}
