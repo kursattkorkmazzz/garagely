@@ -6,6 +6,7 @@ import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppIcon } from "@/components/ui/app-icon";
 import { AppButton } from "@/components/ui/app-button";
+import { AppSelector } from "@/components/ui/app-selector";
 import {
   AppAvatar,
   AppAvatarImage,
@@ -34,14 +35,14 @@ export function AppHeader({
   const avatar = useStore((state) => state.user.avatar);
 
   // TODO: Replace with actual vehicle data from store
-  const selectedVehicle = "Luxury Sedan";
+  const selectedVehicle = "";
 
   const handleAvatarPress = () => {
     router.push("/(tabs)/profile");
   };
 
   const handleVehicleSelectorPress = () => {
-    router.push("/vehicles");
+    // TODO: Implement vehicle selector
   };
 
   return (
@@ -56,16 +57,11 @@ export function AppHeader({
         </AppButton>
 
         {showVehicleSelector && (
-          <AppButton
-            variant="ghost"
-            style={styles.vehicleSelector}
+          <AppSelector
+            value={selectedVehicle}
+            placeholder={t("garage.selectVehicle")}
             onPress={handleVehicleSelectorPress}
-          >
-            <AppText variant="bodyMedium" style={{ fontWeight: "600" }}>
-              {selectedVehicle}
-            </AppText>
-            <AppIcon icon="ChevronDown" size={18} color={theme.foreground} />
-          </AppButton>
+          />
         )}
 
         {showNotificationButton && (
@@ -76,6 +72,7 @@ export function AppHeader({
               styles.iconButton,
               { backgroundColor: withOpacity(theme.muted, 0.1) },
             ]}
+            onPress={() => router.push("/(tabs)/alerts")}
           >
             <AppIcon icon="Bell" size={20} color={theme.foreground} />
             {/* Notification dot */}
@@ -120,11 +117,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: spacing.lg,
-  },
-  vehicleSelector: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
   },
   iconButton: {
     width: 40,
