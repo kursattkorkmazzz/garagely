@@ -1,12 +1,7 @@
 import React from "react";
-import {
-  View,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { View, Modal, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import { AppText } from "./app-text";
+import { AppButton } from "./app-button";
 import { useTheme } from "@/theme/theme-context";
 import { spacing } from "@/theme/tokens/spacing";
 import { radius } from "@/theme/tokens/radius";
@@ -95,17 +90,15 @@ export function AppActionSheet({
 
                 {/* Options */}
                 {options.map((option, index) => (
-                  <Pressable
+                  <AppButton
                     key={index}
+                    variant="ghost"
                     onPress={() => handleOptionPress(option)}
-                    style={({ pressed }) => [
+                    style={[
                       styles.option,
                       index < options.length - 1 && {
                         borderBottomWidth: 1,
                         borderBottomColor: theme.border,
-                      },
-                      pressed && {
-                        backgroundColor: withOpacity(theme.muted, 0.1),
                       },
                     ]}
                   >
@@ -113,22 +106,24 @@ export function AppActionSheet({
                       variant="bodyMedium"
                       style={[
                         styles.optionText,
-                        option.destructive && { color: theme.destructive },
+                        option.destructive
+                          ? { color: theme.destructive }
+                          : { color: theme.foreground },
                       ]}
                     >
                       {option.label}
                     </AppText>
-                  </Pressable>
+                  </AppButton>
                 ))}
               </View>
 
               {/* Cancel Button */}
-              <Pressable
+              <AppButton
+                variant="ghost"
                 onPress={onClose}
-                style={({ pressed }) => [
+                style={[
                   styles.cancelButton,
                   { backgroundColor: theme.card, borderColor: theme.border },
-                  pressed && { backgroundColor: withOpacity(theme.muted, 0.1) },
                 ]}
               >
                 <AppText
@@ -137,7 +132,7 @@ export function AppActionSheet({
                 >
                   {_cancelLabel}
                 </AppText>
-              </Pressable>
+              </AppButton>
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -170,17 +165,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   option: {
-    padding: spacing.md,
-    alignItems: "center",
+    borderRadius: 0,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    minHeight: 50,
   },
   optionText: {
     fontWeight: "500",
   },
   cancelButton: {
-    padding: spacing.md,
-    alignItems: "center",
     borderRadius: radius * 2,
     borderWidth: 1,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    minHeight: 50,
   },
   cancelText: {
     fontWeight: "600",
