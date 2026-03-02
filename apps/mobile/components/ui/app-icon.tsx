@@ -15,7 +15,12 @@ export function AppIcon({ icon, size = 24, color, ...rest }: AppIconProps) {
   const IconComponent = icons[icon] as LucideIcon;
 
   return (
-    <IconComponent {...rest} size={size} color={color ?? theme.foreground} />
+    <IconComponent
+      {...rest}
+      size={size}
+      color={color ?? theme.foreground}
+      strokeWidth={1.5}
+    />
   );
 }
 

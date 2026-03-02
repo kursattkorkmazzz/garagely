@@ -10,6 +10,7 @@ import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
 import { AppBadge } from "@/components/ui/app-badge";
 import { AppIcon } from "@/components/ui/app-icon";
+import * as Application from "expo-application";
 import {
   AppAvatar,
   AppAvatarImage,
@@ -42,7 +43,8 @@ export default function ProfileScreen() {
   useEffect(() => {
     console.log("User is changed");
     console.log(user);
-  }, [user]);
+    console.log(avatar);
+  }, []);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
@@ -425,6 +427,17 @@ export default function ProfileScreen() {
           onPress={() => {}}
         />
       </AppSettingsSection>
+
+      {/* App Version */}
+      <AppText
+        variant="bodySmall"
+        color="muted"
+        style={{ marginTop: spacing.sm, textAlign: "center" }}
+      >
+        {t("profile.version", {
+          version: Application.nativeApplicationVersion || "0.0.0",
+        })}
+      </AppText>
 
       {/* Sign Out */}
       <AppButton
