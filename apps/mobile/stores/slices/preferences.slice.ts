@@ -22,9 +22,11 @@ export interface PreferencesSlice {
 }
 
 type SetPreferencesState = (partial: Partial<PreferencesSlice>) => void;
+type SetAuthUser = (user: UserWithPreferences) => void;
 
 export const createPreferencesSlice = (
   set: SetPreferencesState,
+  setAuthUser: SetAuthUser,
 ): PreferencesSlice => ({
   // Initial state
   isUpdating: false,
@@ -43,6 +45,8 @@ export const createPreferencesSlice = (
           isUpdating: false,
           error: null,
         });
+        // Directly update auth user for immediate UI update
+        setAuthUser(data);
         callbacks?.onSuccess?.(data);
       },
       onError: (err: SdkError) => {

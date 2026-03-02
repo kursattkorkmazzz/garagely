@@ -17,7 +17,10 @@ export const useStore = create<RootState>()((set, get) => ({
   user: createUserSlice((partial) =>
     set((state) => ({ user: { ...state.user, ...partial } })),
   ),
-  preferences: createPreferencesSlice((partial) =>
-    set((state) => ({ preferences: { ...state.preferences, ...partial } })),
+  preferences: createPreferencesSlice(
+    (partial) =>
+      set((state) => ({ preferences: { ...state.preferences, ...partial } })),
+    // Pass setter for auth.user to preferences slice
+    (user) => set((state) => ({ auth: { ...state.auth, user } })),
   ),
 }));

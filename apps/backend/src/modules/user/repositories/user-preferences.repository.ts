@@ -29,9 +29,9 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
     const data = {
       userId,
       locale: "en",
-      preferredDistanceUnitId: "km",
-      preferredVolumeUnitId: "L",
-      preferredCurrencyId: "USD",
+      preferredDistanceUnit: "km",
+      preferredVolumeUnit: "l",
+      preferredCurrency: "usd",
       theme: "system",
       createdAt: now,
       updatedAt: now,
@@ -64,14 +64,14 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
     if (data.locale !== undefined) {
       updateData.locale = data.locale;
     }
-    if (data.preferredDistanceUnitId !== undefined) {
-      updateData.preferredDistanceUnitId = data.preferredDistanceUnitId;
+    if (data.preferredDistanceUnit !== undefined) {
+      updateData.preferredDistanceUnit = data.preferredDistanceUnit;
     }
-    if (data.preferredVolumeUnitId !== undefined) {
-      updateData.preferredVolumeUnitId = data.preferredVolumeUnitId;
+    if (data.preferredVolumeUnit !== undefined) {
+      updateData.preferredVolumeUnit = data.preferredVolumeUnit;
     }
-    if (data.preferredCurrencyId !== undefined) {
-      updateData.preferredCurrencyId = data.preferredCurrencyId;
+    if (data.preferredCurrency !== undefined) {
+      updateData.preferredCurrency = data.preferredCurrency;
     }
     if (data.theme !== undefined) {
       updateData.theme = data.theme;

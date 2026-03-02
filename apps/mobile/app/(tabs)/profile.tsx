@@ -59,7 +59,6 @@ export default function ProfileScreen() {
   const updatePreferences = useStore(
     (state) => state.preferences.updatePreferences,
   );
-  const setUser = useStore((state) => state.auth.setUser);
   const changePassword = useStore((state) => state.auth.changePassword);
   const isAuthLoading = useStore((state) => state.auth.isLoading);
 
@@ -198,16 +197,13 @@ export default function ProfileScreen() {
     (unit) => ({
       label: unit.label,
       onPress: async () => {
-        await updatePreferences(
-          { preferredDistanceUnitId: unit.id },
-          { onSuccess: (updatedUser) => setUser(updatedUser) },
-        );
+        await updatePreferences({ preferredDistanceUnit: unit.id });
       },
     }),
   );
 
   const getCurrentDistanceUnitLabel = () => {
-    const unitId = user?.preferences?.preferredDistanceUnitId;
+    const unitId = user?.preferences?.preferredDistanceUnit;
     const unit = distanceUnits.find((u) => u.id === unitId);
     return unit?.label || t("profile.distanceUnits.km");
   };
@@ -221,15 +217,12 @@ export default function ProfileScreen() {
   const volumeUnitOptions: ActionSheetOption[] = volumeUnits.map((unit) => ({
     label: unit.label,
     onPress: async () => {
-      await updatePreferences(
-        { preferredVolumeUnitId: unit.id },
-        { onSuccess: (updatedUser) => setUser(updatedUser) },
-      );
+      await updatePreferences({ preferredVolumeUnit: unit.id });
     },
   }));
 
   const getCurrentVolumeUnitLabel = () => {
-    const unitId = user?.preferences?.preferredVolumeUnitId;
+    const unitId = user?.preferences?.preferredVolumeUnit;
     const unit = volumeUnits.find((u) => u.id === unitId);
     return unit?.label || t("profile.volumeUnits.l");
   };
@@ -245,15 +238,12 @@ export default function ProfileScreen() {
   const currencyOptions: ActionSheetOption[] = currencies.map((currency) => ({
     label: currency.label,
     onPress: async () => {
-      await updatePreferences(
-        { preferredCurrencyId: currency.id },
-        { onSuccess: (updatedUser) => setUser(updatedUser) },
-      );
+      await updatePreferences({ preferredCurrency: currency.id });
     },
   }));
 
   const getCurrentCurrencyLabel = () => {
-    const currencyId = user?.preferences?.preferredCurrencyId;
+    const currencyId = user?.preferences?.preferredCurrency;
     const currency = currencies.find((c) => c.id === currencyId);
     return currency?.label || t("profile.currencies.usd");
   };
