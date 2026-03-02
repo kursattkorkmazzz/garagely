@@ -9,7 +9,8 @@ import type { IDocumentRelationRepository } from "../repositories/document-relat
 import { getStorageLimits } from "../config/storage.config";
 
 const useEmulator = process.env.FIREBASE_USE_EMULATOR === "true";
-const storageEmulatorHost = process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? "127.0.0.1:9199";
+const storageEmulatorHost =
+  process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? "127.0.0.1:9199";
 
 export interface UploadedFile {
   buffer: Buffer;
@@ -31,8 +32,8 @@ export class StorageService {
   ): Promise<DocumentModel> {
     const limits = getStorageLimits(payload.entityType);
 
-    if (file.size > limits.maxFileSize) {
-      const maxSizeMB = Math.round(limits.maxFileSize / (1024 * 1024));
+    if (file.size > limits.fileSize) {
+      const maxSizeMB = Math.round(limits.fileSize / (1024 * 1024));
       throw new ValidationError(
         `File size exceeds the maximum allowed size of ${maxSizeMB}MB for ${payload.entityType}`,
         { file: [`Maximum file size is ${maxSizeMB}MB`] },

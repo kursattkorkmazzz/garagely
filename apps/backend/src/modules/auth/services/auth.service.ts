@@ -31,6 +31,9 @@ export class AuthService {
   }
 
   async login(data: LoginPayload): Promise<AuthResult> {
+    // Verify password using Firebase REST API
+    await this.verifyPassword(data.email, data.password);
+
     const firebaseUser = await auth.getUserByEmail(data.email);
 
     const user = await this.userService.getUserById(firebaseUser.uid);
