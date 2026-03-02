@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { LoginPayload, RegisterPayload } from "@garagely/shared/payloads/auth";
-import type { UserWithPreferences, UserPreferencesModel } from "@garagely/shared/models/user";
+import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { SdkError } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
 
@@ -27,7 +27,7 @@ export interface AuthSlice {
   restoreSession: () => Promise<void>;
   clearError: () => void;
   setAuthToken: (token: string | null) => void;
-  updateUserPreferences: (preferences: UserPreferencesModel) => void;
+  setUser: (user: UserWithPreferences) => void;
 }
 
 type SetAuthState = (partial: Partial<AuthSlice>) => void;
@@ -167,14 +167,7 @@ export const createAuthSlice = (set: SetAuthState, get: GetAuthState): AuthSlice
     sdk.setAuthToken(token);
   },
 
-  updateUserPreferences: (preferences: UserPreferencesModel) => {
-    const currentUser = get().user;
-    if (!currentUser) return;
-    set({
-      user: {
-        ...currentUser,
-        preferences,
-      },
-    });
+  setUser: (user: UserWithPreferences) => {
+    set({ user });
   },
 });

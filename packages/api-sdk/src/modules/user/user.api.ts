@@ -18,7 +18,7 @@ export interface UserApi {
   deleteMe(callbacks?: SdkCallbacks<void>): Promise<void>;
   updatePreferences(
     payload: UpdateUserPreferencesPayload,
-    callbacks?: SdkCallbacks<UserPreferencesModel>,
+    callbacks?: SdkCallbacks<UserWithPreferences>,
   ): Promise<void>;
   uploadAvatar(
     file: File | Blob,
@@ -68,10 +68,10 @@ export function createUserApi(client: HttpClient): UserApi {
 
     async updatePreferences(
       payload: UpdateUserPreferencesPayload,
-      callbacks?: SdkCallbacks<UserPreferencesModel>,
+      callbacks?: SdkCallbacks<UserWithPreferences>,
     ): Promise<void> {
       try {
-        const data = await client.patch<UserPreferencesModel>(
+        const data = await client.patch<UserWithPreferences>(
           "/users/me/preferences",
           payload,
         );

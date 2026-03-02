@@ -24,7 +24,7 @@ export function AppSettingsSection({
       {title && (
         <AppText
           variant="caption"
-          style={[styles.sectionTitle, { color: theme.muted }]}
+          style={[styles.sectionTitle, { color: theme.mutedForeground }]}
         >
           {title}
         </AppText>

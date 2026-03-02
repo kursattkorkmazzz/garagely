@@ -1,10 +1,10 @@
-import type { UserPreferencesModel } from "@garagely/shared/models/user";
+import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { UpdateUserPreferencesPayload } from "@garagely/shared/payloads/user";
 import type { SdkError } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
 
 export interface PreferencesCallbacks {
-  onSuccess?: (preferences: UserPreferencesModel) => void;
+  onSuccess?: (user: UserWithPreferences) => void;
   onError?: (message: string) => void;
 }
 

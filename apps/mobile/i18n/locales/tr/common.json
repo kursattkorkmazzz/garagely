@@ -52,6 +52,9 @@
       "nextBilling": "Sonraki fatura: {{date}}",
       "language": "Dil",
       "appearance": "Görünüm",
+      "distanceUnit": "Mesafe Birimi",
+      "volumeUnit": "Hacim Birimi",
+      "currency": "Para Birimi",
       "pushNotifications": "Anlık Bildirimler",
       "emailAlerts": "E-posta Uyarıları",
       "changePassword": "Şifre Değiştir",
@@ -67,7 +70,24 @@
       "chooseFromGallery": "Galeriden Seç",
       "removePhoto": "Fotoğrafı Kaldır",
       "selectLanguage": "Dil Seçin",
-      "selectTheme": "Tema Seçin"
+      "selectTheme": "Tema Seçin",
+      "selectDistanceUnit": "Mesafe Birimi Seçin",
+      "selectVolumeUnit": "Hacim Birimi Seçin",
+      "selectCurrency": "Para Birimi Seçin"
+    },
+    "distanceUnits": {
+      "km": "Kilometre (km)",
+      "mi": "Mil (mi)"
+    },
+    "volumeUnits": {
+      "l": "Litre (L)",
+      "gal": "Galon (gal)"
+    },
+    "currencies": {
+      "usd": "ABD Doları ($)",
+      "eur": "Euro (€)",
+      "gbp": "İngiliz Sterlini (£)",
+      "try": "Türk Lirası (₺)"
     },
     "theme": {
       "light": "Açık",

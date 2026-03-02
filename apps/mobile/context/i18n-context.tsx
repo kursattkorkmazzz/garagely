@@ -45,7 +45,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   const user = useStore((state) => state.auth.user);
   const updatePreferences = useStore((state) => state.preferences.updatePreferences);
-  const updateUserPreferences = useStore((state) => state.auth.updateUserPreferences);
+  const setUser = useStore((state) => state.auth.setUser);
   const isUpdating = useStore((state) => state.preferences.isUpdating);
 
   useEffect(() => {
@@ -76,14 +76,14 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         await updatePreferences(
           { locale: newLanguage },
           {
-            onSuccess: (preferences) => {
-              updateUserPreferences(preferences);
+            onSuccess: (updatedUser) => {
+              setUser(updatedUser);
             },
           },
         );
       }
     },
-    [user, updatePreferences, updateUserPreferences],
+    [user, updatePreferences, setUser],
   );
 
   const value = useMemo(

@@ -52,6 +52,9 @@
       "nextBilling": "Next billing on {{date}}",
       "language": "Language",
       "appearance": "Appearance",
+      "distanceUnit": "Distance Unit",
+      "volumeUnit": "Volume Unit",
+      "currency": "Currency",
       "pushNotifications": "Push Notifications",
       "emailAlerts": "Email Alerts",
       "changePassword": "Change Password",
@@ -67,7 +70,24 @@
       "chooseFromGallery": "Choose from Gallery",
       "removePhoto": "Remove Photo",
       "selectLanguage": "Select Language",
-      "selectTheme": "Select Theme"
+      "selectTheme": "Select Theme",
+      "selectDistanceUnit": "Select Distance Unit",
+      "selectVolumeUnit": "Select Volume Unit",
+      "selectCurrency": "Select Currency"
+    },
+    "distanceUnits": {
+      "km": "Kilometers (km)",
+      "mi": "Miles (mi)"
+    },
+    "volumeUnits": {
+      "l": "Liters (L)",
+      "gal": "Gallons (gal)"
+    },
+    "currencies": {
+      "usd": "US Dollar ($)",
+      "eur": "Euro (€)",
+      "gbp": "British Pound (£)",
+      "try": "Turkish Lira (₺)"
     },
     "theme": {
       "light": "Light",

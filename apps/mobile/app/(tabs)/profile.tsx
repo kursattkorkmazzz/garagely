@@ -43,6 +43,12 @@ export default function ProfileScreen() {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showThemeSheet, setShowThemeSheet] = useState(false);
+  const [showDistanceUnitSheet, setShowDistanceUnitSheet] = useState(false);
+  const [showVolumeUnitSheet, setShowVolumeUnitSheet] = useState(false);
+  const [showCurrencySheet, setShowCurrencySheet] = useState(false);
+
+  const updatePreferences = useStore((state) => state.preferences.updatePreferences);
+  const setUser = useStore((state) => state.auth.setUser);
 
   const handleUploadAvatar = async (uri: string) => {
     await uploadAvatar(uri, {
@@ -171,6 +177,74 @@ export default function ProfileScreen() {
     }
   };
 
+  // Distance unit options
+  const distanceUnits = [
+    { id: "km", label: t("profile.distanceUnits.km") },
+    { id: "mi", label: t("profile.distanceUnits.mi") },
+  ];
+
+  const distanceUnitOptions: ActionSheetOption[] = distanceUnits.map((unit) => ({
+    label: unit.label,
+    onPress: async () => {
+      await updatePreferences(
+        { preferredDistanceUnitId: unit.id },
+        { onSuccess: (updatedUser) => setUser(updatedUser) },
+      );
+    },
+  }));
+
+  const getCurrentDistanceUnitLabel = () => {
+    const unitId = user?.preferences?.preferredDistanceUnitId;
+    const unit = distanceUnits.find((u) => u.id === unitId);
+    return unit?.label || t("profile.distanceUnits.km");
+  };
+
+  // Volume unit options
+  const volumeUnits = [
+    { id: "l", label: t("profile.volumeUnits.l") },
+    { id: "gal", label: t("profile.volumeUnits.gal") },
+  ];
+
+  const volumeUnitOptions: ActionSheetOption[] = volumeUnits.map((unit) => ({
+    label: unit.label,
+    onPress: async () => {
+      await updatePreferences(
+        { preferredVolumeUnitId: unit.id },
+        { onSuccess: (updatedUser) => setUser(updatedUser) },
+      );
+    },
+  }));
+
+  const getCurrentVolumeUnitLabel = () => {
+    const unitId = user?.preferences?.preferredVolumeUnitId;
+    const unit = volumeUnits.find((u) => u.id === unitId);
+    return unit?.label || t("profile.volumeUnits.l");
+  };
+
+  // Currency options
+  const currencies = [
+    { id: "usd", label: t("profile.currencies.usd") },
+    { id: "eur", label: t("profile.currencies.eur") },
+    { id: "gbp", label: t("profile.currencies.gbp") },
+    { id: "try", label: t("profile.currencies.try") },
+  ];
+
+  const currencyOptions: ActionSheetOption[] = currencies.map((currency) => ({
+    label: currency.label,
+    onPress: async () => {
+      await updatePreferences(
+        { preferredCurrencyId: currency.id },
+        { onSuccess: (updatedUser) => setUser(updatedUser) },
+      );
+    },
+  }));
+
+  const getCurrentCurrencyLabel = () => {
+    const currencyId = user?.preferences?.preferredCurrencyId;
+    const currency = currencies.find((c) => c.id === currencyId);
+    return currency?.label || t("profile.currencies.usd");
+  };
+
   const handleSignOut = async () => {
     await logout();
     router.replace("/(auth)");
@@ -239,6 +313,30 @@ export default function ProfileScreen() {
           title={t("profile.settings.appearance")}
           value={getCurrentThemeLabel()}
           onPress={() => setShowThemeSheet(true)}
+        />
+        <AppSettingsItem
+          icon="Ruler"
+          iconColor="#14B8A6"
+          iconBackgroundColor={withOpacity("#14B8A6", 0.15)}
+          title={t("profile.settings.distanceUnit")}
+          value={getCurrentDistanceUnitLabel()}
+          onPress={() => setShowDistanceUnitSheet(true)}
+        />
+        <AppSettingsItem
+          icon="Droplets"
+          iconColor="#0EA5E9"
+          iconBackgroundColor={withOpacity("#0EA5E9", 0.15)}
+          title={t("profile.settings.volumeUnit")}
+          value={getCurrentVolumeUnitLabel()}
+          onPress={() => setShowVolumeUnitSheet(true)}
+        />
+        <AppSettingsItem
+          icon="CircleDollarSign"
+          iconColor="#22C55E"
+          iconBackgroundColor={withOpacity("#22C55E", 0.15)}
+          title={t("profile.settings.currency")}
+          value={getCurrentCurrencyLabel()}
+          onPress={() => setShowCurrencySheet(true)}
         />
       </AppSettingsSection>
 
@@ -354,6 +452,30 @@ export default function ProfileScreen() {
         onClose={() => setShowThemeSheet(false)}
         title={t("profile.actionSheets.selectTheme")}
         options={themeOptions}
+      />
+
+      {/* Distance Unit Action Sheet */}
+      <AppActionSheet
+        visible={showDistanceUnitSheet}
+        onClose={() => setShowDistanceUnitSheet(false)}
+        title={t("profile.actionSheets.selectDistanceUnit")}
+        options={distanceUnitOptions}
+      />
+
+      {/* Volume Unit Action Sheet */}
+      <AppActionSheet
+        visible={showVolumeUnitSheet}
+        onClose={() => setShowVolumeUnitSheet(false)}
+        title={t("profile.actionSheets.selectVolumeUnit")}
+        options={volumeUnitOptions}
+      />
+
+      {/* Currency Action Sheet */}
+      <AppActionSheet
+        visible={showCurrencySheet}
+        onClose={() => setShowCurrencySheet(false)}
+        title={t("profile.actionSheets.selectCurrency")}
+        options={currencyOptions}
       />
     </ScrollView>
   );
