@@ -29,12 +29,6 @@ export interface VehicleApi {
   getBodyTypes(callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>): Promise<void>;
   getFuelTypes(callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>): Promise<void>;
 
-  // User model creation
-  createModel(
-    payload: CreateVehicleModelPayload,
-    callbacks?: SdkCallbacks<VehicleModelModel>,
-  ): Promise<void>;
-
   // Upsert brand and model together
   upsertBrandAndModel(
     payload: UpsertBrandModelPayload,
@@ -56,7 +50,10 @@ export interface VehicleApi {
     payload: UpdateVehiclePayload,
     callbacks?: SdkCallbacks<VehicleModel>,
   ): Promise<void>;
-  deleteVehicle(vehicleId: string, callbacks?: SdkCallbacks<void>): Promise<void>;
+  deleteVehicle(
+    vehicleId: string,
+    callbacks?: SdkCallbacks<void>,
+  ): Promise<void>;
 
   // Cover photo
   uploadCover(
@@ -74,7 +71,9 @@ export interface VehicleApi {
 export function createVehicleApi(client: HttpClient): VehicleApi {
   return {
     // Lookup methods
-    async getBrands(callbacks?: SdkCallbacks<VehicleBrandModel[]>): Promise<void> {
+    async getBrands(
+      callbacks?: SdkCallbacks<VehicleBrandModel[]>,
+    ): Promise<void> {
       try {
         const data = await client.get<VehicleBrandModel[]>("/vehicles/brands");
         callbacks?.onSuccess?.(data);
@@ -114,7 +113,9 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
     ): Promise<void> {
       try {
-        const data = await client.get<VehicleBodyTypeModel[]>("/vehicles/body-types");
+        const data = await client.get<VehicleBodyTypeModel[]>(
+          "/vehicles/body-types",
+        );
         callbacks?.onSuccess?.(data);
       } catch (error) {
         callbacks?.onError?.(error as SdkError);
@@ -125,22 +126,8 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
     ): Promise<void> {
       try {
-        const data = await client.get<VehicleFuelTypeModel[]>("/vehicles/fuel-types");
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
-    },
-
-    // User model creation
-    async createModel(
-      payload: CreateVehicleModelPayload,
-      callbacks?: SdkCallbacks<VehicleModelModel>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<VehicleModelModel>(
-          "/vehicles/models",
-          payload,
+        const data = await client.get<VehicleFuelTypeModel[]>(
+          "/vehicles/fuel-types",
         );
         callbacks?.onSuccess?.(data);
       } catch (error) {
