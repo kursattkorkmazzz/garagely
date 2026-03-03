@@ -6,6 +6,7 @@ import { AppText } from "@/components/ui/app-text";
 import { AppIcon } from "@/components/ui/app-icon";
 import { AddVehicleWizard } from "@/components/vehicle";
 import { spacing } from "@/theme/tokens/spacing";
+import { AppButton } from "@/components/ui/app-button";
 
 export default function AddVehicleScreen() {
   const { theme } = useTheme();
@@ -16,9 +17,9 @@ export default function AddVehicleScreen() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <AppButton variant="ghost" size="sm" onPress={() => router.back()}>
           <AppIcon icon="X" size={24} color={theme.foreground} />
-        </Pressable>
+        </AppButton>
         <AppText variant="heading3" style={styles.headerTitle}>
           {t("addVehicle.title")}
         </AppText>

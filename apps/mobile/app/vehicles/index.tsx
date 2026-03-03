@@ -19,7 +19,8 @@ const mockVehicles: VehicleCardData[] = [
     costPerKm: 0.42,
     lastServiceDate: "Oct 12, 2023",
     isOverdue: false,
-    coverImage: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
+    coverImage:
+      "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
     color: "#4A5568",
   },
   {
@@ -61,9 +62,9 @@ export default function VehicleListScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Pressable onPress={handleBackPress} style={styles.backButton}>
+          <AppButton variant="ghost" size="sm" onPress={handleBackPress}>
             <AppIcon icon="ArrowLeft" size={24} color={theme.foreground} />
-          </Pressable>
+          </AppButton>
           <View>
             <AppText variant="heading2">{t("vehicles.title")}</AppText>
             <AppText variant="caption" color="muted">
@@ -74,7 +75,9 @@ export default function VehicleListScreen() {
         <AppButton variant="primary" size="sm" onPress={handleAddPress}>
           <View style={styles.addButtonContent}>
             <AppIcon icon="Plus" size={18} color={theme.primaryForeground} />
-            <AppText style={{ color: theme.primaryForeground, fontWeight: "600" }}>
+            <AppText
+              style={{ color: theme.primaryForeground, fontWeight: "600" }}
+            >
               {t("vehicles.add")}
             </AppText>
           </View>
