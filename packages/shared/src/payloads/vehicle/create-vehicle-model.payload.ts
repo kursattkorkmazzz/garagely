@@ -6,4 +6,6 @@ export const createVehicleModelPayloadValidator = yup.object({
   year: yup.number().integer().min(1900).max(2100).nullable(),
 });
 
-export type CreateVehicleModelPayload = yup.InferType<typeof createVehicleModelPayloadValidator>;
+export type CreateVehicleModelPayload = yup.InferType<
+  typeof createVehicleModelPayloadValidator
+>;

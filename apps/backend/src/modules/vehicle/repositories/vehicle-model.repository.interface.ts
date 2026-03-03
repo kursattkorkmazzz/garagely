@@ -1,13 +1,17 @@
 import type { VehicleModelModel } from "@garagely/shared/models/vehicle";
-import type { CreateVehicleModelPayload } from "@garagely/shared/payloads/vehicle";
+import { CreateVehicleModelPayload } from "@garagely/shared/payloads/vehicle";
 
-export interface IVehicleModelRepository {
-  findById(id: string): Promise<VehicleModelModel | null>;
-  findByBrandId(brandId: string): Promise<VehicleModelModel[]>;
+export interface IVehicleModelRepository<Tx = {}> {
+  findById(id: string, tx?: Tx): Promise<VehicleModelModel | null>;
+  findByBrandId(brandId: string, tx?: Tx): Promise<VehicleModelModel[]>;
   findByBrandNameYear(
     brandId: string,
     nameLower: string,
-    year: number | null | undefined
+    year: number | null | undefined,
+    tx?: Tx,
   ): Promise<VehicleModelModel | null>;
-  create(data: CreateVehicleModelPayload & { isSystem: boolean; isActive: boolean }): Promise<VehicleModelModel>;
+  create(
+    data: Omit<VehicleModelModel, "id">,
+    tx?: Tx,
+  ): Promise<VehicleModelModel>;
 }

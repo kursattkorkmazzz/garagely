@@ -124,6 +124,77 @@
       "overdue": "OVERDUE"
     }
   },
+  "addVehicle": {
+    "title": "Add Vehicle",
+    "searchBrand": "Search brands...",
+    "selectModel": "SELECT MODEL",
+    "changeBrand": "Change",
+    "cantFindBrand": "Can't find your brand?",
+    "enterManually": "Enter it manually",
+    "enterCustomVehicle": "Enter Your Vehicle",
+    "customVehicleHint": "Enter your vehicle's brand and model names",
+    "brandName": "Brand Name",
+    "brandNamePlaceholder": "e.g., Toyota, Honda, Tesla",
+    "modelName": "Model Name",
+    "modelNamePlaceholder": "e.g., Civic, Corolla, Model 3",
+    "backToBrandList": "Back to brand list",
+    "fuelType": "Fuel Type",
+    "transmissionType": "Transmission",
+    "bodyType": "Body Type",
+    "licensePlate": "License Plate",
+    "licensePlatePlaceholder": "e.g., ABC-1234",
+    "vin": "VIN (Vehicle Identification Number)",
+    "vinPlaceholder": "17 characters",
+    "vinHint": "Found on your registration or driver-side door frame",
+    "color": "Color",
+    "clearColor": "Clear selection",
+    "currentKm": "Current Odometer",
+    "currentKmPlaceholder": "e.g., 45000",
+    "purchaseDate": "Purchase Date",
+    "purchaseDatePlaceholder": "Select date",
+    "purchasePrice": "Purchase Price",
+    "purchasePricePlaceholder": "e.g., 25000",
+    "purchaseKm": "Odometer at Purchase",
+    "purchaseKmPlaceholder": "e.g., 30000",
+    "coverPhoto": "Cover Photo",
+    "addCoverPhoto": "Add Cover Photo",
+    "photoHint": "Take a photo or choose from gallery",
+    "tapToChange": "Tap to change",
+    "changePhoto": "Change Photo",
+    "selectPhoto": "Select Photo",
+    "optionalStepHint": "This step is optional. You can skip it and add details later.",
+    "createVehicle": "Create Vehicle",
+    "steps": {
+      "brandModel": {
+        "title": "Brand & Model",
+        "subtitle": "Select your vehicle's make and model"
+      },
+      "specs": {
+        "title": "Specifications",
+        "subtitle": "Choose fuel, transmission, and body type"
+      },
+      "details": {
+        "title": "Vehicle Details",
+        "subtitle": "Add license plate, VIN, and color (optional)"
+      },
+      "odometer": {
+        "title": "Odometer & Purchase",
+        "subtitle": "Track mileage and purchase info (optional)"
+      },
+      "photo": {
+        "title": "Cover Photo",
+        "subtitle": "Add a photo of your vehicle (optional)"
+      }
+    },
+    "errors": {
+      "selectBrandModel": "Please select a brand and model",
+      "selectSpecs": "Please select fuel type, transmission, and body type",
+      "createFailed": "Failed to create vehicle",
+      "createModelFailed": "Failed to create custom model",
+      "uploadFailed": "Failed to upload photo"
+    },
+    "success": "Vehicle added successfully!"
+  },
   "garage": {
     "title": "Garage",
     "selectVehicle": "Select Vehicle",

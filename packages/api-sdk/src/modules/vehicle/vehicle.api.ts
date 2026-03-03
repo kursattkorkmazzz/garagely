@@ -11,6 +11,8 @@ import type {
   CreateVehiclePayload,
   UpdateVehiclePayload,
   CreateVehicleModelPayload,
+  UpsertBrandModelPayload,
+  UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
 import type { HttpClient, SdkCallbacks, SdkError } from "../../types";
 
@@ -31,6 +33,12 @@ export interface VehicleApi {
   createModel(
     payload: CreateVehicleModelPayload,
     callbacks?: SdkCallbacks<VehicleModelModel>,
+  ): Promise<void>;
+
+  // Upsert brand and model together
+  upsertBrandAndModel(
+    payload: UpsertBrandModelPayload,
+    callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
   ): Promise<void>;
 
   // Vehicle CRUD
@@ -132,6 +140,22 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       try {
         const data = await client.post<VehicleModelModel>(
           "/vehicles/models",
+          payload,
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    // Upsert brand and model together
+    async upsertBrandAndModel(
+      payload: UpsertBrandModelPayload,
+      callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
+    ): Promise<void> {
+      try {
+        const data = await client.post<UpsertBrandModelResponse>(
+          "/vehicles/upsert-brand-model",
           payload,
         );
         callbacks?.onSuccess?.(data);

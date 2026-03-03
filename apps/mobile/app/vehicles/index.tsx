@@ -45,7 +45,7 @@ export default function VehicleListScreen() {
   };
 
   const handleAddPress = () => {
-    // TODO: Navigate to add vehicle screen
+    router.push("/vehicles/add");
   };
 
   const handleVehiclePress = (vehicle: VehicleCardData) => {

@@ -8,4 +8,6 @@ export const vehicleBrandModelValidator = yup.object({
   isActive: yup.boolean().required(),
 });
 
-export type VehicleBrandModel = yup.InferType<typeof vehicleBrandModelValidator>;
+export type VehicleBrandModel = yup.InferType<
+  typeof vehicleBrandModelValidator
+>;

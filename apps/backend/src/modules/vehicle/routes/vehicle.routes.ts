@@ -15,10 +15,12 @@ import {
   createVehiclePayloadValidator,
   updateVehiclePayloadValidator,
   createVehicleModelPayloadValidator,
+  upsertBrandModelPayloadValidator,
 } from "@garagely/shared/payloads/vehicle";
 import { asyncHandler } from "../../../common/utils/async-handler.util";
 import { getStorageLimits } from "../../storage/config/storage.config";
 import { EntityType } from "@garagely/shared/models/entity-type";
+import { FirestoreTransactionManager } from "../../../providers/firebase/firestore-transaction-manager";
 
 const router = Router();
 
@@ -36,12 +38,17 @@ const vehicleModelRepository = new VehicleModelRepository();
 const vehicleLookupRepository = new VehicleLookupRepository();
 const documentRepository = new DocumentRepository();
 const documentRelationRepository = new DocumentRelationRepository();
-const storageService = new StorageService(documentRepository, documentRelationRepository);
+const storageService = new StorageService(
+  documentRepository,
+  documentRelationRepository,
+);
+const transactionManager = new FirestoreTransactionManager();
 const vehicleService = new VehicleService(
   vehicleRepository,
   vehicleBrandRepository,
   vehicleModelRepository,
   vehicleLookupRepository,
+  transactionManager,
   storageService,
 );
 const vehicleController = new VehicleController(vehicleService);
@@ -51,16 +58,22 @@ router.use(authMiddleware);
 
 // Lookup endpoints
 router.get("/brands", asyncHandler(vehicleController.getBrands));
-router.get("/brands/:brandId/models", asyncHandler(vehicleController.getModelsByBrand));
-router.get("/transmission-types", asyncHandler(vehicleController.getTransmissionTypes));
+router.get(
+  "/brands/:brandId/models",
+  asyncHandler(vehicleController.getModelsByBrand),
+);
+router.get(
+  "/transmission-types",
+  asyncHandler(vehicleController.getTransmissionTypes),
+);
 router.get("/body-types", asyncHandler(vehicleController.getBodyTypes));
 router.get("/fuel-types", asyncHandler(vehicleController.getFuelTypes));
 
-// User model creation
+// Upsert brand and model together
 router.post(
-  "/models",
-  validatePayload(createVehicleModelPayloadValidator),
-  asyncHandler(vehicleController.createModel),
+  "/upsert-brand-model",
+  validatePayload(upsertBrandModelPayloadValidator),
+  asyncHandler(vehicleController.upsertBrandAndModel),
 );
 
 // Vehicle CRUD
@@ -83,7 +96,11 @@ router.patch(
 router.delete("/:id", asyncHandler(vehicleController.deleteVehicle));
 
 // Cover photo endpoints
-router.post("/:id/cover", upload.single("file"), asyncHandler(vehicleController.uploadCover));
+router.post(
+  "/:id/cover",
+  upload.single("file"),
+  asyncHandler(vehicleController.uploadCover),
+);
 router.get("/:id/cover", asyncHandler(vehicleController.getCover));
 router.delete("/:id/cover", asyncHandler(vehicleController.removeCover));
 

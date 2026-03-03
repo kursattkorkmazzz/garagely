@@ -124,6 +124,77 @@
       "overdue": "GECİKMİŞ"
     }
   },
+  "addVehicle": {
+    "title": "Araç Ekle",
+    "searchBrand": "Marka ara...",
+    "selectModel": "MODEL SEÇİN",
+    "changeBrand": "Değiştir",
+    "cantFindBrand": "Markanızı bulamıyor musunuz?",
+    "enterManually": "Manuel olarak girin",
+    "enterCustomVehicle": "Aracınızı Girin",
+    "customVehicleHint": "Aracınızın marka ve model adlarını girin",
+    "brandName": "Marka Adı",
+    "brandNamePlaceholder": "örn. Toyota, Honda, Tesla",
+    "modelName": "Model Adı",
+    "modelNamePlaceholder": "örn. Civic, Corolla, Model 3",
+    "backToBrandList": "Marka listesine dön",
+    "fuelType": "Yakıt Tipi",
+    "transmissionType": "Şanzıman",
+    "bodyType": "Kasa Tipi",
+    "licensePlate": "Plaka",
+    "licensePlatePlaceholder": "örn. 34 ABC 123",
+    "vin": "Şasi Numarası (VIN)",
+    "vinPlaceholder": "17 karakter",
+    "vinHint": "Ruhsatta veya sürücü kapısı çerçevesinde bulunur",
+    "color": "Renk",
+    "clearColor": "Seçimi temizle",
+    "currentKm": "Güncel Kilometre",
+    "currentKmPlaceholder": "örn. 45000",
+    "purchaseDate": "Satın Alma Tarihi",
+    "purchaseDatePlaceholder": "Tarih seçin",
+    "purchasePrice": "Satın Alma Fiyatı",
+    "purchasePricePlaceholder": "örn. 250000",
+    "purchaseKm": "Satın Alma Kilometresi",
+    "purchaseKmPlaceholder": "örn. 30000",
+    "coverPhoto": "Kapak Fotoğrafı",
+    "addCoverPhoto": "Kapak Fotoğrafı Ekle",
+    "photoHint": "Fotoğraf çekin veya galeriden seçin",
+    "tapToChange": "Değiştirmek için dokun",
+    "changePhoto": "Fotoğrafı Değiştir",
+    "selectPhoto": "Fotoğraf Seç",
+    "optionalStepHint": "Bu adım isteğe bağlıdır. Atlayabilir ve detayları daha sonra ekleyebilirsiniz.",
+    "createVehicle": "Araç Oluştur",
+    "steps": {
+      "brandModel": {
+        "title": "Marka ve Model",
+        "subtitle": "Aracınızın markasını ve modelini seçin"
+      },
+      "specs": {
+        "title": "Özellikler",
+        "subtitle": "Yakıt, şanzıman ve kasa tipini seçin"
+      },
+      "details": {
+        "title": "Araç Detayları",
+        "subtitle": "Plaka, şasi no ve renk ekleyin (isteğe bağlı)"
+      },
+      "odometer": {
+        "title": "Kilometre ve Satın Alma",
+        "subtitle": "Kilometre ve satın alma bilgilerini takip edin (isteğe bağlı)"
+      },
+      "photo": {
+        "title": "Kapak Fotoğrafı",
+        "subtitle": "Aracınızın fotoğrafını ekleyin (isteğe bağlı)"
+      }
+    },
+    "errors": {
+      "selectBrandModel": "Lütfen marka ve model seçin",
+      "selectSpecs": "Lütfen yakıt tipi, şanzıman ve kasa tipi seçin",
+      "createFailed": "Araç oluşturulamadı",
+      "createModelFailed": "Özel model oluşturulamadı",
+      "uploadFailed": "Fotoğraf yüklenemedi"
+    },
+    "success": "Araç başarıyla eklendi!"
+  },
   "garage": {
     "title": "Garaj",
     "selectVehicle": "Araç Seçin",

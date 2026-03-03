@@ -11,21 +11,21 @@ import { EntityType } from "@garagely/shared/models/entity-type";
 import type {
   CreateVehiclePayload,
   UpdateVehiclePayload,
-  CreateVehicleModelPayload,
+  UpsertBrandModelPayload,
+  UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
-import {
-  NotFoundError,
-  ConflictError,
-  ForbiddenError,
-} from "@garagely/shared/error.types";
+import { NotFoundError, ForbiddenError } from "@garagely/shared/error.types";
 import type { IVehicleRepository } from "../repositories/vehicle.repository.interface";
-import type { IVehicleBrandRepository } from "../repositories/vehicle-brand.repository.interface";
-import type { IVehicleModelRepository } from "../repositories/vehicle-model.repository.interface";
 import type { IVehicleLookupRepository } from "../repositories/vehicle-lookup.repository.interface";
 import type {
   StorageService,
   UploadedFile,
 } from "../../storage/services/storage.service";
+import {
+  IVehicleBrandRepository,
+  IVehicleModelRepository,
+} from "../repositories";
+import { FirestoreTransactionManager } from "../../../providers/firebase/firestore-transaction-manager";
 
 export class VehicleService {
   constructor(
@@ -33,6 +33,7 @@ export class VehicleService {
     private readonly vehicleBrandRepository: IVehicleBrandRepository,
     private readonly vehicleModelRepository: IVehicleModelRepository,
     private readonly vehicleLookupRepository: IVehicleLookupRepository,
+    private readonly transactionManager: FirestoreTransactionManager,
     private readonly storageService?: StorageService,
   ) {}
 
@@ -63,33 +64,60 @@ export class VehicleService {
     return this.vehicleLookupRepository.findAllFuelTypes();
   }
 
-  // User model creation
-  async createModel(data: CreateVehicleModelPayload): Promise<VehicleModelModel> {
-    const brand = await this.vehicleBrandRepository.findById(data.brandId);
+  // Upsert brand and model - finds or creates both
+  async upsertBrandAndModel(
+    data: UpsertBrandModelPayload,
+  ): Promise<UpsertBrandModelResponse> {
+    return this.transactionManager.run<UpsertBrandModelResponse>(async (tx) => {
+      // Find or create brand
+      let brand = await this.vehicleBrandRepository.findByNameLower(
+        data.brand.name.toLowerCase(),
+        tx,
+      );
+      if (!brand) {
+        brand = await this.vehicleBrandRepository.create(
+          {
+            name: data.brand.name.trim(),
+            isSystem: false,
+            isActive: true,
+            logoUrl: null,
+          },
+          tx,
+        );
+      }
 
-    if (!brand) {
-      throw new NotFoundError("Brand not found");
-    }
+      // Find or create model
+      let model = await this.vehicleModelRepository.findByBrandNameYear(
+        brand.id,
+        data.model.name.toLowerCase(),
+        null,
+      );
 
-    const existing = await this.vehicleModelRepository.findByBrandNameYear(
-      data.brandId,
-      data.name.toLowerCase(),
-      data.year,
-    );
-
-    if (existing) {
-      throw new ConflictError("Model already exists for this brand and year");
-    }
-
-    return this.vehicleModelRepository.create({
-      ...data,
-      isSystem: false,
-      isActive: true,
+      if (!model) {
+        model = await this.vehicleModelRepository.create(
+          {
+            brandId: brand.id,
+            name: data.model.name.trim(),
+            year: null,
+            isSystem: false,
+            isActive: true,
+            coverPhotoUrl: null,
+          },
+          tx,
+        );
+      }
+      return {
+        brand: brand,
+        model: model,
+      };
     });
   }
 
   // Vehicle CRUD
-  async createVehicle(userId: string, data: CreateVehiclePayload): Promise<VehicleModel> {
+  async createVehicle(
+    userId: string,
+    data: CreateVehiclePayload,
+  ): Promise<VehicleModel> {
     await this.validateVehicleReferences(data);
 
     const vehicle = await this.vehicleRepository.create(userId, data);
@@ -111,7 +139,10 @@ export class VehicleService {
     return vehiclesWithCover;
   }
 
-  async getVehicleById(userId: string, vehicleId: string): Promise<VehicleModel> {
+  async getVehicleById(
+    userId: string,
+    vehicleId: string,
+  ): Promise<VehicleModel> {
     const vehicle = await this.vehicleRepository.findById(vehicleId);
 
     if (!vehicle) {
@@ -122,7 +153,9 @@ export class VehicleService {
       throw new ForbiddenError("You do not have access to this vehicle");
     }
 
-    const coverPhoto = this.storageService ? await this.getCover(vehicleId) : null;
+    const coverPhoto = this.storageService
+      ? await this.getCover(vehicleId)
+      : null;
 
     return { ...vehicle, coverPhoto };
   }
@@ -145,7 +178,9 @@ export class VehicleService {
     await this.validateVehicleReferences(data);
 
     const updatedVehicle = await this.vehicleRepository.update(vehicleId, data);
-    const coverPhoto = this.storageService ? await this.getCover(vehicleId) : null;
+    const coverPhoto = this.storageService
+      ? await this.getCover(vehicleId)
+      : null;
 
     return { ...updatedVehicle, coverPhoto };
   }
@@ -246,23 +281,28 @@ export class VehicleService {
     data: CreateVehiclePayload | UpdateVehiclePayload,
   ): Promise<void> {
     if (data.vehicleBrandId !== undefined) {
-      const brand = await this.vehicleBrandRepository.findById(data.vehicleBrandId);
+      const brand = await this.vehicleBrandRepository.findById(
+        data.vehicleBrandId,
+      );
       if (!brand) {
         throw new NotFoundError("Brand not found");
       }
     }
 
     if (data.vehicleModelId !== undefined) {
-      const model = await this.vehicleModelRepository.findById(data.vehicleModelId);
+      const model = await this.vehicleModelRepository.findById(
+        data.vehicleModelId,
+      );
       if (!model) {
         throw new NotFoundError("Model not found");
       }
     }
 
     if (data.vehicleTransmissionTypeId !== undefined) {
-      const transmissionType = await this.vehicleLookupRepository.findTransmissionTypeById(
-        data.vehicleTransmissionTypeId,
-      );
+      const transmissionType =
+        await this.vehicleLookupRepository.findTransmissionTypeById(
+          data.vehicleTransmissionTypeId,
+        );
       if (!transmissionType) {
         throw new NotFoundError("Transmission type not found");
       }

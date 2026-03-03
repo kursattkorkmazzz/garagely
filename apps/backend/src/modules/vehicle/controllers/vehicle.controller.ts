@@ -19,7 +19,10 @@ export class VehicleController {
     sendSuccess(res, models);
   };
 
-  getTransmissionTypes = async (_req: Request, res: Response): Promise<void> => {
+  getTransmissionTypes = async (
+    _req: Request,
+    res: Response,
+  ): Promise<void> => {
     const types = await this.vehicleService.getTransmissionTypes();
     sendSuccess(res, types);
   };
@@ -34,10 +37,10 @@ export class VehicleController {
     sendSuccess(res, types);
   };
 
-  // User model creation
-  createModel = async (req: Request, res: Response): Promise<void> => {
-    const model = await this.vehicleService.createModel(req.body);
-    sendSuccess(res, model, 201);
+  // Upsert brand and model together
+  upsertBrandAndModel = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.vehicleService.upsertBrandAndModel(req.body);
+    sendSuccess(res, result, 200);
   };
 
   // Vehicle CRUD
@@ -63,7 +66,11 @@ export class VehicleController {
   updateVehicle = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.uid;
     const id = req.params.id as string;
-    const vehicle = await this.vehicleService.updateVehicle(userId, id, req.body);
+    const vehicle = await this.vehicleService.updateVehicle(
+      userId,
+      id,
+      req.body,
+    );
     sendSuccess(res, vehicle);
   };
 
@@ -81,7 +88,9 @@ export class VehicleController {
     const file = req.file as UploadedFile | undefined;
 
     if (!file) {
-      throw new ValidationError("No file uploaded", { file: ["File is required"] });
+      throw new ValidationError("No file uploaded", {
+        file: ["File is required"],
+      });
     }
 
     const document = await this.vehicleService.uploadCover(userId, id, file);

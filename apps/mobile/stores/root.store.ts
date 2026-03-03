@@ -2,11 +2,13 @@ import { create } from "zustand";
 import { createAuthSlice, type AuthSlice } from "./slices/auth.slice";
 import { createUserSlice, type UserSlice } from "./slices/user.slice";
 import { createPreferencesSlice, type PreferencesSlice } from "./slices/preferences.slice";
+import { createVehicleSlice, type VehicleSlice } from "./slices/vehicle.slice";
 
 export interface RootState {
   auth: AuthSlice;
   user: UserSlice;
   preferences: PreferencesSlice;
+  vehicle: VehicleSlice;
 }
 
 export const useStore = create<RootState>()((set, get) => ({
@@ -22,5 +24,9 @@ export const useStore = create<RootState>()((set, get) => ({
       set((state) => ({ preferences: { ...state.preferences, ...partial } })),
     // Pass setter for auth.user to preferences slice
     (user) => set((state) => ({ auth: { ...state.auth, user } })),
+  ),
+  vehicle: createVehicleSlice(
+    (partial) => set((state) => ({ vehicle: { ...state.vehicle, ...partial } })),
+    () => get().vehicle,
   ),
 }));

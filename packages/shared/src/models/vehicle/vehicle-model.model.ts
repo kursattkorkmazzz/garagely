@@ -10,4 +10,6 @@ export const vehicleModelModelValidator = yup.object({
   isActive: yup.boolean().required(),
 });
 
-export type VehicleModelModel = yup.InferType<typeof vehicleModelModelValidator>;
+export type VehicleModelModel = yup.InferType<
+  typeof vehicleModelModelValidator
+>;

@@ -5,6 +5,7 @@ import {
   PressableProps,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from "react-native";
 import { useTheme } from "@/theme/theme-context";
 import { AppText } from "./app-text";
@@ -24,12 +25,14 @@ type ButtonSize = "default" | "sm" | "lg" | "icon";
 type AppButtonProps = Omit<PressableProps, "children"> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  loading?: boolean;
   children: ReactNode;
 };
 
 export function AppButton({
   variant = "primary",
   size = "default",
+  loading = false,
   children,
   style,
   disabled,
@@ -160,7 +163,7 @@ export function AppButton({
       borderRadius: radius * 2,
       alignItems: "center",
       justifyContent: "center",
-      opacity: disabled ? 0.5 : 1,
+      opacity: disabled || loading ? 0.5 : 1,
       ...variantStyles.container,
       ...sizeStyles.container,
     },
@@ -174,17 +177,21 @@ export function AppButton({
 
   const isTextChild = typeof children === "string";
 
+  const spinnerColor = variantStyles.text.color || theme.foreground;
+
   return (
     <Pressable
       {...rest}
-      disabled={disabled}
+      disabled={disabled || loading}
       style={(state) => [
         styles.container,
         state.pressed && { opacity: 0.8 },
         typeof style === "function" ? style(state) : style,
       ]}
     >
-      {isTextChild ? (
+      {loading ? (
+        <ActivityIndicator size="small" color={spinnerColor} />
+      ) : isTextChild ? (
         <AppText variant="buttonMedium" style={textStyle}>
           {children}
         </AppText>
