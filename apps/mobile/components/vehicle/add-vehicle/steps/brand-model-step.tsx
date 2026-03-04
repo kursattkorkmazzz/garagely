@@ -14,12 +14,19 @@ import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
 import { useStore } from "@/stores/root.store";
 import { AppText } from "@/components/ui/app-text";
-import { AppInput, InputField, InputLeftAction } from "@/components/ui/app-input";
+import {
+  AppInput,
+  InputField,
+  InputLeftAction,
+} from "@/components/ui/app-input";
 import { AppIcon } from "@/components/ui/app-icon";
 import { AppButton } from "@/components/ui/app-button";
 import { spacing } from "@/theme/tokens/spacing";
 import { radius } from "@/theme/tokens/radius";
-import type { VehicleBrandModel, VehicleModelModel } from "@garagely/shared/models/vehicle";
+import type {
+  VehicleBrandModel,
+  VehicleModelModel,
+} from "@garagely/shared/models/vehicle";
 
 type BrandModelStepProps = {
   selectedBrandId: string | null;
@@ -48,14 +55,17 @@ export function BrandModelStep({
 }: BrandModelStepProps) {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
-  const { brands, models, isLoadingLookups, fetchBrands, fetchModelsByBrand, clearModels } =
-    useStore((state) => state.vehicle);
+  const {
+    brands,
+    models,
+    isLoadingLookups,
+    fetchBrands,
+    fetchModelsByBrand,
+    clearModels,
+  } = useStore((state) => state.vehicle);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showModels, setShowModels] = useState(false);
-
-  // Debug log
-  console.log("BrandModelStep render - isCustomEntry:", isCustomEntry);
 
   useEffect(() => {
     if (brands.length === 0) {
@@ -103,8 +113,6 @@ export function BrandModelStep({
   };
 
   const handleShowCustomEntry = () => {
-    Alert.alert("Debug", "Button clicked! Setting isCustomEntry to true");
-    console.log("handleShowCustomEntry called, setting isCustomEntry to true");
     onCustomEntryChange(true);
     onModelSelect(null);
     // Pre-fill with search query if user was searching
@@ -167,9 +175,7 @@ export function BrandModelStep({
         >
           {item.name}
         </AppText>
-        {isSelected && (
-          <AppIcon icon="Check" size={20} color={theme.primary} />
-        )}
+        {isSelected && <AppIcon icon="Check" size={20} color={theme.primary} />}
       </Pressable>
     );
   };
@@ -197,9 +203,7 @@ export function BrandModelStep({
         >
           {item.name}
         </AppText>
-        {isSelected && (
-          <AppIcon icon="Check" size={20} color={theme.primary} />
-        )}
+        {isSelected && <AppIcon icon="Check" size={20} color={theme.primary} />}
       </Pressable>
     );
   };
@@ -220,7 +224,11 @@ export function BrandModelStep({
           <AppText variant="bodyMedium" style={styles.customModelTitle}>
             {t("addVehicle.enterCustomVehicle")}
           </AppText>
-          <AppText variant="bodySmall" color="muted" style={styles.customModelSubtitle}>
+          <AppText
+            variant="bodySmall"
+            color="muted"
+            style={styles.customModelSubtitle}
+          >
             {t("addVehicle.customVehicleHint")}
           </AppText>
 
@@ -230,7 +238,11 @@ export function BrandModelStep({
           </AppText>
           <AppInput style={styles.customModelInput}>
             <InputLeftAction>
-              <AppIcon icon="Building2" size={20} color={theme.mutedForeground} />
+              <AppIcon
+                icon="Building2"
+                size={20}
+                color={theme.mutedForeground}
+              />
             </InputLeftAction>
             <InputField
               placeholder={t("addVehicle.brandNamePlaceholder")}
@@ -374,7 +386,11 @@ export function BrandModelStep({
                   {t("addVehicle.enterManually")}
                 </AppText>
               </View>
-              <AppIcon icon="ChevronRight" size={20} color={theme.mutedForeground} />
+              <AppIcon
+                icon="ChevronRight"
+                size={20}
+                color={theme.mutedForeground}
+              />
             </TouchableOpacity>
           </View>
         }

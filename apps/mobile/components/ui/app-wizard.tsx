@@ -28,6 +28,7 @@ type AppWizardProps = {
   backLabel?: string;
   completeLabel?: string;
   cancelLabel?: string;
+  onStepChange?: (stepIndex: number) => void;
 };
 
 export function AppWizard({
@@ -40,6 +41,7 @@ export function AppWizard({
   backLabel,
   completeLabel,
   cancelLabel,
+  onStepChange,
 }: AppWizardProps) {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
@@ -57,7 +59,8 @@ export function AppWizard({
 
   const canProceed = useCallback(async (): Promise<boolean> => {
     if (currentStep.canProceed === undefined) return true;
-    if (typeof currentStep.canProceed === "boolean") return currentStep.canProceed;
+    if (typeof currentStep.canProceed === "boolean")
+      return currentStep.canProceed;
     return await currentStep.canProceed();
   }, [currentStep]);
 
@@ -78,6 +81,7 @@ export function AppWizard({
         onComplete();
       } else {
         setCurrentStepIndex((prev) => prev + 1);
+        onStepChange?.(currentStepIndex + 1);
       }
     } finally {
       setIsLoading(false);
@@ -93,14 +97,18 @@ export function AppWizard({
       onCancel?.();
     } else {
       setCurrentStepIndex((prev) => prev - 1);
+      onStepChange?.(currentStepIndex - 1);
     }
   }, [currentStep, isFirstStep, onCancel]);
 
-  const goToStep = useCallback((index: number) => {
-    if (index >= 0 && index < steps.length) {
-      setCurrentStepIndex(index);
-    }
-  }, [steps.length]);
+  const goToStep = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < steps.length) {
+        setCurrentStepIndex(index);
+      }
+    },
+    [steps.length],
+  );
 
   return (
     <View style={styles.container}>
@@ -181,11 +189,18 @@ export function AppWizard({
           style={styles.nextButton}
         >
           <View style={styles.buttonContent}>
-            <AppText variant="bodyMedium" style={{ color: theme.primaryForeground }}>
+            <AppText
+              variant="bodyMedium"
+              style={{ color: theme.primaryForeground }}
+            >
               {isLastStep ? _completeLabel : _nextLabel}
             </AppText>
             {!isLastStep && (
-              <AppIcon icon="ChevronRight" size={18} color={theme.primaryForeground} />
+              <AppIcon
+                icon="ChevronRight"
+                size={18}
+                color={theme.primaryForeground}
+              />
             )}
           </View>
         </AppButton>
@@ -206,9 +221,12 @@ export function useWizard(totalSteps: number) {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   }, []);
 
-  const goTo = useCallback((step: number) => {
-    setCurrentStep(Math.max(0, Math.min(step, totalSteps - 1)));
-  }, [totalSteps]);
+  const goTo = useCallback(
+    (step: number) => {
+      setCurrentStep(Math.max(0, Math.min(step, totalSteps - 1)));
+    },
+    [totalSteps],
+  );
 
   const reset = useCallback(() => {
     setCurrentStep(0);

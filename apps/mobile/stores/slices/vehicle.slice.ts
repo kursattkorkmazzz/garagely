@@ -48,24 +48,30 @@ export interface VehicleSlice {
   fetchVehicles: (callbacks?: VehicleCallbacks) => Promise<void>;
   createVehicle: (
     payload: CreateVehiclePayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (vehicle: VehicleModel) => void },
+    callbacks?: VehicleCallbacks & {
+      onSuccess?: (vehicle: VehicleModel) => void;
+    },
   ) => Promise<VehicleModel | null>;
-  deleteVehicle: (vehicleId: string, callbacks?: VehicleCallbacks) => Promise<void>;
+  deleteVehicle: (
+    vehicleId: string,
+    callbacks?: VehicleCallbacks,
+  ) => Promise<void>;
 
   // Actions - Lookups
   fetchBrands: (callbacks?: VehicleCallbacks) => Promise<void>;
-  fetchModelsByBrand: (brandId: string, callbacks?: VehicleCallbacks) => Promise<void>;
+  fetchModelsByBrand: (
+    brandId: string,
+    callbacks?: VehicleCallbacks,
+  ) => Promise<void>;
   fetchFuelTypes: (callbacks?: VehicleCallbacks) => Promise<void>;
   fetchTransmissionTypes: (callbacks?: VehicleCallbacks) => Promise<void>;
   fetchBodyTypes: (callbacks?: VehicleCallbacks) => Promise<void>;
   fetchAllLookups: (callbacks?: VehicleCallbacks) => Promise<void>;
-  createModel: (
-    payload: CreateVehicleModelPayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (model: VehicleModelModel) => void },
-  ) => Promise<VehicleModelModel | null>;
   upsertBrandAndModel: (
     payload: UpsertBrandModelPayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (result: UpsertBrandModelResponse) => void },
+    callbacks?: VehicleCallbacks & {
+      onSuccess?: (result: UpsertBrandModelResponse) => void;
+    },
   ) => Promise<UpsertBrandModelResponse | null>;
 
   // Actions - Cover
@@ -96,7 +102,10 @@ function createReactNativeFile(uri: string) {
   } as unknown as Blob;
 }
 
-export const createVehicleSlice = (set: SetVehicleState, get: GetVehicleState): VehicleSlice => ({
+export const createVehicleSlice = (
+  set: SetVehicleState,
+  get: GetVehicleState,
+): VehicleSlice => ({
   // Initial state - Vehicles
   vehicles: [],
   isLoadingVehicles: false,
@@ -137,7 +146,9 @@ export const createVehicleSlice = (set: SetVehicleState, get: GetVehicleState): 
 
   createVehicle: async (
     payload: CreateVehiclePayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (vehicle: VehicleModel) => void },
+    callbacks?: VehicleCallbacks & {
+      onSuccess?: (vehicle: VehicleModel) => void;
+    },
   ): Promise<VehicleModel | null> => {
     set({ isCreating: true, createError: null });
 
@@ -277,37 +288,11 @@ export const createVehicleSlice = (set: SetVehicleState, get: GetVehicleState): 
       callbacks?.onError?.({ message: "Failed to load lookups" } as SdkError);
     }
   },
-
-  createModel: async (
-    payload: CreateVehicleModelPayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (model: VehicleModelModel) => void },
-  ): Promise<VehicleModelModel | null> => {
-    set({ isLoadingLookups: true, lookupsError: null });
-
-    let createdModel: VehicleModelModel | null = null;
-
-    await sdk.vehicle.createModel(payload, {
-      onSuccess: (data) => {
-        createdModel = data;
-        const currentModels = get().models;
-        set({
-          models: [...currentModels, data],
-          isLoadingLookups: false,
-        });
-        callbacks?.onSuccess?.(data);
-      },
-      onError: (err: SdkError) => {
-        set({ isLoadingLookups: false, lookupsError: err.message });
-        callbacks?.onError?.(err);
-      },
-    });
-
-    return createdModel;
-  },
-
   upsertBrandAndModel: async (
     payload: UpsertBrandModelPayload,
-    callbacks?: VehicleCallbacks & { onSuccess?: (result: UpsertBrandModelResponse) => void },
+    callbacks?: VehicleCallbacks & {
+      onSuccess?: (result: UpsertBrandModelResponse) => void;
+    },
   ): Promise<UpsertBrandModelResponse | null> => {
     set({ isLoadingLookups: true, lookupsError: null });
 
