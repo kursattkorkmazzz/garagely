@@ -33,16 +33,25 @@ export function AppHeader({
   const router = useRouter();
   const user = useStore((state) => state.auth.user);
   const avatar = useStore((state) => state.user.avatar);
+  const vehicles = useStore((state) => state.vehicle.vehicles);
 
-  // TODO: Replace with actual vehicle data from store
-  const selectedVehicle = "";
+  const firstVehicle = vehicles[0];
+  const selectedVehicleLabel = firstVehicle
+    ? (() => {
+        const brand = firstVehicle.brandName ?? "";
+        const model = firstVehicle.modelName ?? "";
+        return brand && model
+          ? `${brand} ${model}`
+          : brand || model || firstVehicle.plate || "";
+      })()
+    : "";
 
   const handleAvatarPress = () => {
     router.push("/(tabs)/profile");
   };
 
   const handleVehicleSelectorPress = () => {
-    // TODO: Implement vehicle selector
+    router.push("/vehicles");
   };
 
   return (
@@ -58,7 +67,7 @@ export function AppHeader({
 
         {showVehicleSelector && (
           <AppSelector
-            value={selectedVehicle}
+            value={selectedVehicleLabel}
             placeholder={t("garage.selectVehicle")}
             onPress={handleVehicleSelectorPress}
           />

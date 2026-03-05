@@ -9,6 +9,7 @@ import type {
 import type { DocumentModel } from "@garagely/shared/models/document";
 import { EntityType } from "@garagely/shared/models/entity-type";
 import type {
+  CreateVehicleModelPayload,
   CreateVehiclePayload,
   UpdateVehiclePayload,
   UpsertBrandModelPayload,
@@ -113,6 +114,36 @@ export class VehicleService {
     });
   }
 
+  // Create a custom model under an existing brand
+  async createModel(
+    data: CreateVehicleModelPayload,
+  ): Promise<VehicleModelModel> {
+    const brand = await this.vehicleBrandRepository.findById(data.brandId);
+
+    if (!brand) {
+      throw new NotFoundError("Brand not found");
+    }
+
+    const existingModel = await this.vehicleModelRepository.findByBrandNameYear(
+      data.brandId,
+      data.name.toLowerCase(),
+      data.year ?? null,
+    );
+
+    if (existingModel) {
+      return existingModel;
+    }
+
+    return this.vehicleModelRepository.create({
+      brandId: data.brandId,
+      name: data.name.trim(),
+      year: data.year ?? null,
+      isSystem: false,
+      isActive: true,
+      coverPhotoUrl: null,
+    });
+  }
+
   // Vehicle CRUD
   async createVehicle(
     userId: string,
@@ -121,7 +152,11 @@ export class VehicleService {
     await this.validateVehicleReferences(data);
 
     const vehicle = await this.vehicleRepository.create(userId, data);
-    return { ...vehicle, coverPhoto: null };
+    const { brandName, modelName, modelYear } = await this.resolveBrandModelNames(
+      vehicle.vehicleBrandId,
+      vehicle.vehicleModelId,
+    );
+    return { ...vehicle, coverPhoto: null, brandName, modelName, modelYear };
   }
 
   async getVehiclesByUser(userId: string): Promise<VehicleModel[]> {
@@ -132,7 +167,11 @@ export class VehicleService {
         const coverPhoto = this.storageService
           ? await this.getCover(vehicle.id)
           : null;
-        return { ...vehicle, coverPhoto };
+        const { brandName, modelName, modelYear } = await this.resolveBrandModelNames(
+          vehicle.vehicleBrandId,
+          vehicle.vehicleModelId,
+        );
+        return { ...vehicle, coverPhoto, brandName, modelName, modelYear };
       }),
     );
 
@@ -157,7 +196,12 @@ export class VehicleService {
       ? await this.getCover(vehicleId)
       : null;
 
-    return { ...vehicle, coverPhoto };
+    const { brandName, modelName, modelYear } = await this.resolveBrandModelNames(
+      vehicle.vehicleBrandId,
+      vehicle.vehicleModelId,
+    );
+
+    return { ...vehicle, coverPhoto, brandName, modelName, modelYear };
   }
 
   async updateVehicle(
@@ -182,7 +226,12 @@ export class VehicleService {
       ? await this.getCover(vehicleId)
       : null;
 
-    return { ...updatedVehicle, coverPhoto };
+    const { brandName, modelName, modelYear } = await this.resolveBrandModelNames(
+      updatedVehicle.vehicleBrandId,
+      updatedVehicle.vehicleModelId,
+    );
+
+    return { ...updatedVehicle, coverPhoto, brandName, modelName, modelYear };
   }
 
   async deleteVehicle(userId: string, vehicleId: string): Promise<void> {
@@ -325,5 +374,20 @@ export class VehicleService {
         throw new NotFoundError("Fuel type not found");
       }
     }
+  }
+
+  private async resolveBrandModelNames(
+    brandId: string,
+    modelId: string,
+  ): Promise<{ brandName: string | null; modelName: string | null; modelYear: number | null }> {
+    const [brand, model] = await Promise.all([
+      this.vehicleBrandRepository.findById(brandId),
+      this.vehicleModelRepository.findById(modelId),
+    ]);
+    return {
+      brandName: brand?.name ?? null,
+      modelName: model?.name ?? null,
+      modelYear: model?.year ?? null,
+    };
   }
 }

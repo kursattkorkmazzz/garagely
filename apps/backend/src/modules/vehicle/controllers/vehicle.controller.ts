@@ -19,6 +19,15 @@ export class VehicleController {
     sendSuccess(res, models);
   };
 
+  createModel = async (req: Request, res: Response): Promise<void> => {
+    const brandId = req.params.brandId as string;
+    const model = await this.vehicleService.createModel({
+      brandId,
+      ...req.body,
+    });
+    sendSuccess(res, model, 201);
+  };
+
   getTransmissionTypes = async (
     _req: Request,
     res: Response,

@@ -5,6 +5,7 @@ import {
   TextInputProps,
   StyleSheet,
   ViewProps,
+  Platform,
 } from "react-native";
 import { useTheme } from "@/theme/theme-context";
 import { radius } from "@/theme/tokens/radius";
@@ -75,7 +76,7 @@ export function InputField({
       color: theme.foreground,
       fontSize: 16,
       paddingVertical: spacing.sm,
-      outline: "none",
+      ...(Platform.OS === "web" ? ({ outline: "none" } as object) : {}),
     },
   });
 

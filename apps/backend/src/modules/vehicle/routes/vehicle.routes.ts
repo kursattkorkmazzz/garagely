@@ -62,6 +62,11 @@ router.get(
   "/brands/:brandId/models",
   asyncHandler(vehicleController.getModelsByBrand),
 );
+router.post(
+  "/brands/:brandId/models",
+  validatePayload(createVehicleModelPayloadValidator.omit(["brandId"])),
+  asyncHandler(vehicleController.createModel),
+);
 router.get(
   "/transmission-types",
   asyncHandler(vehicleController.getTransmissionTypes),

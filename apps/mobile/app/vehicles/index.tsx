@@ -1,45 +1,48 @@
-import { ScrollView, View, StyleSheet, Pressable } from "react-native";
+import { useEffect, useCallback } from "react";
+import { ScrollView, View, StyleSheet, ActivityIndicator } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
+import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
 import { AppIcon } from "@/components/ui/app-icon";
 import { VehicleCard, VehicleCardData } from "@/components/garage";
 import { spacing } from "@/theme/tokens/spacing";
+import type { VehicleModel } from "@garagely/shared/models/vehicle";
 
-// TODO: Replace with actual data from store
-const mockVehicles: VehicleCardData[] = [
-  {
-    id: "1",
-    name: "BMW X5",
-    licensePlate: "ABC-1234",
-    modelYear: 2021,
-    mileage: 45200,
-    costPerKm: 0.42,
-    lastServiceDate: "Oct 12, 2023",
-    isOverdue: false,
-    coverImage:
-      "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-    color: "#4A5568",
-  },
-  {
-    id: "2",
-    name: "Tesla Model 3",
-    licensePlate: "ELC-9988",
-    modelYear: 2022,
-    mileage: 28500,
-    costPerKm: 0.18,
-    lastServiceDate: "Jan 15, 2023",
-    isOverdue: true,
-    color: "#1E3A5F",
-  },
-];
+function toVehicleCardData(vehicle: VehicleModel): VehicleCardData {
+  const brandName = vehicle.brandName ?? "";
+  const modelName = vehicle.modelName ?? "";
+  const name =
+    brandName && modelName
+      ? `${brandName} ${modelName}`
+      : brandName || modelName || vehicle.plate || vehicle.id;
+
+  return {
+    id: vehicle.id,
+    name,
+    licensePlate: vehicle.plate ?? "-",
+    modelYear: vehicle.modelYear ?? 0,
+    mileage: vehicle.currentKm ?? 0,
+    costPerKm: 0,
+    coverImage: vehicle.coverPhoto?.url ?? undefined,
+    color: vehicle.color ?? undefined,
+  };
+}
 
 export default function VehicleListScreen() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
+  const { vehicles, isLoadingVehicles, fetchVehicles, uploadCover } = useStore(
+    (state) => state.vehicle,
+  );
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   const handleBackPress = () => {
     router.back();
@@ -50,12 +53,29 @@ export default function VehicleListScreen() {
   };
 
   const handleVehiclePress = (vehicle: VehicleCardData) => {
-    // TODO: Navigate to vehicle details
+    router.push(`/vehicles/${vehicle.id}`);
   };
 
-  const handleCameraPress = (vehicle: VehicleCardData) => {
-    // TODO: Open camera/gallery to update vehicle cover
-  };
+  const handleCameraPress = useCallback(
+    async (vehicle: VehicleCardData) => {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await uploadCover(vehicle.id, result.assets[0].uri);
+      }
+    },
+    [uploadCover],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -68,7 +88,7 @@ export default function VehicleListScreen() {
           <View>
             <AppText variant="heading2">{t("vehicles.title")}</AppText>
             <AppText variant="caption" color="muted">
-              {t("vehicles.total", { count: mockVehicles.length })}
+              {t("vehicles.total", { count: vehicles.length })}
             </AppText>
           </View>
         </View>
@@ -84,21 +104,53 @@ export default function VehicleListScreen() {
         </AppButton>
       </View>
 
+      {/* Loading state */}
+      {isLoadingVehicles && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+        </View>
+      )}
+
       {/* Vehicle List */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {mockVehicles.map((vehicle) => (
-          <VehicleCard
-            key={vehicle.id}
-            vehicle={vehicle}
-            onPress={() => handleVehiclePress(vehicle)}
-            onCameraPress={() => handleCameraPress(vehicle)}
-          />
-        ))}
-      </ScrollView>
+      {!isLoadingVehicles && (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {vehicles.map((vehicle) => {
+            const cardData = toVehicleCardData(vehicle);
+            return (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={cardData}
+                onPress={() => handleVehiclePress(cardData)}
+                onCameraPress={() => handleCameraPress(cardData)}
+              />
+            );
+          })}
+          {vehicles.length === 0 && (
+            <View style={styles.emptyContainer}>
+              <AppIcon icon="Car" size={48} color={theme.mutedForeground} />
+              <AppText
+                variant="bodyMedium"
+                color="muted"
+                style={styles.emptyText}
+              >
+                {t("vehicles.empty")}
+              </AppText>
+              <AppButton
+                variant="primary"
+                size="sm"
+                onPress={handleAddPress}
+                style={styles.emptyButton}
+              >
+                {t("vehicles.add")}
+              </AppButton>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -119,13 +171,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
   },
-  backButton: {
-    padding: spacing.xs,
-  },
   addButtonContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollView: {
     flex: 1,
@@ -133,5 +187,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: spacing.lg,
     paddingTop: 0,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.xl * 2,
+    gap: spacing.md,
+  },
+  emptyText: {
+    textAlign: "center",
+  },
+  emptyButton: {
+    marginTop: spacing.sm,
   },
 });

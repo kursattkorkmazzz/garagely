@@ -23,6 +23,10 @@ export const vehicleModelValidator = yup.object({
   purchaseKm: yup.number().integer().min(0).nullable().defined(),
   createdAt: firestoreDate().required(),
   updatedAt: firestoreDate().required(),
+  // Denormalized fields populated at query time (not stored in Firestore)
+  brandName: yup.string().nullable().optional(),
+  modelName: yup.string().nullable().optional(),
+  modelYear: yup.number().integer().nullable().optional(),
 });
 
 export type VehicleModel = yup.InferType<typeof vehicleModelValidator>;

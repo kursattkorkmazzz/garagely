@@ -29,6 +29,12 @@ export interface VehicleApi {
   getBodyTypes(callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>): Promise<void>;
   getFuelTypes(callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>): Promise<void>;
 
+  // Create a custom model under an existing brand
+  createModel(
+    payload: CreateVehicleModelPayload,
+    callbacks?: SdkCallbacks<VehicleModelModel>,
+  ): Promise<void>;
+
   // Upsert brand and model together
   upsertBrandAndModel(
     payload: UpsertBrandModelPayload,
@@ -128,6 +134,22 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       try {
         const data = await client.get<VehicleFuelTypeModel[]>(
           "/vehicles/fuel-types",
+        );
+        callbacks?.onSuccess?.(data);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    // Create a custom model under an existing brand
+    async createModel(
+      payload: CreateVehicleModelPayload,
+      callbacks?: SdkCallbacks<VehicleModelModel>,
+    ): Promise<void> {
+      try {
+        const data = await client.post<VehicleModelModel>(
+          `/vehicles/brands/${payload.brandId}/models`,
+          { name: payload.name, year: payload.year },
         );
         callbacks?.onSuccess?.(data);
       } catch (error) {

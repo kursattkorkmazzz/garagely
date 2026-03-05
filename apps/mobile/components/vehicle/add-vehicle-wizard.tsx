@@ -71,9 +71,6 @@ export function AddVehicleWizard() {
 
   const [formState, setFormState] = useState<FormState>(initialFormState);
 
-  // Debug log
-  console.log("AddVehicleWizard render - formState.isCustomEntry:", formState.isCustomEntry);
-
   // Update form state helpers
   const updateForm = useCallback((updates: Partial<FormState>) => {
     setFormState((prev) => ({ ...prev, ...updates }));
@@ -121,7 +118,6 @@ export function AddVehicleWizard() {
 
   const handleCustomEntryChange = useCallback(
     (isCustom: boolean) => {
-      console.log("handleCustomEntryChange called with:", isCustom);
       updateForm({
         isCustomEntry: isCustom,
         selectedBrand: isCustom ? null : formState.selectedBrand,
@@ -256,8 +252,8 @@ export function AddVehicleWizard() {
 
       const upsertResult = await upsertBrandAndModel(
         {
-          brandName: formState.customBrandName.trim(),
-          modelName: formState.customModelName.trim(),
+          brand: { name: formState.customBrandName.trim() },
+          model: { name: formState.customModelName.trim() },
         },
         {
           onError: (err) => {
@@ -270,8 +266,8 @@ export function AddVehicleWizard() {
         return;
       }
 
-      brandId = upsertResult.brandId;
-      modelId = upsertResult.modelId;
+      brandId = upsertResult.brand.id;
+      modelId = upsertResult.model.id;
     } else {
       // Normal mode: use selected brand and model
       if (!formState.selectedBrand || !formState.selectedModel) {

@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
@@ -53,9 +52,6 @@ export function BrandModelStep({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showModels, setShowModels] = useState(false);
-
-  // Debug log
-  console.log("BrandModelStep render - isCustomEntry:", isCustomEntry);
 
   useEffect(() => {
     if (brands.length === 0) {
@@ -103,8 +99,6 @@ export function BrandModelStep({
   };
 
   const handleShowCustomEntry = () => {
-    Alert.alert("Debug", "Button clicked! Setting isCustomEntry to true");
-    console.log("handleShowCustomEntry called, setting isCustomEntry to true");
     onCustomEntryChange(true);
     onModelSelect(null);
     // Pre-fill with search query if user was searching

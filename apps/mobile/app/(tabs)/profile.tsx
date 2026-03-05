@@ -42,12 +42,6 @@ export default function ProfileScreen() {
     (state) => state.user,
   );
 
-  useEffect(() => {
-    console.log("User is changed");
-    console.log(user);
-    console.log(avatar);
-  }, []);
-
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showThemeSheet, setShowThemeSheet] = useState(false);
