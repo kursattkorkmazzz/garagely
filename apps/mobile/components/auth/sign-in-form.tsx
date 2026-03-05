@@ -24,8 +24,8 @@ import { useRouter } from "expo-router";
 import { AppSpinner } from "../ui/app-spinner";
 
 const initialValues: LoginPayload = {
-  email: "",
-  password: "",
+  email: "kursat.korkmaz123@hotmail.com",
+  password: "admin1234",
 };
 
 export function SignInForm() {

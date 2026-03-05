@@ -9,6 +9,8 @@ import {
 import { useTheme } from "@/theme/theme-context";
 import { radius } from "@/theme/tokens/radius";
 import { spacing } from "@/theme/tokens/spacing";
+import { AppText } from "./app-text";
+import { AppView } from "./app-view";
 
 // Context for sharing input state
 interface InputContextProps {
@@ -29,9 +31,10 @@ function useInputContext() {
 // AppInput - Container component
 type AppInputProps = ViewProps & {
   children: ReactNode;
+  label?: ReactNode;
 };
 
-export function AppInput({ children, style, ...rest }: AppInputProps) {
+export function AppInput({ children, style, label, ...rest }: AppInputProps) {
   const { theme } = useTheme();
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -46,13 +49,31 @@ export function AppInput({ children, style, ...rest }: AppInputProps) {
       paddingHorizontal: spacing.md,
       minHeight: 56,
     },
+    labelContainer: {
+      gap: spacing.sm,
+    },
+    label: {
+      paddingLeft: spacing.sm,
+    },
   });
+
+  const InputComponent = (
+    <View {...rest} style={[styles.container, style]}>
+      {children}
+    </View>
+  );
 
   return (
     <InputContext.Provider value={{ isFocused, setIsFocused }}>
-      <View {...rest} style={[styles.container, style]}>
-        {children}
-      </View>
+      {label && (
+        <AppView style={styles.labelContainer}>
+          <AppText variant="label" color="muted" style={styles.label}>
+            {label}
+          </AppText>
+          {InputComponent}
+        </AppView>
+      )}
+      {!label && InputComponent}
     </InputContext.Provider>
   );
 }
@@ -139,5 +160,21 @@ export function InputRightAction({
     <View {...rest} style={[styles.container, style]}>
       {children}
     </View>
+  );
+}
+
+// InputErrorMessageProps - Container for left side content
+type InputErrorMessageProps = React.ComponentProps<typeof AppText>;
+
+// InputErrorMessage - Container for right side content
+export function InputErrorMessage({
+  children,
+  style,
+  ...rest
+}: InputErrorMessageProps) {
+  return (
+    <AppText {...rest} variant="bodySmall" color="destructive">
+      {children}
+    </AppText>
   );
 }

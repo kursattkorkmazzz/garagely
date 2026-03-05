@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { View, Image, StyleSheet, ImageSourcePropType } from "react-native";
 import { AppText } from "./app-text";
 import { useTheme } from "@/theme/theme-context";
@@ -55,7 +61,9 @@ export function AppAvatar({ children, size = "default" }: AppAvatarProps) {
 
   return (
     <AvatarContext.Provider value={{ size, imageLoaded, setImageLoaded }}>
-      <View style={[styles.container, { width: avatarSize, height: avatarSize }]}>
+      <View
+        style={[styles.container, { width: avatarSize, height: avatarSize }]}
+      >
         {children}
       </View>
     </AvatarContext.Provider>
@@ -171,7 +179,10 @@ type AppAvatarBadgeProps = {
   backgroundColor?: string;
 };
 
-export function AppAvatarBadge({ children, backgroundColor }: AppAvatarBadgeProps) {
+export function AppAvatarBadge({
+  children,
+  backgroundColor,
+}: AppAvatarBadgeProps) {
   const { theme } = useTheme();
   const { size } = useAvatarContext();
   const badgeSize = badgeSizes[size];
