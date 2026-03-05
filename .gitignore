@@ -27,6 +27,8 @@ out/
 build
 dist
 
+# Expo
+.expo/
 
 # Debug
 npm-debug.log*
