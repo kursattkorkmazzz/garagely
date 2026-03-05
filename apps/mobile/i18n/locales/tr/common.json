@@ -135,7 +135,9 @@
       "deleteFailed": "Araç silinemedi",
       "deleteSuccess": "Araç başarıyla silindi",
       "confirmDelete": "Bu aracı silmek istediğinizden emin misiniz?",
-      "editCover": "Kapak Fotoğrafını Düzenle"
+      "editCover": "Kapak Fotoğrafını Düzenle",
+      "notFound": "Araç bulunamadı",
+      "noCoverPhoto": "Kapak fotoğrafı yok"
     },
     "card": {
       "modelYear": "MODEL YILI",

@@ -141,7 +141,7 @@ export default function VehicleDetailScreen() {
       >
         <AppIcon icon="Car" size={48} color={theme.mutedForeground} />
         <AppText variant="bodyMedium" color="muted" style={styles.notFoundText}>
-          Vehicle not found
+          {t("vehicles.details.notFound")}
         </AppText>
         <AppButton
           variant="secondary"
@@ -203,7 +203,7 @@ export default function VehicleDetailScreen() {
             </AppText>
           ) : (
             <AppText variant="caption" color="muted">
-              No cover photo
+              {t("vehicles.details.noCoverPhoto")}
             </AppText>
           )}
         </View>

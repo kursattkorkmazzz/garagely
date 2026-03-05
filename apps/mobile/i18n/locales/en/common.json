@@ -135,7 +135,9 @@
       "deleteFailed": "Failed to delete vehicle",
       "deleteSuccess": "Vehicle deleted successfully",
       "confirmDelete": "Are you sure you want to delete this vehicle?",
-      "editCover": "Edit Cover Photo"
+      "editCover": "Edit Cover Photo",
+      "notFound": "Vehicle not found",
+      "noCoverPhoto": "No cover photo"
     },
     "card": {
       "modelYear": "MODEL YEAR",
