@@ -48,7 +48,11 @@ export function ListItem<T extends ListItemBase>({
   );
 
   return (
-    <Pressable onPress={() => onClick?.(item)}>
+    <Pressable
+      onPress={() => {
+        onClick?.(item);
+      }}
+    >
       <AppCard style={style.cardContainer}>
         <AppCardHeader
           style={{

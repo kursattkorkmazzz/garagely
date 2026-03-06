@@ -10,26 +10,6 @@ import { AppView } from "@/components/ui/app-view";
 import { useFormikContext } from "formik";
 import { AddVehicleFormState } from "../../add-vehicle-wizard";
 
-// Map transmission types to icons
-const transmissionTypeIcons: Record<string, IconName> = {
-  manual: "Settings",
-  automatic: "Settings2",
-  cvt: "CircleDot",
-};
-
-// Map body types to icons
-const bodyTypeIcons: Record<string, IconName> = {
-  sedan: "Car",
-  suv: "Truck",
-  hatchback: "CarFront",
-  coupe: "Car",
-  convertible: "Wind",
-  wagon: "CarTaxiFront",
-  van: "Bus",
-  pickup: "Truck",
-  minivan: "Bus",
-};
-
 const MOCK_FUEL_TYPES = [
   {
     id: "1",
@@ -63,36 +43,104 @@ const MOCK_FUEL_TYPES = [
   },
 ];
 
+const MOCK_TRANSMISSIN_TYPES = [
+  {
+    id: "1",
+    type: "manual",
+    icon: "Settings",
+    isActive: true,
+  },
+  {
+    id: "2",
+    type: "automatic",
+    icon: "Settings2",
+    isActive: true,
+  },
+  {
+    id: "3",
+    type: "cvt",
+    icon: "CircleDot",
+    isActive: true,
+  },
+];
+
+const MOCK_BODY_TYPES = [
+  {
+    id: "1",
+    type: "sedan",
+    icon: "Car",
+    isActive: true,
+  },
+  {
+    id: "2",
+    type: "suv",
+    icon: "Truck",
+    isActive: true,
+  },
+  {
+    id: "3",
+    type: "hatchback",
+    icon: "CarFront",
+    isActive: true,
+  },
+  {
+    id: "4",
+    type: "coupe",
+    icon: "Car",
+    isActive: true,
+  },
+  {
+    id: "5",
+    type: "convertible",
+    icon: "Wind",
+    isActive: true,
+  },
+  {
+    id: "6",
+    type: "wagon",
+    icon: "CarTaxiFront",
+    isActive: true,
+  },
+  {
+    id: "7",
+    type: "van",
+    icon: "Bus",
+    isActive: true,
+  },
+  {
+    id: "8",
+    type: "pickup",
+    icon: "Truck",
+    isActive: true,
+  },
+  {
+    id: "9",
+    type: "minivan",
+    icon: "Bus",
+    isActive: true,
+  },
+];
 export function SpecsStep() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const formik = useFormikContext<AddVehicleFormState>();
 
-  const [fuelTypes, _] = useState(MOCK_FUEL_TYPES);
-
   return (
     <ScrollView style={styles.container}>
       {/* Fuel Type */}
-      <View style={styles.section}>
+      <AppView style={styles.section}>
         <AppText variant="bodyMedium" style={styles.sectionTitle}>
           {t("addVehicle.fuelType")}
         </AppText>
 
-        <AppView
-          style={{
-            flexDirection: "column",
-            flex: 1,
-            gap: spacing.sm,
-          }}
-        >
-          {fuelTypes.map((fuelType) => (
+        {/* Fuel Type List */}
+        <AppView style={styles.listContainer}>
+          {MOCK_FUEL_TYPES.map((fuelType) => (
             <ListItem
               key={fuelType.id}
               item={{
                 id: fuelType.id,
-                name: t(`${fuelType.type}`, {
-                  ns: "fuelTypes",
-                }),
+                name: t(`fuel_types:${fuelType.type}`),
               }}
               isSelected={
                 formik.values.fuelTypeId
@@ -109,23 +157,75 @@ export function SpecsStep() {
             {formik.errors.fuelTypeId}
           </AppText>
         </AppView>
-      </View>
+      </AppView>
 
-      {/* Transmission Type */}
-      <View style={styles.section}>
+      {/* Transmision Type */}
+      <AppView style={styles.section}>
         <AppText variant="bodyMedium" style={styles.sectionTitle}>
           {t("addVehicle.transmissionType")}
         </AppText>
-        {/* Transmission Type Card */}
-      </View>
+
+        {/* Tranmission Type List */}
+        <AppView style={styles.listContainer}>
+          {MOCK_TRANSMISSIN_TYPES.map((transmissionType) => (
+            <ListItem
+              key={transmissionType.id}
+              item={{
+                id: transmissionType.id,
+                name: t(`transmissionTypes.${transmissionType.type}`, {
+                  ns: "vehicles",
+                }),
+              }}
+              isSelected={
+                formik.values.transmissionTypeId
+                  ? formik.values.transmissionTypeId === transmissionType.id
+                  : false
+              }
+              onClick={(item) => {
+                formik.setFieldValue("transmissionTypeId", transmissionType.id);
+              }}
+              RightAction={<AppIcon icon={transmissionType.icon as any} />}
+            />
+          ))}
+          <AppText variant="bodySmall" color="destructive">
+            {formik.errors.transmissionTypeId}
+          </AppText>
+        </AppView>
+      </AppView>
 
       {/* Body Type */}
-      <View style={styles.section}>
+      <AppView style={styles.section}>
         <AppText variant="bodyMedium" style={styles.sectionTitle}>
           {t("addVehicle.bodyType")}
         </AppText>
-        {/* Body Type Card */}
-      </View>
+
+        {/* Body Type List */}
+        <AppView style={styles.listContainer}>
+          {MOCK_BODY_TYPES.map((bodyTypes) => (
+            <ListItem
+              key={bodyTypes.id}
+              item={{
+                id: bodyTypes.id,
+                name: t(`bodyTypes.${bodyTypes.type}`, {
+                  ns: "vehicles",
+                }),
+              }}
+              isSelected={
+                formik.values.bodyTypeId
+                  ? formik.values.bodyTypeId === bodyTypes.id
+                  : false
+              }
+              onClick={(item) => {
+                formik.setFieldValue("bodyTypeId", item.id);
+              }}
+              RightAction={<AppIcon icon={bodyTypes.icon as any} />}
+            />
+          ))}
+          <AppText variant="bodySmall" color="destructive">
+            {formik.errors.bodyTypeId}
+          </AppText>
+        </AppView>
+      </AppView>
     </ScrollView>
   );
 }
@@ -135,13 +235,15 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.sm,
   },
+  listContainer: {
+    flexDirection: "column",
+    flex: 1,
+    gap: spacing.sm,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  section: {
-    marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontWeight: "600",

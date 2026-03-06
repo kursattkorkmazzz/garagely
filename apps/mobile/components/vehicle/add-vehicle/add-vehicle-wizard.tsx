@@ -24,8 +24,8 @@ const AddVehicleStepValidator = object({
 
   // Step 2: Specs
   fuelTypeId: string().required("Bu alan zorunludur"),
-  transmissionTypeId: string().nullable(),
-  bodyTypeId: string().nullable(),
+  transmissionTypeId: string().required("Bu alan zorunludur"),
+  bodyTypeId: string().required("Bu alan zorunludur"),
 
   // Step 3: Details
   plate: string().required(),
@@ -50,7 +50,7 @@ export type AddVehicleFormState = {
   isCustomEntry: boolean;
 
   fuelTypeId: string | undefined;
-  transmissionTypeId: string | null;
+  transmissionTypeId: string | undefined;
   bodyTypeId: string | null;
 
   plate: string | null;
@@ -72,7 +72,7 @@ const initialFormState: AddVehicleFormState = {
 
   isCustomEntry: true,
   fuelTypeId: undefined,
-  transmissionTypeId: null,
+  transmissionTypeId: undefined,
   bodyTypeId: null,
 
   plate: "",
@@ -108,16 +108,36 @@ export function AddVehicleForm() {
   }, []);
 
   // Validation helpers
-  const canProceedStep1 = useCallback(() => {
+  const canProceedStep1 = useCallback(async () => {
+    return true; // TODO: Remove after implementation
     if (formik.values.isCustomEntry) {
       return (
         !formik.errors.customBrandName &&
         !formik.errors.customModelName &&
-        !formik.errors.customYear
+        !formik.errors.customYear &&
+        formik.dirty
       );
     }
-    return !formik.errors.selectedBrand && !formik.errors.selectedModel;
-  }, []);
+    return (
+      !formik.errors.selectedBrand &&
+      !formik.errors.selectedModel &&
+      formik.dirty
+    );
+  }, [formik]);
+
+  const canProceedStep2 = useCallback(async () => {
+    return true; // TODO: Remove after implementation
+
+    if (
+      !formik.errors.bodyTypeId &&
+      !formik.errors.fuelTypeId &&
+      !formik.errors.transmissionTypeId &&
+      formik.dirty
+    )
+      return true;
+
+    return false;
+  }, [formik]);
 
   // Define wizard steps
   const steps: WizardStep[] = useMemo(
@@ -131,13 +151,20 @@ export function AddVehicleForm() {
       },
       {
         id: "specs",
+        title: t("addVehicle.steps.specs.title"),
+        subtitle: t("addVehicle.steps.specs.subtitle"),
+        content: <SpecsStep />,
+        canProceed: canProceedStep2,
+      },
+      {
+        id: "specs2",
         title: "Specification",
         subtitle: "Specificatiob Sub Title",
-        content: <SpecsStep />,
-        canProceed: () => true,
+        content: null,
+        canProceed: canProceedStep2,
       },
     ],
-    [t, canProceedStep1],
+    [t, canProceedStep1, canProceedStep2],
   );
 
   return (
@@ -164,6 +191,7 @@ export function AddVehicleWizard() {
           console.log(values);
         }}
         validationSchema={AddVehicleStepValidator}
+        validateOnChange={true}
       >
         <AddVehicleForm />
       </Formik>

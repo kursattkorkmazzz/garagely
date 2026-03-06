@@ -7,10 +7,13 @@ import en_common from "./locales/en/common.json";
 import en_auth from "./locales/en/auth.json";
 import en_backend from "./locales/en/backend.json";
 import en_fuel_types from "./locales/en/fuel_types.json";
+import en_vehicles from "./locales/en/vehicles.json";
+
 import tr_common from "./locales/tr/common.json";
 import tr_auth from "./locales/tr/auth.json";
 import tr_backend from "./locales/tr/backend.json";
 import tr_fuel_types from "./locales/tr/fuel_types.json";
+import tr_vehicles from "./locales/tr/vehicles.json";
 
 import type { Language } from "./types";
 
@@ -21,13 +24,15 @@ const resources = {
     common: en_common,
     auth: en_auth,
     backend: en_backend,
-    fuelTypes: en_fuel_types,
+    fuel_types: en_fuel_types,
+    vehicles: en_vehicles,
   },
   tr: {
     common: tr_common,
     auth: tr_auth,
     backend: tr_backend,
-    fuelTypes: tr_fuel_types,
+    fuel_types: tr_fuel_types,
+    vehicles: tr_vehicles,
   },
 };
 
@@ -63,7 +68,7 @@ export async function initI18n(): Promise<void> {
     lng: language,
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "auth", "backend", "fuelTypes"],
+    ns: ["common", "auth", "backend", "fuel_types", "vehicles"],
     interpolation: {
       escapeValue: false,
     },

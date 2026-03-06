@@ -1,0 +1,18 @@
+{
+  "transmissionTypes": {
+    "automatic": "Otomatik",
+    "manual": "Manuel",
+    "cvt": "CVT"
+  },
+  "bodyTypes": {
+    "sedan": "Sedan",
+    "suv": "SUV",
+    "hatchback": "Hatchback",
+    "coupe": "Coupe",
+    "convertible": "Cabrio",
+    "wagon": "Station Wagon",
+    "van": "Van",
+    "pickup": "Pickup",
+    "minivan": "Minivan"
+  }
+}
