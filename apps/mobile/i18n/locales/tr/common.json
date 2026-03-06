@@ -179,6 +179,23 @@
     "changePhoto": "Fotoğrafı Değiştir",
     "selectPhoto": "Fotoğraf Seç",
     "optionalStepHint": "Bu adım isteğe bağlıdır. Atlayabilir ve detayları daha sonra ekleyebilirsiniz.",
+    "optional": "isteğe bağlı",
+    "mainExteriorView": "Ana Dış Görünüm",
+    "additionalViews": "Ek Görünümler",
+    "addedCount": "{{count}} / 7 eklendi",
+    "photoViews": {
+      "interior": "İç Mekan",
+      "rear": "Arka",
+      "side": "Yan",
+      "front": "Ön",
+      "engine": "Motor",
+      "wheels": "Jantlar",
+      "other": "Diğer"
+    },
+    "photographyTip": {
+      "title": "Fotoğraf İpucu",
+      "text": "Doğal gün ışığında çekim yapın ve sert gölgelerden kaçının. En iyi sonuçlar için aracın temiz olduğundan emin olun."
+    },
     "createVehicle": "Araç Oluştur",
     "steps": {
       "brandModel": {
@@ -198,8 +215,8 @@
         "subtitle": "Kilometre ve satın alma bilgilerini takip edin (isteğe bağlı)"
       },
       "photo": {
-        "title": "Kapak Fotoğrafı",
-        "subtitle": "Aracınızın fotoğrafını ekleyin (isteğe bağlı)"
+        "title": "Araç Fotoğrafları",
+        "subtitle": "Aracınızın fotoğraflarını ekleyin"
       }
     },
     "errors": {

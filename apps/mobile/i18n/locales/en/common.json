@@ -179,6 +179,23 @@
     "changePhoto": "Change Photo",
     "selectPhoto": "Select Photo",
     "optionalStepHint": "This step is optional. You can skip it and add details later.",
+    "optional": "optional",
+    "mainExteriorView": "Main Exterior View",
+    "additionalViews": "Additional Views",
+    "addedCount": "{{count}} / 7 added",
+    "photoViews": {
+      "interior": "Interior",
+      "rear": "Rear",
+      "side": "Side",
+      "front": "Front",
+      "engine": "Engine",
+      "wheels": "Wheels",
+      "other": "Other"
+    },
+    "photographyTip": {
+      "title": "Photography Tip",
+      "text": "Shoot in natural daylight and avoid harsh shadows. Make sure the vehicle is clean for the best results."
+    },
     "createVehicle": "Create Vehicle",
     "steps": {
       "brandModel": {
@@ -198,8 +215,8 @@
         "subtitle": "Track mileage and purchase info (optional)"
       },
       "photo": {
-        "title": "Cover Photo",
-        "subtitle": "Add a photo of your vehicle (optional)"
+        "title": "Vehicle Photos",
+        "subtitle": "Add photos of your vehicle"
       }
     },
     "errors": {

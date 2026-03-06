@@ -14,6 +14,7 @@ import { BrandModelStep } from "./steps/brand-model-step/brand-model-step";
 import { SpecsStep } from "./steps/specs-step/specs-step";
 import { DetailsStep } from "./steps/details-step/details-step";
 import { OdometerStep } from "./steps/odometer-step/odometer-step";
+import { PhotoStep } from "./steps/photo-step/photo-step";
 
 const AddVehicleStepValidator = object({
   // Step 1: Brand & Model
@@ -40,8 +41,17 @@ const AddVehicleStepValidator = object({
   purchasePrice: number().nullable(),
   purchaseKm: number().nullable(),
 
-  // Step 5: Photo
-  photoUri: string().nullable(),
+  // Step 5: Photos
+  coverPhotoUri: string().nullable(),
+  additionalPhotos: object({
+    interior: string().nullable(),
+    rear: string().nullable(),
+    side: string().nullable(),
+    front: string().nullable(),
+    engine: string().nullable(),
+    wheels: string().nullable(),
+    other: string().nullable(),
+  }),
 });
 export type AddVehicleFormState = {
   selectedBrand: string;
@@ -62,7 +72,16 @@ export type AddVehicleFormState = {
   purchasePrice: number;
   purchaseKm: number;
   purchaseDate: Date | null;
-  photoUri: string | null;
+  coverPhotoUri: string | null;
+  additionalPhotos: {
+    interior: string | null;
+    rear: string | null;
+    side: string | null;
+    front: string | null;
+    engine: string | null;
+    wheels: string | null;
+    other: string | null;
+  };
 };
 
 const initialFormState: AddVehicleFormState = {
@@ -84,7 +103,16 @@ const initialFormState: AddVehicleFormState = {
   purchasePrice: 0,
   purchaseKm: 0,
   purchaseDate: null,
-  photoUri: null,
+  coverPhotoUri: null,
+  additionalPhotos: {
+    interior: null,
+    rear: null,
+    side: null,
+    front: null,
+    engine: null,
+    wheels: null,
+    other: null,
+  },
 };
 
 export function AddVehicleForm() {
@@ -152,6 +180,11 @@ export function AddVehicleForm() {
     return true;
   }, []);
 
+  const canProceedStep5 = useCallback(async () => {
+    // Step 5 is optional, always allow proceeding
+    return true;
+  }, []);
+
   // Define wizard steps
   const steps: WizardStep[] = useMemo(
     () => [
@@ -183,8 +216,15 @@ export function AddVehicleForm() {
         content: <OdometerStep />,
         canProceed: canProceedStep4,
       },
+      {
+        id: "photos",
+        title: t("addVehicle.steps.photo.title"),
+        subtitle: t("addVehicle.steps.photo.subtitle"),
+        content: <PhotoStep />,
+        canProceed: canProceedStep5,
+      },
     ],
-    [t, canProceedStep1, canProceedStep2, canProceedStep3, canProceedStep4],
+    [t, canProceedStep1, canProceedStep2, canProceedStep3, canProceedStep4, canProceedStep5],
   );
 
   return (
