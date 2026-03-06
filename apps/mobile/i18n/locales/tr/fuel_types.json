@@ -1,0 +1,8 @@
+{
+  "petrol": "Benzin",
+  "diesel": "Dizel",
+  "electric": "Elektrikli",
+  "hybrid": "Hibrit",
+  "lpg": "LPG",
+  "petrolLpg": "Benzin & LPG"
+}

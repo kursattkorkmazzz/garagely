@@ -11,6 +11,7 @@ import {
 import { bool, date, InferType, number, object, string } from "yup";
 import { Formik, useFormik, useFormikContext } from "formik";
 import { BrandModelStep } from "./steps/brand-model-step/brand-model-step";
+import { SpecsStep } from "./steps/specs-step/specs-step";
 
 const AddVehicleStepValidator = object({
   // Step 1: Brand & Model
@@ -22,7 +23,7 @@ const AddVehicleStepValidator = object({
   isCustomEntry: bool(),
 
   // Step 2: Specs
-  fuelTypeId: string().nullable(),
+  fuelTypeId: string().required("Bu alan zorunludur"),
   transmissionTypeId: string().nullable(),
   bodyTypeId: string().nullable(),
 
@@ -48,7 +49,7 @@ export type AddVehicleFormState = {
   customYear: number | undefined;
   isCustomEntry: boolean;
 
-  fuelTypeId: string | null;
+  fuelTypeId: string | undefined;
   transmissionTypeId: string | null;
   bodyTypeId: string | null;
 
@@ -70,7 +71,7 @@ const initialFormState: AddVehicleFormState = {
   customYear: undefined,
 
   isCustomEntry: true,
-  fuelTypeId: null,
+  fuelTypeId: undefined,
   transmissionTypeId: null,
   bodyTypeId: null,
 
@@ -127,6 +128,13 @@ export function AddVehicleForm() {
         subtitle: t("addVehicle.steps.brandModel.subtitle"),
         content: <BrandModelStep />,
         canProceed: canProceedStep1,
+      },
+      {
+        id: "specs",
+        title: "Specification",
+        subtitle: "Specificatiob Sub Title",
+        content: <SpecsStep />,
+        canProceed: () => true,
       },
     ],
     [t, canProceedStep1],
