@@ -11,11 +11,13 @@ import { useFormikContext } from "formik";
 import { ScrollView, StyleSheet } from "react-native";
 import { AddVehicleFormState } from "../../../add-vehicle-wizard";
 import { AppText } from "@/components/ui/app-text";
+import { useI18n } from "@/hooks/use-i18n";
 
 type BrandModeManuelEntryform = {
   onFindFromListButtonClick?: () => void;
 };
 export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
+  const { t } = useI18n();
   const { handleChange, handleBlur, errors, touched } =
     useFormikContext<AddVehicleFormState>();
 
@@ -30,11 +32,11 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <AppInput
-        AppInputLabel={<AppInputLabel>Marka Adı</AppInputLabel>}
+        AppInputLabel={<AppInputLabel>{t("addVehicle.brandName")}</AppInputLabel>}
         AppInputField={
           <AppInputField
             id="customBrandName"
-            placeholder="ex: Porsche"
+            placeholder={t("addVehicle.brandNamePlaceholder")}
             onChangeText={handleChange("customBrandName")}
             onBlur={handleBlur("customBrandName")}
             InputLeftAction={
@@ -52,11 +54,11 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
       />
 
       <AppInput
-        AppInputLabel={<AppInputLabel>Model</AppInputLabel>}
+        AppInputLabel={<AppInputLabel>{t("addVehicle.modelName")}</AppInputLabel>}
         AppInputField={
           <AppInputField
             id="customModelName"
-            placeholder="ex: Taycan"
+            placeholder={t("addVehicle.modelNamePlaceholder")}
             onChangeText={handleChange("customModelName")}
             onBlur={handleBlur("customModelName")}
             InputLeftAction={
@@ -74,11 +76,11 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
       />
 
       <AppInput
-        AppInputLabel={<AppInputLabel>Yıl</AppInputLabel>}
+        AppInputLabel={<AppInputLabel>{t("addVehicle.year")}</AppInputLabel>}
         AppInputField={
           <AppInputField
             id="customYear"
-            placeholder="ex: 2025"
+            placeholder={t("addVehicle.yearPlaceholder")}
             inputMode="numeric"
             onChangeText={handleChange("customYear")}
             onBlur={handleBlur("customYear")}
@@ -105,7 +107,7 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
           textAlign: "right",
         }}
       >
-        Listeden bul
+        {t("addVehicle.findFromList")}
       </AppText>
     </ScrollView>
   );

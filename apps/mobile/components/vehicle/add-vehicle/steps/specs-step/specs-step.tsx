@@ -153,9 +153,11 @@ export function SpecsStep() {
               RightAction={<AppIcon icon={fuelType.icon as any} />}
             />
           ))}
-          <AppText variant="bodySmall" color="destructive">
-            {formik.errors.fuelTypeId}
-          </AppText>
+          {formik.touched.fuelTypeId && formik.errors.fuelTypeId && (
+            <AppText variant="bodySmall" color="destructive">
+              {formik.errors.fuelTypeId}
+            </AppText>
+          )}
         </AppView>
       </AppView>
 
@@ -187,9 +189,12 @@ export function SpecsStep() {
               RightAction={<AppIcon icon={transmissionType.icon as any} />}
             />
           ))}
-          <AppText variant="bodySmall" color="destructive">
-            {formik.errors.transmissionTypeId}
-          </AppText>
+          {formik.touched.transmissionTypeId &&
+            formik.errors.transmissionTypeId && (
+              <AppText variant="bodySmall" color="destructive">
+                {formik.errors.transmissionTypeId}
+              </AppText>
+            )}
         </AppView>
       </AppView>
 
@@ -221,9 +226,11 @@ export function SpecsStep() {
               RightAction={<AppIcon icon={bodyTypes.icon as any} />}
             />
           ))}
-          <AppText variant="bodySmall" color="destructive">
-            {formik.errors.bodyTypeId}
-          </AppText>
+          {formik.touched.bodyTypeId && formik.errors.bodyTypeId && (
+            <AppText variant="bodySmall" color="destructive">
+              {formik.errors.bodyTypeId}
+            </AppText>
+          )}
         </AppView>
       </AppView>
     </ScrollView>
@@ -233,6 +240,8 @@ export function SpecsStep() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: "flex",
+    flexDirection: "column",
     gap: spacing.sm,
   },
   listContainer: {
@@ -248,5 +257,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontWeight: "600",
     marginBottom: spacing.md,
+  },
+  section: {
+    gap: spacing.sm,
   },
 });

@@ -147,30 +147,43 @@ export function AddVehicleForm() {
   // Validation helpers
   const canProceedStep1 = useCallback(async () => {
     if (formik.values.isCustomEntry) {
+      formik.setFieldTouched("customBrandName", true);
+      formik.setFieldTouched("customModelName", true);
+      formik.setFieldTouched("customYear", true);
+      await Promise.all([
+        formik.validateField("customBrandName"),
+        formik.validateField("customModelName"),
+        formik.validateField("customYear"),
+      ]);
       return (
-        !formik.errors.customBrandName &&
-        !formik.errors.customModelName &&
-        !formik.errors.customYear &&
-        formik.dirty
+        !!formik.values.customBrandName &&
+        !!formik.values.customModelName &&
+        !!formik.values.customYear
       );
     }
-    return (
-      !formik.errors.selectedBrand &&
-      !formik.errors.selectedModel &&
-      formik.dirty
-    );
+    formik.setFieldTouched("selectedBrand", true);
+    formik.setFieldTouched("selectedModel", true);
+    await Promise.all([
+      formik.validateField("selectedBrand"),
+      formik.validateField("selectedModel"),
+    ]);
+    return !!formik.values.selectedBrand && !!formik.values.selectedModel;
   }, [formik]);
 
   const canProceedStep2 = useCallback(async () => {
-    if (
-      !formik.errors.bodyTypeId &&
-      !formik.errors.fuelTypeId &&
-      !formik.errors.transmissionTypeId &&
-      formik.dirty
-    )
-      return true;
-
-    return false;
+    formik.setFieldTouched("fuelTypeId", true);
+    formik.setFieldTouched("transmissionTypeId", true);
+    formik.setFieldTouched("bodyTypeId", true);
+    await Promise.all([
+      formik.validateField("fuelTypeId"),
+      formik.validateField("transmissionTypeId"),
+      formik.validateField("bodyTypeId"),
+    ]);
+    return (
+      !!formik.values.fuelTypeId &&
+      !!formik.values.transmissionTypeId &&
+      !!formik.values.bodyTypeId
+    );
   }, [formik]);
 
   const canProceedStep3 = useCallback(async () => {
