@@ -226,6 +226,15 @@
       "createModelFailed": "Özel model oluşturulamadı",
       "uploadFailed": "Fotoğraf yüklenemedi"
     },
+    "validation": {
+      "brandNameRequired": "Marka adı zorunludur",
+      "modelNameRequired": "Model adı zorunludur",
+      "yearRequired": "Yıl zorunludur",
+      "fuelTypeRequired": "Yakıt tipi zorunludur",
+      "transmissionRequired": "Şanzıman tipi zorunludur",
+      "bodyTypeRequired": "Kasa tipi zorunludur",
+      "plateRequired": "Plaka zorunludur"
+    },
     "success": "Araç başarıyla eklendi!"
   },
   "garage": {

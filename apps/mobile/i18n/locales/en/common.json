@@ -226,6 +226,15 @@
       "createModelFailed": "Failed to create custom model",
       "uploadFailed": "Failed to upload photo"
     },
+    "validation": {
+      "brandNameRequired": "Brand name is required",
+      "modelNameRequired": "Model name is required",
+      "yearRequired": "Year is required",
+      "fuelTypeRequired": "Fuel type is required",
+      "transmissionRequired": "Transmission is required",
+      "bodyTypeRequired": "Body type is required",
+      "plateRequired": "License plate is required"
+    },
     "success": "Vehicle added successfully!"
   },
   "garage": {

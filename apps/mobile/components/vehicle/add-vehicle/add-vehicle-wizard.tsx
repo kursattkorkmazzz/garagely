@@ -8,51 +8,58 @@ import {
   vehicleBrandModelValidator,
   vehicleModelModelValidator,
 } from "@garagely/shared/models/vehicle";
-import { bool, date, InferType, number, object, string } from "yup";
-import { Formik, useFormik, useFormikContext } from "formik";
+import { bool, date, number, object, string } from "yup";
+import { Formik, useFormikContext } from "formik";
 import { BrandModelStep } from "./steps/brand-model-step/brand-model-step";
 import { SpecsStep } from "./steps/specs-step/specs-step";
 import { DetailsStep } from "./steps/details-step/details-step";
 import { OdometerStep } from "./steps/odometer-step/odometer-step";
 import { PhotoStep } from "./steps/photo-step/photo-step";
 
-const AddVehicleStepValidator = object({
-  // Step 1: Brand & Model
-  selectedBrand: vehicleBrandModelValidator,
-  selectedModel: vehicleModelModelValidator,
-  customBrandName: string().required("Bu alan zorunludur"),
-  customModelName: string().required("Bu alan zorunludur"),
-  customYear: number().required("Bu alan zorunludur"),
-  isCustomEntry: bool(),
+const createAddVehicleValidator = (t: (key: string) => string) =>
+  object({
+    // Step 1: Brand & Model
+    selectedBrand: vehicleBrandModelValidator,
+    selectedModel: vehicleModelModelValidator,
+    customBrandName: string().required(
+      t("addVehicle.validation.brandNameRequired"),
+    ),
+    customModelName: string().required(
+      t("addVehicle.validation.modelNameRequired"),
+    ),
+    customYear: number().required(t("addVehicle.validation.yearRequired")),
+    isCustomEntry: bool(),
 
-  // Step 2: Specs
-  fuelTypeId: string().required("Bu alan zorunludur"),
-  transmissionTypeId: string().required("Bu alan zorunludur"),
-  bodyTypeId: string().required("Bu alan zorunludur"),
+    // Step 2: Specs
+    fuelTypeId: string().required(t("addVehicle.validation.fuelTypeRequired")),
+    transmissionTypeId: string().required(
+      t("addVehicle.validation.transmissionRequired"),
+    ),
+    bodyTypeId: string().required(t("addVehicle.validation.bodyTypeRequired")),
 
-  // Step 3: Details
-  plate: string().required("Plate is required"),
-  vin: string(),
-  color: string(),
+    // Step 3: Details
+    plate: string().required(t("addVehicle.validation.plateRequired")),
+    vin: string(),
+    color: string(),
 
-  // Step 4: Odometer & Purchase
-  currentKm: number().nullable(),
-  purchaseDate: date().nullable(),
-  purchasePrice: number().nullable(),
-  purchaseKm: number().nullable(),
+    // Step 4: Odometer & Purchase
+    currentKm: number().nullable(),
+    purchaseDate: date().nullable(),
+    purchasePrice: number().nullable(),
+    purchaseKm: number().nullable(),
 
-  // Step 5: Photos
-  coverPhotoUri: string().nullable(),
-  additionalPhotos: object({
-    interior: string().nullable(),
-    rear: string().nullable(),
-    side: string().nullable(),
-    front: string().nullable(),
-    engine: string().nullable(),
-    wheels: string().nullable(),
-    other: string().nullable(),
-  }),
-});
+    // Step 5: Photos
+    coverPhotoUri: string().nullable(),
+    additionalPhotos: object({
+      interior: string().nullable(),
+      rear: string().nullable(),
+      side: string().nullable(),
+      front: string().nullable(),
+      engine: string().nullable(),
+      wheels: string().nullable(),
+      other: string().nullable(),
+    }),
+  });
 export type AddVehicleFormState = {
   selectedBrand: string;
   selectedModel: string;
@@ -139,7 +146,6 @@ export function AddVehicleForm() {
 
   // Validation helpers
   const canProceedStep1 = useCallback(async () => {
-    return true; // TODO: Remove after implementation
     if (formik.values.isCustomEntry) {
       return (
         !formik.errors.customBrandName &&
@@ -156,8 +162,6 @@ export function AddVehicleForm() {
   }, [formik]);
 
   const canProceedStep2 = useCallback(async () => {
-    return true; // TODO: Remove after implementation
-
     if (
       !formik.errors.bodyTypeId &&
       !formik.errors.fuelTypeId &&
@@ -224,7 +228,14 @@ export function AddVehicleForm() {
         canProceed: canProceedStep5,
       },
     ],
-    [t, canProceedStep1, canProceedStep2, canProceedStep3, canProceedStep4, canProceedStep5],
+    [
+      t,
+      canProceedStep1,
+      canProceedStep2,
+      canProceedStep3,
+      canProceedStep4,
+      canProceedStep5,
+    ],
   );
 
   return (
@@ -240,6 +251,10 @@ export function AddVehicleForm() {
 
 export function AddVehicleWizard() {
   const { theme } = useTheme();
+  const { t } = useI18n();
+
+  const validationSchema = useMemo(() => createAddVehicleValidator(t), [t]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -250,7 +265,7 @@ export function AddVehicleWizard() {
         onSubmit={(values) => {
           console.log(values);
         }}
-        validationSchema={AddVehicleStepValidator}
+        validationSchema={validationSchema}
         validateOnChange={true}
       >
         <AddVehicleForm />
