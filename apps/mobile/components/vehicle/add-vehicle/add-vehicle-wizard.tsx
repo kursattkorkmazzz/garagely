@@ -12,6 +12,8 @@ import { bool, date, InferType, number, object, string } from "yup";
 import { Formik, useFormik, useFormikContext } from "formik";
 import { BrandModelStep } from "./steps/brand-model-step/brand-model-step";
 import { SpecsStep } from "./steps/specs-step/specs-step";
+import { DetailsStep } from "./steps/details-step/details-step";
+import { OdometerStep } from "./steps/odometer-step/odometer-step";
 
 const AddVehicleStepValidator = object({
   // Step 1: Brand & Model
@@ -28,7 +30,7 @@ const AddVehicleStepValidator = object({
   bodyTypeId: string().required("Bu alan zorunludur"),
 
   // Step 3: Details
-  plate: string().required(),
+  plate: string().required("Plate is required"),
   vin: string(),
   color: string(),
 
@@ -139,6 +141,17 @@ export function AddVehicleForm() {
     return false;
   }, [formik]);
 
+  const canProceedStep3 = useCallback(async () => {
+    formik.setFieldTouched("plate", true);
+    await formik.validateField("plate");
+    return !formik.errors.plate && !!formik.values.plate;
+  }, [formik]);
+
+  const canProceedStep4 = useCallback(async () => {
+    // Step 4 is optional, always allow proceeding
+    return true;
+  }, []);
+
   // Define wizard steps
   const steps: WizardStep[] = useMemo(
     () => [
@@ -157,14 +170,21 @@ export function AddVehicleForm() {
         canProceed: canProceedStep2,
       },
       {
-        id: "specs2",
-        title: "Specification",
-        subtitle: "Specificatiob Sub Title",
-        content: null,
-        canProceed: canProceedStep2,
+        id: "vehicle-details",
+        title: t("addVehicle.steps.details.title"),
+        subtitle: t("addVehicle.steps.details.subtitle"),
+        content: <DetailsStep />,
+        canProceed: canProceedStep3,
+      },
+      {
+        id: "odometer-purchase",
+        title: t("addVehicle.steps.odometer.title"),
+        subtitle: t("addVehicle.steps.odometer.subtitle"),
+        content: <OdometerStep />,
+        canProceed: canProceedStep4,
       },
     ],
-    [t, canProceedStep1, canProceedStep2],
+    [t, canProceedStep1, canProceedStep2, canProceedStep3, canProceedStep4],
   );
 
   return (

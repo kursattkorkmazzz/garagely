@@ -75,17 +75,31 @@
     },
     "distanceUnits": {
       "km": "Kilometers (km)",
-      "mi": "Miles (mi)"
+      "miles": "Miles (mi)"
+    },
+    "distanceUnitsShort": {
+      "km": "KM",
+      "miles": "MI"
     },
     "volumeUnits": {
       "l": "Liters (L)",
       "gal": "Gallons (gal)"
+    },
+    "volumeUnitsShort": {
+      "l": "L",
+      "gal": "GAL"
     },
     "currencies": {
       "usd": "US Dollar ($)",
       "eur": "Euro (€)",
       "gbp": "British Pound (£)",
       "try": "Turkish Lira (₺)"
+    },
+    "currencySymbols": {
+      "usd": "$",
+      "eur": "€",
+      "gbp": "£",
+      "try": "₺"
     },
     "theme": {
       "light": "Light",
@@ -146,7 +160,9 @@
     "vin": "VIN (Vehicle Identification Number)",
     "vinPlaceholder": "17 characters",
     "vinHint": "Found on your registration or driver-side door frame",
-    "color": "Color",
+    "color": "Vehicle Color",
+    "moreColors": "More Colors",
+    "lessColors": "Less Colors",
     "clearColor": "Clear selection",
     "currentKm": "Current Odometer",
     "currentKmPlaceholder": "e.g., 45000",

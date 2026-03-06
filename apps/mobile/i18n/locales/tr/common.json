@@ -75,17 +75,31 @@
     },
     "distanceUnits": {
       "km": "Kilometre (km)",
-      "mi": "Mil (mi)"
+      "miles": "Mil (mi)"
+    },
+    "distanceUnitsShort": {
+      "km": "KM",
+      "miles": "MI"
     },
     "volumeUnits": {
       "l": "Litre (L)",
       "gal": "Galon (gal)"
+    },
+    "volumeUnitsShort": {
+      "l": "L",
+      "gal": "GAL"
     },
     "currencies": {
       "usd": "ABD Doları ($)",
       "eur": "Euro (€)",
       "gbp": "İngiliz Sterlini (£)",
       "try": "Türk Lirası (₺)"
+    },
+    "currencySymbols": {
+      "usd": "$",
+      "eur": "€",
+      "gbp": "£",
+      "try": "₺"
     },
     "theme": {
       "light": "Açık",
@@ -146,7 +160,9 @@
     "vin": "Şasi Numarası (VIN)",
     "vinPlaceholder": "17 karakter",
     "vinHint": "Ruhsatta veya sürücü kapısı çerçevesinde bulunur",
-    "color": "Renk",
+    "color": "Araç Rengi",
+    "moreColors": "Daha Fazla Renk",
+    "lessColors": "Daha Az Renk",
     "clearColor": "Seçimi temizle",
     "currentKm": "Güncel Kilometre",
     "currentKmPlaceholder": "örn. 45000",
