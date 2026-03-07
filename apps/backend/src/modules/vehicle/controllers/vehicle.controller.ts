@@ -3,6 +3,7 @@ import type { VehicleService } from "../services/vehicle.service";
 import type { UploadedFile } from "../../storage/services/storage.service";
 import { sendSuccess } from "../../../common/utils/response.util";
 import { ValidationError } from "@garagely/shared/error.types";
+import { VehicleImageType } from "@garagely/shared/models/vehicle";
 
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
@@ -81,10 +82,11 @@ export class VehicleController {
     sendSuccess(res, { message: "Vehicle deleted successfully" });
   };
 
-  // Cover photo endpoints
-  uploadCover = async (req: Request, res: Response): Promise<void> => {
+  // Vehicle image endpoints
+  uploadImage = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.uid;
     const id = req.params.id as string;
+    const imageType = req.params.imageType as string;
     const file = req.file as UploadedFile | undefined;
 
     if (!file) {
@@ -93,20 +95,60 @@ export class VehicleController {
       });
     }
 
-    const document = await this.vehicleService.uploadCover(userId, id, file);
+    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+      throw new ValidationError("Invalid image type", {
+        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+      });
+    }
+
+    const document = await this.vehicleService.uploadImage(
+      userId,
+      id,
+      imageType as VehicleImageType,
+      file,
+    );
     sendSuccess(res, document, 201);
   };
 
-  getCover = async (req: Request, res: Response): Promise<void> => {
+  getImage = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id as string;
-    const cover = await this.vehicleService.getCover(id);
-    sendSuccess(res, cover);
+    const imageType = req.params.imageType as string;
+
+    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+      throw new ValidationError("Invalid image type", {
+        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+      });
+    }
+
+    const image = await this.vehicleService.getImage(
+      id,
+      imageType as VehicleImageType,
+    );
+    sendSuccess(res, image);
   };
 
-  removeCover = async (req: Request, res: Response): Promise<void> => {
+  removeImage = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.uid;
     const id = req.params.id as string;
-    await this.vehicleService.removeCover(userId, id);
-    sendSuccess(res, { message: "Cover photo removed successfully" });
+    const imageType = req.params.imageType as string;
+
+    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+      throw new ValidationError("Invalid image type", {
+        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+      });
+    }
+
+    await this.vehicleService.removeImage(
+      userId,
+      id,
+      imageType as VehicleImageType,
+    );
+    sendSuccess(res, { message: "Image removed successfully" });
+  };
+
+  getAllImages = async (req: Request, res: Response): Promise<void> => {
+    const id = req.params.id as string;
+    const images = await this.vehicleService.getAllImages(id);
+    sendSuccess(res, images);
   };
 }

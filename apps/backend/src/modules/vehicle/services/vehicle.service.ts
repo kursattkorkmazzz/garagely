@@ -8,6 +8,10 @@ import type {
 } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
 import { EntityType } from "@garagely/shared/models/entity-type";
+import {
+  VehicleImageType,
+  vehicleImageTypeToEntityType,
+} from "@garagely/shared/models/vehicle";
 import type {
   CreateVehiclePayload,
   UpdateVehiclePayload,
@@ -130,7 +134,7 @@ export class VehicleService {
     const vehiclesWithCover = await Promise.all(
       vehicles.map(async (vehicle) => {
         const coverPhoto = this.storageService
-          ? await this.getCover(vehicle.id)
+          ? await this.getImage(vehicle.id, VehicleImageType.COVER)
           : null;
         return { ...vehicle, coverPhoto };
       }),
@@ -154,7 +158,7 @@ export class VehicleService {
     }
 
     const coverPhoto = this.storageService
-      ? await this.getCover(vehicleId)
+      ? await this.getImage(vehicleId, VehicleImageType.COVER)
       : null;
 
     return { ...vehicle, coverPhoto };
@@ -179,7 +183,7 @@ export class VehicleService {
 
     const updatedVehicle = await this.vehicleRepository.update(vehicleId, data);
     const coverPhoto = this.storageService
-      ? await this.getCover(vehicleId)
+      ? await this.getImage(vehicleId, VehicleImageType.COVER)
       : null;
 
     return { ...updatedVehicle, coverPhoto };
@@ -196,21 +200,28 @@ export class VehicleService {
       throw new ForbiddenError("You do not have access to this vehicle");
     }
 
+    // Delete all vehicle images
     if (this.storageService) {
-      await this.storageService.deleteDocumentsByEntity(
-        vehicleId,
-        EntityType.VEHICLE_COVER,
-        userId,
+      const imageTypes = Object.values(VehicleImageType);
+      await Promise.all(
+        imageTypes.map((imageType) =>
+          this.storageService!.deleteDocumentsByEntity(
+            vehicleId,
+            vehicleImageTypeToEntityType[imageType],
+            userId,
+          ),
+        ),
       );
     }
 
     await this.vehicleRepository.delete(vehicleId);
   }
 
-  // Cover photo methods
-  async uploadCover(
+  // Vehicle image methods
+  async uploadImage(
     userId: string,
     vehicleId: string,
+    imageType: VehicleImageType,
     file: UploadedFile,
   ): Promise<DocumentModel> {
     if (!this.storageService) {
@@ -227,34 +238,45 @@ export class VehicleService {
       throw new ForbiddenError("You do not have access to this vehicle");
     }
 
+    const entityType = vehicleImageTypeToEntityType[imageType];
+
+    // Delete existing image of this type (each type allows only 1 image)
     await this.storageService.deleteDocumentsByEntity(
       vehicleId,
-      EntityType.VEHICLE_COVER,
+      entityType,
       userId,
     );
 
     return this.storageService.uploadAndLinkDocument(
       userId,
       file,
-      { entityType: EntityType.VEHICLE_COVER },
+      { entityType },
       vehicleId,
     );
   }
 
-  async getCover(vehicleId: string): Promise<DocumentModel | null> {
+  async getImage(
+    vehicleId: string,
+    imageType: VehicleImageType,
+  ): Promise<DocumentModel | null> {
     if (!this.storageService) {
       throw new Error("Storage service not configured");
     }
 
+    const entityType = vehicleImageTypeToEntityType[imageType];
     const documents = await this.storageService.getDocumentsByEntity(
       vehicleId,
-      EntityType.VEHICLE_COVER,
+      entityType,
     );
 
     return documents[0] ?? null;
   }
 
-  async removeCover(userId: string, vehicleId: string): Promise<void> {
+  async removeImage(
+    userId: string,
+    vehicleId: string,
+    imageType: VehicleImageType,
+  ): Promise<void> {
     if (!this.storageService) {
       throw new Error("Storage service not configured");
     }
@@ -269,11 +291,33 @@ export class VehicleService {
       throw new ForbiddenError("You do not have access to this vehicle");
     }
 
+    const entityType = vehicleImageTypeToEntityType[imageType];
     await this.storageService.deleteDocumentsByEntity(
       vehicleId,
-      EntityType.VEHICLE_COVER,
+      entityType,
       userId,
     );
+  }
+
+  async getAllImages(
+    vehicleId: string,
+  ): Promise<Record<VehicleImageType, DocumentModel | null>> {
+    if (!this.storageService) {
+      throw new Error("Storage service not configured");
+    }
+
+    const imageTypes = Object.values(VehicleImageType);
+    const results = await Promise.all(
+      imageTypes.map(async (imageType) => {
+        const image = await this.getImage(vehicleId, imageType);
+        return [imageType, image] as const;
+      }),
+    );
+
+    return Object.fromEntries(results) as Record<
+      VehicleImageType,
+      DocumentModel | null
+    >;
   }
 
   // Validation helpers

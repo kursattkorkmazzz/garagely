@@ -10,6 +10,13 @@ const MB = 1024 * 1024;
 const defaultLimits: Record<EntityType, StorageLimits> = {
   [EntityType.USER_PROFILE]: { fileSize: 10 * MB, files: 1 },
   [EntityType.VEHICLE_COVER]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_INTERIOR]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_BACK]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_SIDE]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_FRONT]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_MOTOR]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_TIRES]: { fileSize: 15 * MB, files: 1 },
+  [EntityType.VEHICLE_OTHER]: { fileSize: 15 * MB, files: 1 },
 };
 
 function parseEnvSize(envVar: string | undefined, defaultSize: number): number {

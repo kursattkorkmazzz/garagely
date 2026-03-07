@@ -126,7 +126,6 @@ export function AddVehicleForm() {
   const { t } = useI18n();
   const router = useRouter();
   const formik = useFormikContext<AddVehicleFormState>();
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   // Complete handler
   const handleComplete = useCallback(async () => {
@@ -256,7 +255,6 @@ export function AddVehicleForm() {
       steps={steps}
       onComplete={handleComplete}
       onCancel={handleCancel}
-      onStepChange={setCurrentStepIndex}
       completeLabel={t("addVehicle.createVehicle")}
     />
   );

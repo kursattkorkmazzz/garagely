@@ -95,13 +95,17 @@ router.patch(
 
 router.delete("/:id", asyncHandler(vehicleController.deleteVehicle));
 
-// Cover photo endpoints
+// Vehicle image endpoints
+router.get("/:id/images", asyncHandler(vehicleController.getAllImages));
 router.post(
-  "/:id/cover",
+  "/:id/images/:imageType",
   upload.single("file"),
-  asyncHandler(vehicleController.uploadCover),
+  asyncHandler(vehicleController.uploadImage),
 );
-router.get("/:id/cover", asyncHandler(vehicleController.getCover));
-router.delete("/:id/cover", asyncHandler(vehicleController.removeCover));
+router.get("/:id/images/:imageType", asyncHandler(vehicleController.getImage));
+router.delete(
+  "/:id/images/:imageType",
+  asyncHandler(vehicleController.removeImage),
+);
 
 export { router as vehicleRouter };

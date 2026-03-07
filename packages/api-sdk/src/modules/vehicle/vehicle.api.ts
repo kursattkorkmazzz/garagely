@@ -6,6 +6,7 @@ import type {
   VehicleBodyTypeModel,
   VehicleFuelTypeModel,
 } from "@garagely/shared/models/vehicle";
+import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
 import type {
   CreateVehiclePayload,
@@ -55,17 +56,27 @@ export interface VehicleApi {
     callbacks?: SdkCallbacks<void>,
   ): Promise<void>;
 
-  // Cover photo
-  uploadCover(
+  // Vehicle images
+  uploadImage(
     vehicleId: string,
+    imageType: VehicleImageType,
     file: File | Blob,
     callbacks?: SdkCallbacks<DocumentModel>,
   ): Promise<void>;
-  getCover(
+  getImage(
     vehicleId: string,
+    imageType: VehicleImageType,
     callbacks?: SdkCallbacks<DocumentModel | null>,
   ): Promise<void>;
-  removeCover(vehicleId: string, callbacks?: SdkCallbacks<void>): Promise<void>;
+  removeImage(
+    vehicleId: string,
+    imageType: VehicleImageType,
+    callbacks?: SdkCallbacks<void>,
+  ): Promise<void>;
+  getAllImages(
+    vehicleId: string,
+    callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
+  ): Promise<void>;
 }
 
 export function createVehicleApi(client: HttpClient): VehicleApi {
@@ -213,9 +224,10 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       }
     },
 
-    // Cover photo
-    async uploadCover(
+    // Vehicle images
+    async uploadImage(
       vehicleId: string,
+      imageType: VehicleImageType,
       file: File | Blob,
       callbacks?: SdkCallbacks<DocumentModel>,
     ): Promise<void> {
@@ -223,7 +235,7 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
         const formData = new FormData();
         formData.append("file", file);
         const data = await client.postFormData<DocumentModel>(
-          `/vehicles/${vehicleId}/cover`,
+          `/vehicles/${vehicleId}/images/${imageType}`,
           formData,
         );
         callbacks?.onSuccess?.(data);
@@ -232,13 +244,14 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       }
     },
 
-    async getCover(
+    async getImage(
       vehicleId: string,
+      imageType: VehicleImageType,
       callbacks?: SdkCallbacks<DocumentModel | null>,
     ): Promise<void> {
       try {
         const data = await client.get<DocumentModel | null>(
-          `/vehicles/${vehicleId}/cover`,
+          `/vehicles/${vehicleId}/images/${imageType}`,
         );
         callbacks?.onSuccess?.(data);
       } catch (error) {
@@ -246,13 +259,28 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       }
     },
 
-    async removeCover(
+    async removeImage(
       vehicleId: string,
+      imageType: VehicleImageType,
       callbacks?: SdkCallbacks<void>,
     ): Promise<void> {
       try {
-        await client.delete<void>(`/vehicles/${vehicleId}/cover`);
+        await client.delete<void>(`/vehicles/${vehicleId}/images/${imageType}`);
         callbacks?.onSuccess?.(undefined);
+      } catch (error) {
+        callbacks?.onError?.(error as SdkError);
+      }
+    },
+
+    async getAllImages(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
+    ): Promise<void> {
+      try {
+        const data = await client.get<
+          Record<VehicleImageType, DocumentModel | null>
+        >(`/vehicles/${vehicleId}/images`);
+        callbacks?.onSuccess?.(data);
       } catch (error) {
         callbacks?.onError?.(error as SdkError);
       }
