@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
-import { useStore } from "@/stores/root.store";
+import { sdk } from "@/stores/sdk";
 import { AppWizard, type WizardStep } from "@/components/ui/app-wizard";
 import { appToast } from "@/components/ui/app-toast";
 import {
@@ -11,6 +11,12 @@ import {
   vehicleModelModelValidator,
   VehicleImageType,
 } from "@garagely/shared/models/vehicle";
+import type { VehicleModel } from "@garagely/shared/models/vehicle";
+import type {
+  UpsertBrandModelPayload,
+  UpsertBrandModelResponse,
+  CreateVehiclePayload,
+} from "@garagely/shared/payloads/vehicle";
 import { bool, date, number, object, string } from "yup";
 import { Formik, useFormikContext } from "formik";
 import { BrandModelStep } from "./steps/brand-model-step/brand-model-step";
@@ -136,48 +142,92 @@ const initialFormState: AddVehicleFormState = {
   },
 };
 
+// Helper to create React Native file for FormData uploads
+function createReactNativeFile(uri: string, imageType: VehicleImageType) {
+  const uriParts = uri.split(".");
+  const extension = uriParts[uriParts.length - 1]?.toLowerCase() || "jpg";
+  const mimeType = extension === "png" ? "image/png" : "image/jpeg";
+
+  return {
+    uri,
+    type: mimeType,
+    name: `${imageType}.${extension}`,
+  } as unknown as Blob;
+}
+
+// SDK wrapper functions
+async function upsertBrandAndModel(
+  payload: UpsertBrandModelPayload,
+): Promise<UpsertBrandModelResponse | null> {
+  return new Promise((resolve) => {
+    sdk.vehicle.upsertBrandAndModel(payload, {
+      onSuccess: (data) => resolve(data),
+      onError: (err) => {
+        console.error("[AddVehicle] upsertBrandAndModel error:", err.message);
+        resolve(null);
+      },
+    });
+  });
+}
+
+async function createVehicle(
+  payload: CreateVehiclePayload,
+): Promise<VehicleModel | null> {
+  return new Promise((resolve) => {
+    sdk.vehicle.createVehicle(payload, {
+      onSuccess: (data) => resolve(data),
+      onError: (err) => {
+        console.error("[AddVehicle] createVehicle error:", err.message);
+        resolve(null);
+      },
+    });
+  });
+}
+
+async function uploadVehicleImage(
+  vehicleId: string,
+  imageType: VehicleImageType,
+  uri: string,
+): Promise<boolean> {
+  const file = createReactNativeFile(uri, imageType);
+  return new Promise((resolve) => {
+    sdk.vehicle.uploadImage(vehicleId, imageType, file, {
+      onSuccess: () => resolve(true),
+      onError: (err) => {
+        console.error("[AddVehicle] uploadImage error:", err.message);
+        resolve(false);
+      },
+    });
+  });
+}
+
 export function AddVehicleForm() {
   const { t } = useI18n();
   const router = useRouter();
   const formik = useFormikContext<AddVehicleFormState>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Store actions
-  const createVehicle = useStore((state) => state.vehicle.createVehicle);
-  const upsertBrandAndModel = useStore(
-    (state) => state.vehicle.upsertBrandAndModel,
-  );
-  const uploadImage = useStore((state) => state.vehicle.uploadImage);
-
   // Complete handler
   const handleComplete = useCallback(async () => {
     setIsSubmitting(true);
-    console.log("[AddVehicle] === Starting handleComplete ===");
 
     try {
       const values = formik.values;
-      console.log("[AddVehicle] Form values:", JSON.stringify(values, null, 2));
 
       let brandId = values.selectedBrand;
       let modelId = values.selectedModel;
 
       // Step 1: If custom entry, create brand/model first
       if (values.isCustomEntry) {
-        console.log("[AddVehicle] Step 1: Creating custom brand/model...");
-        const upsertPayload = {
+        const result = await upsertBrandAndModel({
           brand: { name: values.customBrandName },
           model: {
             name: values.customModelName,
             year: values.customYear ?? null,
           },
-        };
-        console.log("[AddVehicle] Upsert payload:", JSON.stringify(upsertPayload));
-
-        const result = await upsertBrandAndModel(upsertPayload);
-        console.log("[AddVehicle] Upsert result:", JSON.stringify(result));
+        });
 
         if (!result) {
-          console.error("[AddVehicle] ERROR: Failed to create brand/model - result is null/undefined");
           appToast.error(t("addVehicle.errors.createModelFailed"));
           setIsSubmitting(false);
           return;
@@ -185,12 +235,10 @@ export function AddVehicleForm() {
 
         brandId = result.brand.id;
         modelId = result.model.id;
-        console.log("[AddVehicle] Created brandId:", brandId, "modelId:", modelId);
       }
 
       // Step 2: Create vehicle
-      console.log("[AddVehicle] Step 2: Creating vehicle...");
-      const vehiclePayload = {
+      const vehicle = await createVehicle({
         vehicleBrandId: brandId,
         vehicleModelId: modelId,
         vehicleFuelTypeId: values.fuelTypeId!,
@@ -203,79 +251,44 @@ export function AddVehicleForm() {
         purchaseDate: values.purchaseDate || null,
         purchasePrice: values.purchasePrice || null,
         purchaseKm: values.purchaseKm || null,
-      };
-      console.log("[AddVehicle] Vehicle payload:", JSON.stringify(vehiclePayload));
-
-      const vehicle = await createVehicle(vehiclePayload);
-      console.log("[AddVehicle] Create vehicle result:", JSON.stringify(vehicle));
+      });
 
       if (!vehicle) {
-        console.error("[AddVehicle] ERROR: Failed to create vehicle - vehicle is null/undefined");
         appToast.error(t("addVehicle.errors.createFailed"));
         setIsSubmitting(false);
         return;
       }
 
       // Step 3: Upload images
-      console.log("[AddVehicle] Step 3: Uploading images...");
-      const uploadPromises: Promise<unknown>[] = [];
+      const uploadPromises: Promise<boolean>[] = [];
 
-      // Upload cover photo
       if (values.coverPhotoUri) {
-        console.log("[AddVehicle] Adding cover photo upload:", values.coverPhotoUri);
         uploadPromises.push(
-          uploadImage(vehicle.id, VehicleImageType.COVER, values.coverPhotoUri),
+          uploadVehicleImage(vehicle.id, VehicleImageType.COVER, values.coverPhotoUri),
         );
       }
 
-      // Upload additional photos
       Object.entries(values.additionalPhotos).forEach(([viewType, uri]) => {
         if (uri && VIEW_TYPE_TO_IMAGE_TYPE[viewType]) {
-          console.log("[AddVehicle] Adding", viewType, "photo upload:", uri);
           uploadPromises.push(
-            uploadImage(vehicle.id, VIEW_TYPE_TO_IMAGE_TYPE[viewType], uri),
+            uploadVehicleImage(vehicle.id, VIEW_TYPE_TO_IMAGE_TYPE[viewType], uri),
           );
         }
       });
 
-      // Wait for all uploads (don't fail if some uploads fail)
       if (uploadPromises.length > 0) {
-        console.log("[AddVehicle] Waiting for", uploadPromises.length, "image uploads...");
-        const uploadResults = await Promise.allSettled(uploadPromises);
-        console.log("[AddVehicle] Upload results:", JSON.stringify(uploadResults));
-
-        // Log any failed uploads
-        uploadResults.forEach((result, index) => {
-          if (result.status === "rejected") {
-            console.error("[AddVehicle] Upload", index, "failed:", result.reason);
-          }
-        });
-      } else {
-        console.log("[AddVehicle] No images to upload");
+        await Promise.allSettled(uploadPromises);
       }
 
-      // Success
-      console.log("[AddVehicle] === SUCCESS ===");
       appToast.success(t("addVehicle.success"));
       router.back();
     } catch (error) {
-      console.error("[AddVehicle] === CAUGHT ERROR ===");
       console.error("[AddVehicle] Error:", error);
-      console.error("[AddVehicle] Error message:", (error as Error)?.message);
-      console.error("[AddVehicle] Error stack:", (error as Error)?.stack);
       appToast.error(t("addVehicle.errors.createFailed"));
     } finally {
       setIsSubmitting(false);
-      console.log("[AddVehicle] === handleComplete finished ===");
     }
-  }, [
-    formik.values,
-    createVehicle,
-    upsertBrandAndModel,
-    uploadImage,
-    t,
-    router,
-  ]);
+  }, [formik.values, t, router]);
 
   // Cancel handler
   const handleCancel = useCallback(() => {

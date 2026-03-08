@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
-import { useStore } from "@/stores/root.store";
+import { sdk } from "@/stores/sdk";
 import { AppText } from "@/components/ui/app-text";
 import { spacing } from "@/theme/tokens/spacing";
 import { AppIcon, type IconName } from "@/components/ui/app-icon";
@@ -10,34 +10,49 @@ import { ListItem } from "@/components/common/list-item";
 import { AppView } from "@/components/ui/app-view";
 import { useFormikContext } from "formik";
 import { AddVehicleFormState } from "../../add-vehicle-wizard";
+import type {
+  VehicleFuelTypeModel,
+  VehicleTransmissionTypeModel,
+  VehicleBodyTypeModel,
+} from "@garagely/shared/models/vehicle";
 
 export function SpecsStep() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const formik = useFormikContext<AddVehicleFormState>();
 
-  // Store state and actions
-  const fuelTypes = useStore((state) => state.vehicle.fuelTypes);
-  const transmissionTypes = useStore(
-    (state) => state.vehicle.transmissionTypes,
-  );
-  const bodyTypes = useStore((state) => state.vehicle.bodyTypes);
-  const isLoadingLookups = useStore((state) => state.vehicle.isLoadingLookups);
-  const fetchAllLookups = useStore((state) => state.vehicle.fetchAllLookups);
+  // Local state for lookups
+  const [fuelTypes, setFuelTypes] = useState<VehicleFuelTypeModel[]>([]);
+  const [transmissionTypes, setTransmissionTypes] = useState<
+    VehicleTransmissionTypeModel[]
+  >([]);
+  const [bodyTypes, setBodyTypes] = useState<VehicleBodyTypeModel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch lookups on mount
   useEffect(() => {
-    if (
-      fuelTypes.length === 0 ||
-      transmissionTypes.length === 0 ||
-      bodyTypes.length === 0
-    ) {
-      fetchAllLookups();
-      console.log(fuelTypes);
+    async function fetchLookups() {
+      setIsLoading(true);
+      await Promise.all([
+        sdk.vehicle.getFuelTypes({
+          onSuccess: (data) => setFuelTypes(data),
+          onError: () => {},
+        }),
+        sdk.vehicle.getTransmissionTypes({
+          onSuccess: (data) => setTransmissionTypes(data),
+          onError: () => {},
+        }),
+        sdk.vehicle.getBodyTypes({
+          onSuccess: (data) => setBodyTypes(data),
+          onError: () => {},
+        }),
+      ]);
+      setIsLoading(false);
     }
+    fetchLookups();
   }, []);
 
-  if (isLoadingLookups && fuelTypes.length === 0) {
+  if (isLoading) {
     return (
       <AppView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.primary} />
