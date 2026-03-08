@@ -1,12 +1,15 @@
-import { useState, useCallback, useMemo, ReactNode } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
+import { useStore } from "@/stores/root.store";
 import { AppWizard, type WizardStep } from "@/components/ui/app-wizard";
+import { appToast } from "@/components/ui/app-toast";
 import {
   vehicleBrandModelValidator,
   vehicleModelModelValidator,
+  VehicleImageType,
 } from "@garagely/shared/models/vehicle";
 import { bool, date, number, object, string } from "yup";
 import { Formik, useFormikContext } from "formik";
@@ -15,6 +18,17 @@ import { SpecsStep } from "./steps/specs-step/specs-step";
 import { DetailsStep } from "./steps/details-step/details-step";
 import { OdometerStep } from "./steps/odometer-step/odometer-step";
 import { PhotoStep } from "./steps/photo-step/photo-step";
+
+// Map form view types to SDK VehicleImageType
+const VIEW_TYPE_TO_IMAGE_TYPE: Record<string, VehicleImageType> = {
+  interior: VehicleImageType.INTERIOR,
+  rear: VehicleImageType.BACK,
+  side: VehicleImageType.SIDE,
+  front: VehicleImageType.FRONT,
+  engine: VehicleImageType.MOTOR,
+  wheels: VehicleImageType.TIRES,
+  other: VehicleImageType.OTHER,
+};
 
 const createAddVehicleValidator = (t: (key: string) => string) =>
   object({
@@ -126,17 +140,142 @@ export function AddVehicleForm() {
   const { t } = useI18n();
   const router = useRouter();
   const formik = useFormikContext<AddVehicleFormState>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Store actions
+  const createVehicle = useStore((state) => state.vehicle.createVehicle);
+  const upsertBrandAndModel = useStore(
+    (state) => state.vehicle.upsertBrandAndModel,
+  );
+  const uploadImage = useStore((state) => state.vehicle.uploadImage);
 
   // Complete handler
   const handleComplete = useCallback(async () => {
-    console.log("Values");
-    if (formik.isValid) {
-      console.log("No Problem");
-    } else {
-      console.log("Problemo");
+    setIsSubmitting(true);
+    console.log("[AddVehicle] === Starting handleComplete ===");
+
+    try {
+      const values = formik.values;
+      console.log("[AddVehicle] Form values:", JSON.stringify(values, null, 2));
+
+      let brandId = values.selectedBrand;
+      let modelId = values.selectedModel;
+
+      // Step 1: If custom entry, create brand/model first
+      if (values.isCustomEntry) {
+        console.log("[AddVehicle] Step 1: Creating custom brand/model...");
+        const upsertPayload = {
+          brand: { name: values.customBrandName },
+          model: {
+            name: values.customModelName,
+            year: values.customYear ?? null,
+          },
+        };
+        console.log("[AddVehicle] Upsert payload:", JSON.stringify(upsertPayload));
+
+        const result = await upsertBrandAndModel(upsertPayload);
+        console.log("[AddVehicle] Upsert result:", JSON.stringify(result));
+
+        if (!result) {
+          console.error("[AddVehicle] ERROR: Failed to create brand/model - result is null/undefined");
+          appToast.error(t("addVehicle.errors.createModelFailed"));
+          setIsSubmitting(false);
+          return;
+        }
+
+        brandId = result.brand.id;
+        modelId = result.model.id;
+        console.log("[AddVehicle] Created brandId:", brandId, "modelId:", modelId);
+      }
+
+      // Step 2: Create vehicle
+      console.log("[AddVehicle] Step 2: Creating vehicle...");
+      const vehiclePayload = {
+        vehicleBrandId: brandId,
+        vehicleModelId: modelId,
+        vehicleFuelTypeId: values.fuelTypeId!,
+        vehicleTransmissionTypeId: values.transmissionTypeId!,
+        vehicleBodyTypeId: values.bodyTypeId!,
+        plate: values.plate || null,
+        vin: values.vin || null,
+        color: values.color || null,
+        currentKm: values.currentKm || null,
+        purchaseDate: values.purchaseDate || null,
+        purchasePrice: values.purchasePrice || null,
+        purchaseKm: values.purchaseKm || null,
+      };
+      console.log("[AddVehicle] Vehicle payload:", JSON.stringify(vehiclePayload));
+
+      const vehicle = await createVehicle(vehiclePayload);
+      console.log("[AddVehicle] Create vehicle result:", JSON.stringify(vehicle));
+
+      if (!vehicle) {
+        console.error("[AddVehicle] ERROR: Failed to create vehicle - vehicle is null/undefined");
+        appToast.error(t("addVehicle.errors.createFailed"));
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Step 3: Upload images
+      console.log("[AddVehicle] Step 3: Uploading images...");
+      const uploadPromises: Promise<unknown>[] = [];
+
+      // Upload cover photo
+      if (values.coverPhotoUri) {
+        console.log("[AddVehicle] Adding cover photo upload:", values.coverPhotoUri);
+        uploadPromises.push(
+          uploadImage(vehicle.id, VehicleImageType.COVER, values.coverPhotoUri),
+        );
+      }
+
+      // Upload additional photos
+      Object.entries(values.additionalPhotos).forEach(([viewType, uri]) => {
+        if (uri && VIEW_TYPE_TO_IMAGE_TYPE[viewType]) {
+          console.log("[AddVehicle] Adding", viewType, "photo upload:", uri);
+          uploadPromises.push(
+            uploadImage(vehicle.id, VIEW_TYPE_TO_IMAGE_TYPE[viewType], uri),
+          );
+        }
+      });
+
+      // Wait for all uploads (don't fail if some uploads fail)
+      if (uploadPromises.length > 0) {
+        console.log("[AddVehicle] Waiting for", uploadPromises.length, "image uploads...");
+        const uploadResults = await Promise.allSettled(uploadPromises);
+        console.log("[AddVehicle] Upload results:", JSON.stringify(uploadResults));
+
+        // Log any failed uploads
+        uploadResults.forEach((result, index) => {
+          if (result.status === "rejected") {
+            console.error("[AddVehicle] Upload", index, "failed:", result.reason);
+          }
+        });
+      } else {
+        console.log("[AddVehicle] No images to upload");
+      }
+
+      // Success
+      console.log("[AddVehicle] === SUCCESS ===");
+      appToast.success(t("addVehicle.success"));
+      router.back();
+    } catch (error) {
+      console.error("[AddVehicle] === CAUGHT ERROR ===");
+      console.error("[AddVehicle] Error:", error);
+      console.error("[AddVehicle] Error message:", (error as Error)?.message);
+      console.error("[AddVehicle] Error stack:", (error as Error)?.stack);
+      appToast.error(t("addVehicle.errors.createFailed"));
+    } finally {
+      setIsSubmitting(false);
+      console.log("[AddVehicle] === handleComplete finished ===");
     }
-    console.log(formik.values);
-  }, []);
+  }, [
+    formik.values,
+    createVehicle,
+    upsertBrandAndModel,
+    uploadImage,
+    t,
+    router,
+  ]);
 
   // Cancel handler
   const handleCancel = useCallback(() => {
@@ -256,6 +395,7 @@ export function AddVehicleForm() {
       onComplete={handleComplete}
       onCancel={handleCancel}
       completeLabel={t("addVehicle.createVehicle")}
+      isSubmitting={isSubmitting}
     />
   );
 }

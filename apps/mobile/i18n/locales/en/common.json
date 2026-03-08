@@ -199,6 +199,9 @@
       "title": "Photography Tip",
       "text": "Shoot in natural daylight and avoid harsh shadows. Make sure the vehicle is clean for the best results."
     },
+    "uploading": "Uploading...",
+    "uploadingPhotos": "Uploading photos...",
+    "creatingVehicle": "Creating vehicle...",
     "createVehicle": "Create Vehicle",
     "steps": {
       "brandModel": {

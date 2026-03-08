@@ -199,6 +199,9 @@
       "title": "Fotoğraf İpucu",
       "text": "Doğal gün ışığında çekim yapın ve sert gölgelerden kaçının. En iyi sonuçlar için aracın temiz olduğundan emin olun."
     },
+    "uploading": "Yükleniyor...",
+    "uploadingPhotos": "Fotoğraflar yükleniyor...",
+    "creatingVehicle": "Araç oluşturuluyor...",
     "createVehicle": "Araç Oluştur",
     "steps": {
       "brandModel": {

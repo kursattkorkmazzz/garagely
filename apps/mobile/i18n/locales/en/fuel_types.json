@@ -1,8 +1,7 @@
 {
-  "petrol": "Petrol",
-  "diesel": "Diesel",
-  "electric": "Electric",
-  "hybrid": "Hybrid",
-  "lpg": "LPG",
-  "petrolLpg": "Petrol & LPG"
+  "Gasoline": "Gasoline",
+  "Diesel": "Diesel",
+  "Electric": "Electric",
+  "Hybrid": "Hybrid",
+  "LPG": "LPG"
 }

@@ -6,6 +6,7 @@ import type {
   VehicleTransmissionTypeModel,
   VehicleBodyTypeModel,
 } from "@garagely/shared/models/vehicle";
+import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
 import type {
   CreateVehiclePayload,
@@ -74,7 +75,18 @@ export interface VehicleSlice {
     },
   ) => Promise<UpsertBrandModelResponse | null>;
 
-  // Actions - Cover
+  // Actions - Images
+  uploadImage: (
+    vehicleId: string,
+    imageType: VehicleImageType,
+    uri: string,
+    callbacks?: VehicleCallbacks,
+  ) => Promise<DocumentModel | null>;
+  removeImage: (
+    vehicleId: string,
+    imageType: VehicleImageType,
+    callbacks?: VehicleCallbacks,
+  ) => Promise<void>;
   uploadCover: (
     vehicleId: string,
     uri: string,
@@ -90,7 +102,7 @@ type SetVehicleState = (partial: Partial<VehicleSlice>) => void;
 type GetVehicleState = () => VehicleSlice;
 
 // React Native file format for FormData uploads
-function createReactNativeFile(uri: string) {
+function createReactNativeFile(uri: string, imageType: VehicleImageType) {
   const uriParts = uri.split(".");
   const extension = uriParts[uriParts.length - 1]?.toLowerCase() || "jpg";
   const mimeType = extension === "png" ? "image/png" : "image/jpeg";
@@ -98,7 +110,7 @@ function createReactNativeFile(uri: string) {
   return {
     uri,
     type: mimeType,
-    name: `cover.${extension}`,
+    name: `${imageType}.${extension}`,
   } as unknown as Blob;
 }
 
@@ -150,12 +162,14 @@ export const createVehicleSlice = (
       onSuccess?: (vehicle: VehicleModel) => void;
     },
   ): Promise<VehicleModel | null> => {
+    console.log("[VehicleSlice] createVehicle called with payload:", JSON.stringify(payload));
     set({ isCreating: true, createError: null });
 
     let createdVehicle: VehicleModel | null = null;
 
     await sdk.vehicle.createVehicle(payload, {
       onSuccess: (data) => {
+        console.log("[VehicleSlice] createVehicle SUCCESS:", JSON.stringify(data));
         createdVehicle = data;
         const currentVehicles = get().vehicles;
         set({
@@ -165,11 +179,13 @@ export const createVehicleSlice = (
         callbacks?.onSuccess?.(data);
       },
       onError: (err: SdkError) => {
+        console.error("[VehicleSlice] createVehicle ERROR:", err.message, err);
         set({ isCreating: false, createError: err.message });
         callbacks?.onError?.(err);
       },
     });
 
+    console.log("[VehicleSlice] createVehicle returning:", createdVehicle ? "vehicle object" : "null");
     return createdVehicle;
   },
 
@@ -294,26 +310,72 @@ export const createVehicleSlice = (
       onSuccess?: (result: UpsertBrandModelResponse) => void;
     },
   ): Promise<UpsertBrandModelResponse | null> => {
+    console.log("[VehicleSlice] upsertBrandAndModel called with payload:", JSON.stringify(payload));
     set({ isLoadingLookups: true, lookupsError: null });
 
     let result: UpsertBrandModelResponse | null = null;
 
     await sdk.vehicle.upsertBrandAndModel(payload, {
       onSuccess: (data) => {
+        console.log("[VehicleSlice] upsertBrandAndModel SUCCESS:", JSON.stringify(data));
         result = data;
         set({ isLoadingLookups: false });
         callbacks?.onSuccess?.(data);
       },
       onError: (err: SdkError) => {
+        console.error("[VehicleSlice] upsertBrandAndModel ERROR:", err.message, err);
         set({ isLoadingLookups: false, lookupsError: err.message });
         callbacks?.onError?.(err);
       },
     });
 
+    console.log("[VehicleSlice] upsertBrandAndModel returning:", result ? "result object" : "null");
     return result;
   },
 
-  // Actions - Cover
+  // Actions - Images
+  uploadImage: async (
+    vehicleId: string,
+    imageType: VehicleImageType,
+    uri: string,
+    callbacks?: VehicleCallbacks,
+  ): Promise<DocumentModel | null> => {
+    console.log("[VehicleSlice] uploadImage called:", { vehicleId, imageType, uri });
+    let uploadedDocument: DocumentModel | null = null;
+    const file = createReactNativeFile(uri, imageType);
+    console.log("[VehicleSlice] Created file object:", file);
+
+    await sdk.vehicle.uploadImage(vehicleId, imageType, file, {
+      onSuccess: (data) => {
+        console.log("[VehicleSlice] uploadImage SUCCESS:", JSON.stringify(data));
+        uploadedDocument = data;
+        callbacks?.onSuccess?.();
+      },
+      onError: (err: SdkError) => {
+        console.error("[VehicleSlice] uploadImage ERROR:", err.message, err);
+        callbacks?.onError?.(err);
+      },
+    });
+
+    console.log("[VehicleSlice] uploadImage returning:", uploadedDocument ? "document" : "null");
+    return uploadedDocument;
+  },
+
+  removeImage: async (
+    vehicleId: string,
+    imageType: VehicleImageType,
+    callbacks?: VehicleCallbacks,
+  ): Promise<void> => {
+    await sdk.vehicle.removeImage(vehicleId, imageType, {
+      onSuccess: () => {
+        callbacks?.onSuccess?.();
+      },
+      onError: (err: SdkError) => {
+        callbacks?.onError?.(err);
+      },
+    });
+  },
+
   uploadCover: async (
     vehicleId: string,
     uri: string,
@@ -322,9 +384,9 @@ export const createVehicleSlice = (
     set({ isUploadingCover: true, uploadCoverError: null });
 
     let uploadedDocument: DocumentModel | null = null;
-    const file = createReactNativeFile(uri);
+    const file = createReactNativeFile(uri, VehicleImageType.COVER);
 
-    await sdk.vehicle.uploadCover(vehicleId, file, {
+    await sdk.vehicle.uploadImage(vehicleId, VehicleImageType.COVER, file, {
       onSuccess: (data) => {
         uploadedDocument = data;
         const currentVehicles = get().vehicles;

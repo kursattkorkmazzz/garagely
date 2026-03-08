@@ -12,7 +12,9 @@ type AppIconProps = {
 
 export function AppIcon({ icon, size = 24, color, ...rest }: AppIconProps) {
   const { theme } = useTheme();
-  const IconComponent = icons[icon] as LucideIcon;
+
+  // Get the icon component, fallback to CircleHelp if not found
+  const IconComponent = (icons[icon] || icons.CircleHelp) as LucideIcon;
 
   return (
     <IconComponent

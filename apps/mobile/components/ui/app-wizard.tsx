@@ -20,7 +20,7 @@ export type WizardStep = {
 
 type AppWizardProps = {
   steps: WizardStep[];
-  onComplete: () => void;
+  onComplete: () => void | Promise<void>;
   onCancel?: () => void;
   showProgress?: boolean;
   showStepTitle?: boolean;
@@ -29,6 +29,7 @@ type AppWizardProps = {
   completeLabel?: string;
   cancelLabel?: string;
   onStepChange?: (stepIndex: number) => void;
+  isSubmitting?: boolean;
 };
 
 export function AppWizard({
@@ -42,11 +43,14 @@ export function AppWizard({
   completeLabel,
   cancelLabel,
   onStepChange,
+  isSubmitting = false,
 }: AppWizardProps) {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isButtonLoading = isLoading || isSubmitting;
 
   const currentStep = steps[currentStepIndex];
   const isFirstStep = currentStepIndex === 0;
@@ -78,7 +82,7 @@ export function AppWizard({
       }
 
       if (isLastStep) {
-        onComplete();
+        await onComplete();
       } else {
         setCurrentStepIndex((prev) => prev + 1);
         onStepChange?.(currentStepIndex + 1);
@@ -170,6 +174,7 @@ export function AppWizard({
         <AppButton
           variant="ghost"
           onPress={handleBack}
+          disabled={isButtonLoading}
           style={styles.backButton}
         >
           {isFirstStep ? (
@@ -185,7 +190,8 @@ export function AppWizard({
         <AppButton
           variant="primary"
           onPress={handleNext}
-          loading={isLoading}
+          loading={isButtonLoading}
+          disabled={isButtonLoading}
           style={styles.nextButton}
         >
           <View style={styles.buttonContent}>
