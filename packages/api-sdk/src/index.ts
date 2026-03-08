@@ -13,7 +13,6 @@ export interface GaragelySdk {
 
 export function createSdk(config: SdkConfig): GaragelySdk {
   const client = createHttpClient(config);
-
   return {
     auth: createAuthApi(client),
     user: createUserApi(client),

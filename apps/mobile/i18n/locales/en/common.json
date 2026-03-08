@@ -141,8 +141,10 @@
   "addVehicle": {
     "title": "Add Vehicle",
     "searchBrand": "Search brands...",
+    "searchModel": "Search models...",
     "selectModel": "SELECT MODEL",
     "changeBrand": "Change",
+    "addManually": "Can't find it? Add manually",
     "cantFindBrand": "Can't find your brand?",
     "enterManually": "Enter it manually",
     "enterCustomVehicle": "Enter Your Vehicle",

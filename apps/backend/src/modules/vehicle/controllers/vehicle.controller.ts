@@ -1,23 +1,26 @@
 import type { Request, Response } from "express";
 import type { VehicleService } from "../services/vehicle.service";
 import type { UploadedFile } from "../../storage/services/storage.service";
-import { sendSuccess } from "../../../common/utils/response.util";
+import { sendSuccess, sendPaginated } from "../../../common/utils/response.util";
 import { ValidationError } from "@garagely/shared/error.types";
 import { VehicleImageType } from "@garagely/shared/models/vehicle";
+import { extractSearchPaginationQuery } from "../../../common/utils/pagination.util";
 
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   // Lookup endpoints
-  getBrands = async (_req: Request, res: Response): Promise<void> => {
-    const brands = await this.vehicleService.getBrands();
-    sendSuccess(res, brands);
+  getBrands = async (req: Request, res: Response): Promise<void> => {
+    const query = extractSearchPaginationQuery(req);
+    const result = await this.vehicleService.getBrands(query);
+    sendPaginated(res, result.items, result.meta);
   };
 
   getModelsByBrand = async (req: Request, res: Response): Promise<void> => {
     const brandId = req.params.brandId as string;
-    const models = await this.vehicleService.getModelsByBrand(brandId);
-    sendSuccess(res, models);
+    const query = extractSearchPaginationQuery(req);
+    const result = await this.vehicleService.getModelsByBrand(brandId, query);
+    sendPaginated(res, result.items, result.meta);
   };
 
   getTransmissionTypes = async (

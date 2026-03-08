@@ -19,6 +19,9 @@ import type {
   UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
 import { NotFoundError, ForbiddenError } from "@garagely/shared/error.types";
+import type { PaginatedData } from "@garagely/shared/response.types";
+import type { SearchPaginationQuery } from "@garagely/shared/query.types";
+import { buildPaginationMeta } from "../../../common/utils/pagination.util";
 import type { IVehicleRepository } from "../repositories/vehicle.repository.interface";
 import type { IVehicleLookupRepository } from "../repositories/vehicle-lookup.repository.interface";
 import type {
@@ -42,18 +45,57 @@ export class VehicleService {
   ) {}
 
   // Lookup methods
-  async getBrands(): Promise<VehicleBrandModel[]> {
-    return this.vehicleBrandRepository.findSystemBrands();
+  async getBrands(
+    query: Required<SearchPaginationQuery>,
+  ): Promise<PaginatedData<VehicleBrandModel>> {
+    const { search, page, pageSize } = query;
+
+    const result = search && search.trim()
+      ? await this.vehicleBrandRepository.searchByNamePaginated(
+          search.trim(),
+          page,
+          pageSize,
+        )
+      : await this.vehicleBrandRepository.findSystemBrandsPaginated(
+          page,
+          pageSize,
+        );
+
+    return {
+      items: result.items,
+      meta: buildPaginationMeta(page, pageSize, result.total),
+    };
   }
 
-  async getModelsByBrand(brandId: string): Promise<VehicleModelModel[]> {
+  async getModelsByBrand(
+    brandId: string,
+    query: Required<SearchPaginationQuery>,
+  ): Promise<PaginatedData<VehicleModelModel>> {
     const brand = await this.vehicleBrandRepository.findById(brandId);
 
     if (!brand) {
       throw new NotFoundError("Brand not found");
     }
 
-    return this.vehicleModelRepository.findByBrandId(brandId);
+    const { search, page, pageSize } = query;
+
+    const result = search && search.trim()
+      ? await this.vehicleModelRepository.searchByNameInBrandPaginated(
+          brandId,
+          search.trim(),
+          page,
+          pageSize,
+        )
+      : await this.vehicleModelRepository.findByBrandIdPaginated(
+          brandId,
+          page,
+          pageSize,
+        );
+
+    return {
+      items: result.items,
+      meta: buildPaginationMeta(page, pageSize, result.total),
+    };
   }
 
   async getTransmissionTypes(): Promise<VehicleTransmissionTypeModel[]> {

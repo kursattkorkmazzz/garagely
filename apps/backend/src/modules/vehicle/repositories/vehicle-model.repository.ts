@@ -5,6 +5,7 @@ import {
 import type { CreateVehicleModelPayload } from "@garagely/shared/payloads/vehicle";
 import { db } from "../../../providers/firebase/firebase.provider";
 import { IVehicleModelRepository } from "./vehicle-model.repository.interface";
+import type { PaginatedResult } from "./vehicle-brand.repository.interface";
 
 const VEHICLE_MODELS_COLLECTION = "vehicle_models";
 
@@ -38,6 +39,37 @@ export class VehicleModelRepository implements IVehicleModelRepository<FirebaseF
     );
   }
 
+  async findByBrandIdPaginated(
+    brandId: string,
+    page: number,
+    pageSize: number,
+    tx?: FirebaseFirestore.Transaction,
+  ): Promise<PaginatedResult<VehicleModelModel>> {
+    const baseQuery = db
+      .collection(VEHICLE_MODELS_COLLECTION)
+      .where("brandId", "==", brandId)
+      .where("isActive", "==", true);
+
+    // Get total count
+    const countSnapshot = await baseQuery.count().get();
+    const total = countSnapshot.data().count;
+
+    // Get paginated items
+    const offset = (page - 1) * pageSize;
+    const snapshotRef = baseQuery
+      .orderBy("isSystem", "desc")
+      .orderBy("name")
+      .offset(offset)
+      .limit(pageSize);
+    const snapshot = tx ? await tx?.get(snapshotRef) : await snapshotRef.get();
+
+    const items = snapshot.docs.map((doc) =>
+      vehicleModelModelValidator.cast({ id: doc.id, ...doc.data() }),
+    );
+
+    return { items, total };
+  }
+
   async findByBrandNameYear(
     brandId: string,
     nameLower: string,
@@ -64,6 +96,64 @@ export class VehicleModelRepository implements IVehicleModelRepository<FirebaseF
 
     const doc = snapshot.docs[0];
     return vehicleModelModelValidator.cast({ id: doc.id, ...doc.data() });
+  }
+
+  async searchByNameInBrand(
+    brandId: string,
+    search: string,
+    tx?: FirebaseFirestore.Transaction,
+  ): Promise<VehicleModelModel[]> {
+    const searchLower = search.toLowerCase();
+    const searchEnd = searchLower + "\uf8ff";
+
+    const snapshotRef = db
+      .collection(VEHICLE_MODELS_COLLECTION)
+      .where("brandId", "==", brandId)
+      .where("isActive", "==", true)
+      .where("nameLower", ">=", searchLower)
+      .where("nameLower", "<=", searchEnd)
+      .orderBy("nameLower");
+
+    const snapshot = tx ? await tx?.get(snapshotRef) : await snapshotRef.get();
+    return snapshot.docs.map((doc) =>
+      vehicleModelModelValidator.cast({ id: doc.id, ...doc.data() }),
+    );
+  }
+
+  async searchByNameInBrandPaginated(
+    brandId: string,
+    search: string,
+    page: number,
+    pageSize: number,
+    tx?: FirebaseFirestore.Transaction,
+  ): Promise<PaginatedResult<VehicleModelModel>> {
+    const searchLower = search.toLowerCase();
+    const searchEnd = searchLower + "\uf8ff";
+
+    const baseQuery = db
+      .collection(VEHICLE_MODELS_COLLECTION)
+      .where("brandId", "==", brandId)
+      .where("isActive", "==", true)
+      .where("nameLower", ">=", searchLower)
+      .where("nameLower", "<=", searchEnd);
+
+    // Get total count
+    const countSnapshot = await baseQuery.count().get();
+    const total = countSnapshot.data().count;
+
+    // Get paginated items
+    const offset = (page - 1) * pageSize;
+    const snapshotRef = baseQuery
+      .orderBy("nameLower")
+      .offset(offset)
+      .limit(pageSize);
+    const snapshot = tx ? await tx?.get(snapshotRef) : await snapshotRef.get();
+
+    const items = snapshot.docs.map((doc) =>
+      vehicleModelModelValidator.cast({ id: doc.id, ...doc.data() }),
+    );
+
+    return { items, total };
   }
 
   async create(

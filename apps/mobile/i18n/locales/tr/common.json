@@ -141,8 +141,10 @@
   "addVehicle": {
     "title": "Araç Ekle",
     "searchBrand": "Marka ara...",
+    "searchModel": "Model ara...",
     "selectModel": "MODEL SEÇİN",
     "changeBrand": "Değiştir",
+    "addManually": "Bulamıyor musunuz? Manuel ekleyin",
     "cantFindBrand": "Markanızı bulamıyor musunuz?",
     "enterManually": "Manuel olarak girin",
     "enterCustomVehicle": "Aracınızı Girin",

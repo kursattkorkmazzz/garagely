@@ -16,6 +16,10 @@
       "types": "./src/response.types.ts",
       "default": "./src/response.types.ts"
     },
+    "./query.types": {
+      "types": "./src/query.types.ts",
+      "default": "./src/query.types.ts"
+    },
     "./pagination.types": {
       "types": "./src/pagination.types.ts",
       "default": "./src/pagination.types.ts"

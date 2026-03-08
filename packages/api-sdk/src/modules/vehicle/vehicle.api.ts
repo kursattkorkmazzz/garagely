@@ -8,6 +8,8 @@ import type {
 } from "@garagely/shared/models/vehicle";
 import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
+import type { PaginatedData } from "@garagely/shared/response.types";
+import type { SearchPaginationQuery } from "@garagely/shared/query.types";
 import type {
   CreateVehiclePayload,
   UpdateVehiclePayload,
@@ -15,14 +17,23 @@ import type {
   UpsertBrandModelPayload,
   UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
-import type { HttpClient, SdkCallbacks, SdkError } from "../../types";
+import type {
+  HttpClient,
+  SdkCallbacks,
+  SdkPaginatedCallbacks,
+  SdkError,
+} from "../../types";
 
 export interface VehicleApi {
   // Lookup methods
-  getBrands(callbacks?: SdkCallbacks<VehicleBrandModel[]>): Promise<void>;
+  getBrands(
+    query?: SearchPaginationQuery,
+    callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
+  ): Promise<void>;
   getModelsByBrand(
     brandId: string,
-    callbacks?: SdkCallbacks<VehicleModelModel[]>,
+    query?: SearchPaginationQuery,
+    callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
   ): Promise<void>;
   getTransmissionTypes(
     callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
@@ -83,10 +94,19 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
   return {
     // Lookup methods
     async getBrands(
-      callbacks?: SdkCallbacks<VehicleBrandModel[]>,
+      query?: SearchPaginationQuery,
+      callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
     ): Promise<void> {
       try {
-        const data = await client.get<VehicleBrandModel[]>("/vehicles/brands");
+        const params = new URLSearchParams();
+        if (query?.search) params.set("search", query.search);
+        if (query?.page) params.set("page", String(query.page));
+        if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+        const queryString = params.toString();
+        const url = queryString
+          ? `/vehicles/brands?${queryString}`
+          : "/vehicles/brands";
+        const data = await client.get<PaginatedData<VehicleBrandModel>>(url);
         callbacks?.onSuccess?.(data);
       } catch (error) {
         callbacks?.onError?.(error as SdkError);
@@ -95,12 +115,19 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     async getModelsByBrand(
       brandId: string,
-      callbacks?: SdkCallbacks<VehicleModelModel[]>,
+      query?: SearchPaginationQuery,
+      callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
     ): Promise<void> {
       try {
-        const data = await client.get<VehicleModelModel[]>(
-          `/vehicles/brands/${brandId}/models`,
-        );
+        const params = new URLSearchParams();
+        if (query?.search) params.set("search", query.search);
+        if (query?.page) params.set("page", String(query.page));
+        if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+        const queryString = params.toString();
+        const url = queryString
+          ? `/vehicles/brands/${brandId}/models?${queryString}`
+          : `/vehicles/brands/${brandId}/models`;
+        const data = await client.get<PaginatedData<VehicleModelModel>>(url);
         callbacks?.onSuccess?.(data);
       } catch (error) {
         callbacks?.onError?.(error as SdkError);
