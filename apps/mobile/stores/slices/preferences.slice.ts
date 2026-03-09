@@ -1,6 +1,6 @@
 import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { UpdateUserPreferencesPayload } from "@garagely/shared/payloads/user";
-import type { SdkError } from "@garagely/api-sdk";
+import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
 
 export interface PreferencesCallbacks {
@@ -17,7 +17,7 @@ export interface PreferencesSlice {
   updatePreferences: (
     payload: UpdateUserPreferencesPayload,
     callbacks?: PreferencesCallbacks,
-  ) => Promise<void>;
+  ) => CancelableRequest<void>;
   clearError: () => void;
 }
 
@@ -33,13 +33,13 @@ export const createPreferencesSlice = (
   error: null,
 
   // Actions
-  updatePreferences: async (
+  updatePreferences: (
     payload: UpdateUserPreferencesPayload,
     callbacks?: PreferencesCallbacks,
-  ) => {
+  ): CancelableRequest<void> => {
     set({ isUpdating: true, error: null });
 
-    await sdk.user.updatePreferences(payload, {
+    const { request, cancel } = sdk.user.updatePreferences(payload, {
       onSuccess: (data) => {
         set({
           isUpdating: false,
@@ -57,6 +57,8 @@ export const createPreferencesSlice = (
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
   clearError: () => {

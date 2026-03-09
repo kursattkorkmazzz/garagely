@@ -105,7 +105,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
       // Update backend if user is authenticated
       if (user) {
-        await updatePreferences(
+        const { request } = updatePreferences(
           { theme: mapToBackendTheme(newTheme) },
           {
             onSuccess: (updatedUser) => {
@@ -113,6 +113,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             },
           },
         );
+        await request;
       }
     },
     [user, updatePreferences, setUser],

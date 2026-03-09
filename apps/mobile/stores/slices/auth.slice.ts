@@ -5,7 +5,7 @@ import type {
   ChangePasswordPayload,
 } from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
-import type { SdkError } from "@garagely/api-sdk";
+import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
 
 const AUTH_TOKEN_KEY = "@garagely/auth_token";
@@ -25,17 +25,20 @@ export interface AuthSlice {
   isInitialized: boolean;
 
   // Actions
-  login: (payload: LoginPayload, callbacks?: AuthCallbacks) => Promise<void>;
+  login: (
+    payload: LoginPayload,
+    callbacks?: AuthCallbacks,
+  ) => CancelableRequest<void>;
   register: (
     payload: RegisterPayload,
     callbacks?: AuthCallbacks,
-  ) => Promise<void>;
+  ) => CancelableRequest<void>;
   logout: () => Promise<void>;
-  restoreSession: () => Promise<void>;
+  restoreSession: () => CancelableRequest<void>;
   changePassword: (
     payload: ChangePasswordPayload,
     callbacks?: AuthCallbacks,
-  ) => Promise<void>;
+  ) => CancelableRequest<void>;
   clearError: () => void;
   setAuthToken: (token: string | null) => void;
   setUser: (user: UserWithPreferences) => void;
@@ -81,10 +84,13 @@ export const createAuthSlice = (
   isInitialized: false,
 
   // Actions
-  login: async (payload: LoginPayload, callbacks?: AuthCallbacks) => {
+  login: (
+    payload: LoginPayload,
+    callbacks?: AuthCallbacks,
+  ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
-    await sdk.auth.login(payload, {
+    const { request, cancel } = sdk.auth.login(payload, {
       onSuccess: async (data) => {
         await saveToken(data.customToken);
         set({
@@ -105,12 +111,17 @@ export const createAuthSlice = (
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
-  register: async (payload: RegisterPayload, callbacks?: AuthCallbacks) => {
+  register: (
+    payload: RegisterPayload,
+    callbacks?: AuthCallbacks,
+  ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
-    await sdk.auth.register(payload, {
+    const { request, cancel } = sdk.auth.register(payload, {
       onSuccess: async (data) => {
         await saveToken(data.customToken);
         set({
@@ -131,6 +142,8 @@ export const createAuthSlice = (
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
   logout: async () => {
@@ -144,41 +157,53 @@ export const createAuthSlice = (
     sdk.setAuthToken(null);
   },
 
-  restoreSession: async () => {
-    const token = await getStoredToken();
+  restoreSession: (): CancelableRequest<void> => {
+    let cancelGetMe: (() => void) | undefined;
 
-    if (!token) {
-      set({ isInitialized: true });
-      return;
-    }
+    const request = (async () => {
+      const token = await getStoredToken();
 
-    sdk.setAuthToken(token);
-
-    await sdk.user.getMe({
-      onSuccess: (data) => {
-        set({
-          user: data,
-          customToken: token,
-          isAuthenticated: true,
-          isInitialized: true,
-        });
-      },
-      onError: async () => {
-        // Token is invalid or expired, clear it
-        await clearToken();
-        sdk.setAuthToken(null);
+      if (!token) {
         set({ isInitialized: true });
-      },
-    });
+        return;
+      }
+
+      sdk.setAuthToken(token);
+
+      const { request: getMeRequest, cancel } = sdk.user.getMe({
+        onSuccess: (data) => {
+          set({
+            user: data,
+            customToken: token,
+            isAuthenticated: true,
+            isInitialized: true,
+          });
+        },
+        onError: async () => {
+          // Token is invalid or expired, clear it
+          await clearToken();
+          sdk.setAuthToken(null);
+          set({ isInitialized: true });
+        },
+      });
+
+      cancelGetMe = cancel;
+      await getMeRequest;
+    })();
+
+    return {
+      request,
+      cancel: () => cancelGetMe?.(),
+    };
   },
 
-  changePassword: async (
+  changePassword: (
     payload: ChangePasswordPayload,
     callbacks?: AuthCallbacks,
-  ) => {
+  ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
-    await sdk.auth.changePassword(payload, {
+    const { request, cancel } = sdk.auth.changePassword(payload, {
       onSuccess: () => {
         set({
           isLoading: false,
@@ -194,6 +219,8 @@ export const createAuthSlice = (
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
   clearError: () => {

@@ -37,13 +37,14 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (values: LoginPayload) => {
-    await login(values, {
+    const { request } = login(values, {
       onSuccess: () => {
         appToast.success(t("auth:signIn.success"));
         router.replace("/(tabs)");
       },
       onError: handleError,
     });
+    await request;
   };
 
   return (

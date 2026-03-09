@@ -1,5 +1,5 @@
 import type { DocumentModel } from "@garagely/shared/models/document";
-import type { SdkError } from "@garagely/api-sdk";
+import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
 import { sdk } from "../sdk";
 
 export interface UserCallbacks {
@@ -14,9 +14,12 @@ export interface UserSlice {
   avatarError: string | null;
 
   // Actions
-  uploadAvatar: (uri: string, callbacks?: UserCallbacks) => Promise<void>;
-  getAvatar: (callbacks?: UserCallbacks) => Promise<void>;
-  removeAvatar: (callbacks?: UserCallbacks) => Promise<void>;
+  uploadAvatar: (
+    uri: string,
+    callbacks?: UserCallbacks,
+  ) => CancelableRequest<void>;
+  getAvatar: (callbacks?: UserCallbacks) => CancelableRequest<void>;
+  removeAvatar: (callbacks?: UserCallbacks) => CancelableRequest<void>;
   clearAvatarError: () => void;
 }
 
@@ -42,12 +45,15 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
   avatarError: null,
 
   // Actions
-  uploadAvatar: async (uri: string, callbacks?: UserCallbacks) => {
+  uploadAvatar: (
+    uri: string,
+    callbacks?: UserCallbacks,
+  ): CancelableRequest<void> => {
     set({ isUploadingAvatar: true, avatarError: null });
 
     const file = createReactNativeFile(uri);
 
-    await sdk.user.uploadAvatar(file, {
+    const { request, cancel } = sdk.user.uploadAvatar(file, {
       onSuccess: (data) => {
         set({
           avatar: data,
@@ -64,10 +70,12 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
-  getAvatar: async (callbacks?: UserCallbacks) => {
-    await sdk.user.getAvatar({
+  getAvatar: (callbacks?: UserCallbacks): CancelableRequest<void> => {
+    const { request, cancel } = sdk.user.getAvatar({
       onSuccess: (data) => {
         set({ avatar: data });
         callbacks?.onSuccess?.();
@@ -78,12 +86,14 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
-  removeAvatar: async (callbacks?: UserCallbacks) => {
+  removeAvatar: (callbacks?: UserCallbacks): CancelableRequest<void> => {
     set({ isUploadingAvatar: true, avatarError: null });
 
-    await sdk.user.removeAvatar({
+    const { request, cancel } = sdk.user.removeAvatar({
       onSuccess: () => {
         set({
           avatar: null,
@@ -100,6 +110,8 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
         callbacks?.onError?.(err);
       },
     });
+
+    return { request, cancel };
   },
 
   clearAvatarError: () => {

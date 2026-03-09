@@ -19,7 +19,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // Restore session on mount
   useEffect(() => {
     if (!isInitialized) {
-      restoreSession();
+      const { cancel } = restoreSession();
+      return () => cancel();
     }
   }, [isInitialized, restoreSession]);
 

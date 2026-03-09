@@ -43,13 +43,14 @@ export function SignUpForm() {
 
   const handleSubmit = async (values: SignUpFormValues) => {
     const { agreedToTerms, ...payload } = values;
-    await register(payload, {
+    const { request } = register(payload, {
       onSuccess: () => {
         appToast.success(t("auth:signUp.success"));
         router.replace("/(tabs)");
       },
       onError: handleError,
     });
+    await request;
   };
 
   return (

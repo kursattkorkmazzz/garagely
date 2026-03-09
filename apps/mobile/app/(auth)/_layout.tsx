@@ -14,7 +14,8 @@ export default function AuthLayout() {
   // Restore session on mount
   useEffect(() => {
     if (!isInitialized) {
-      restoreSession();
+      const { cancel } = restoreSession();
+      return () => cancel();
     }
   }, [isInitialized, restoreSession]);
 

@@ -73,7 +73,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
       // Update backend if user is authenticated
       if (user) {
-        await updatePreferences(
+        const { request } = updatePreferences(
           { locale: newLanguage },
           {
             onSuccess: (updatedUser) => {
@@ -81,6 +81,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
             },
           },
         );
+        await request;
       }
     },
     [user, updatePreferences, setUser],

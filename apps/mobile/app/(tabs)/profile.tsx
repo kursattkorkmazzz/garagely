@@ -42,12 +42,6 @@ export default function ProfileScreen() {
     (state) => state.user,
   );
 
-  useEffect(() => {
-    console.log("User is changed");
-    console.log(user);
-    console.log(avatar);
-  }, []);
-
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showThemeSheet, setShowThemeSheet] = useState(false);
@@ -63,12 +57,13 @@ export default function ProfileScreen() {
   const isAuthLoading = useStore((state) => state.auth.isLoading);
 
   const handleUploadAvatar = async (uri: string) => {
-    await uploadAvatar(uri, {
+    const { request } = uploadAvatar(uri, {
       onSuccess: () => {
         appToast.success(t("toast.photoUpdated"));
       },
       onError: handleError,
     });
+    await request;
   };
 
   const pickImageFromCamera = async () => {
@@ -112,12 +107,13 @@ export default function ProfileScreen() {
   };
 
   const handleRemoveAvatar = async () => {
-    await removeAvatar({
+    const { request } = removeAvatar({
       onSuccess: () => {
         appToast.success(t("toast.photoRemoved"));
       },
       onError: handleError,
     });
+    await request;
   };
 
   const avatarOptions: ActionSheetOption[] = [
@@ -197,7 +193,10 @@ export default function ProfileScreen() {
     (unit) => ({
       label: unit.label,
       onPress: async () => {
-        await updatePreferences({ preferredDistanceUnit: unit.id });
+        const { request } = updatePreferences({
+          preferredDistanceUnit: unit.id,
+        });
+        await request;
       },
     }),
   );
@@ -217,7 +216,8 @@ export default function ProfileScreen() {
   const volumeUnitOptions: ActionSheetOption[] = volumeUnits.map((unit) => ({
     label: unit.label,
     onPress: async () => {
-      await updatePreferences({ preferredVolumeUnit: unit.id });
+      const { request } = updatePreferences({ preferredVolumeUnit: unit.id });
+      await request;
     },
   }));
 
@@ -238,7 +238,8 @@ export default function ProfileScreen() {
   const currencyOptions: ActionSheetOption[] = currencies.map((currency) => ({
     label: currency.label,
     onPress: async () => {
-      await updatePreferences({ preferredCurrency: currency.id });
+      const { request } = updatePreferences({ preferredCurrency: currency.id });
+      await request;
     },
   }));
 
@@ -252,13 +253,14 @@ export default function ProfileScreen() {
     currentPassword: string;
     newPassword: string;
   }) => {
-    await changePassword(data, {
+    const { request } = changePassword(data, {
       onSuccess: () => {
         setShowChangePasswordModal(false);
         appToast.success(t("toast.passwordChanged"));
       },
       onError: handleError,
     });
+    await request;
   };
 
   const handleSignOut = async () => {
