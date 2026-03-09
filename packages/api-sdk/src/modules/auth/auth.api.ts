@@ -1,6 +1,15 @@
-import type { RegisterPayload, LoginPayload, ChangePasswordPayload } from "@garagely/shared/payloads/auth";
+import type {
+  RegisterPayload,
+  LoginPayload,
+  ChangePasswordPayload,
+} from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
-import type { HttpClient, SdkCallbacks, SdkError } from "../../types";
+import type {
+  HttpClient,
+  SdkCallbacks,
+  SdkError,
+  CancelableRequest,
+} from "../../types";
 
 export interface AuthResponse {
   user: UserWithPreferences;
@@ -15,53 +24,89 @@ export interface AuthApi {
   register(
     payload: RegisterPayload,
     callbacks?: SdkCallbacks<AuthResponse>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   login(
     payload: LoginPayload,
     callbacks?: SdkCallbacks<AuthResponse>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   changePassword(
     payload: ChangePasswordPayload,
     callbacks?: SdkCallbacks<ChangePasswordResponse>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
 }
 
 export function createAuthApi(client: HttpClient): AuthApi {
   return {
-    async register(
+    register(
       payload: RegisterPayload,
       callbacks?: SdkCallbacks<AuthResponse>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<AuthResponse>("/auth/register", payload);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.post<AuthResponse>(
+        "/auth/register",
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async login(
+    login(
       payload: LoginPayload,
       callbacks?: SdkCallbacks<AuthResponse>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<AuthResponse>("/auth/login", payload);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.post<AuthResponse>(
+        "/auth/login",
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async changePassword(
+    changePassword(
       payload: ChangePasswordPayload,
       callbacks?: SdkCallbacks<ChangePasswordResponse>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<ChangePasswordResponse>("/auth/change-password", payload);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.post<ChangePasswordResponse>(
+        "/auth/change-password",
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
   };
 }

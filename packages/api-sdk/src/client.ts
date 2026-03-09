@@ -3,7 +3,13 @@ import type {
   ApiResponse,
   ErrorResponse,
 } from "@garagely/shared/response.types";
-import type { HttpClient, SdkConfig, SdkError } from "./types";
+import type {
+  CancelableRequest,
+  HttpClient,
+  RequestOptions,
+  SdkConfig,
+  SdkError,
+} from "./types";
 
 function isErrorResponse(response: unknown): response is ErrorResponse {
   return (
@@ -20,6 +26,9 @@ export function createHttpClient(config: SdkConfig): HttpClient {
   let authToken: string | null = null;
   const timeout = config.timeout ?? DEFAULT_TIMEOUT;
 
+  // To prevent the race condition, we track the keyed requests.
+  const activeRequest: Map<string, AbortController> = new Map();
+
   function getHeaders(isFormData = false): HeadersInit {
     const headers: HeadersInit = {};
 
@@ -34,95 +43,143 @@ export function createHttpClient(config: SdkConfig): HttpClient {
     return headers;
   }
 
-  async function request<T>(
-    method: string,
-    path: string,
-    body?: unknown,
-    isFormData = false,
-  ): Promise<T> {
-    const url = `${config.baseUrl}${path}`;
+  function request<T>(options: RequestOptions): CancelableRequest<T> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const options: RequestInit = {
-      method,
-      headers: getHeaders(isFormData),
-      signal: controller.signal,
-    };
-
-    if (body !== undefined) {
-      options.body = isFormData ? (body as FormData) : JSON.stringify(body);
+    if (options.key) {
+      activeRequest.get(options.key)?.abort();
+      activeRequest.set(options.key, controller);
     }
 
-    let response: Response;
-    try {
-      response = await fetch(url, options);
-    } catch (error) {
-      clearTimeout(timeoutId);
+    const reqPromise = (async () => {
+      const url = `${config.baseUrl}${options.path}`;
 
-      if (error instanceof Error && error.name === "AbortError") {
+      const requestInit: RequestInit = {
+        method: options.method,
+        headers: getHeaders(options.isFormData ?? false),
+        signal: controller.signal,
+      };
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+      if (options.body !== undefined) {
+        options.body = options.isFormData
+          ? (options.body as FormData)
+          : JSON.stringify(options.body);
+      }
+
+      let response: Response;
+      try {
+        response = await fetch(url, requestInit);
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        if (error instanceof Error && error.name === "AbortError") {
+          const sdkError: SdkError = {
+            code: ErrorCode.REQUEST_TIMEOUT,
+            message: "Request timed out. Please try again.",
+          };
+          throw sdkError;
+        }
+
         const sdkError: SdkError = {
-          code: ErrorCode.REQUEST_TIMEOUT,
-          message: "Request timed out. Please try again.",
+          code: ErrorCode.NETWORK_ERROR,
+          message: "Network error. Please check your connection.",
         };
         throw sdkError;
       }
 
-      const sdkError: SdkError = {
-        code: ErrorCode.NETWORK_ERROR,
-        message: "Network error. Please check your connection.",
-      };
-      throw sdkError;
-    }
+      clearTimeout(timeoutId);
 
-    clearTimeout(timeoutId);
+      let data: unknown;
+      try {
+        data = await response.json();
+      } catch {
+        const sdkError: SdkError = {
+          code: ErrorCode.INTERNAL_ERROR,
+          message: "Invalid response from server.",
+        };
+        throw sdkError;
+      }
 
-    let data: unknown;
-    try {
-      data = await response.json();
-    } catch {
-      const sdkError: SdkError = {
-        code: ErrorCode.INTERNAL_ERROR,
-        message: "Invalid response from server.",
-      };
-      throw sdkError;
-    }
+      if (isErrorResponse(data)) {
+        const sdkError: SdkError = {
+          code: data.error.code,
+          message: data.error.message,
+          details: data.error.details,
+        };
+        throw sdkError;
+      }
 
-    if (isErrorResponse(data)) {
-      const sdkError: SdkError = {
-        code: data.error.code,
-        message: data.error.message,
-        details: data.error.details,
-      };
-      throw sdkError;
-    }
+      return (data as ApiResponse<T>).data;
+    })();
 
-    return (data as ApiResponse<T>).data;
+    return {
+      request: reqPromise,
+      cancel: () => controller.abort(),
+    };
   }
 
   return {
-    get<T>(path: string): Promise<T> {
-      return request<T>("GET", path);
+    get<T>(path: string, key?: string): CancelableRequest<T> {
+      return request<T>({
+        method: "GET",
+        path,
+        key,
+      });
     },
 
-    post<T>(path: string, body?: unknown): Promise<T> {
-      return request<T>("POST", path, body);
+    post<T>(path: string, body?: unknown, key?: string): CancelableRequest<T> {
+      return request<T>({
+        method: "POST",
+        path,
+        body,
+        key,
+      });
     },
 
-    patch<T>(path: string, body?: unknown): Promise<T> {
-      return request<T>("PATCH", path, body);
+    patch<T>(path: string, body?: unknown, key?: string): CancelableRequest<T> {
+      return request<T>({
+        method: "PATCH",
+        path,
+        body,
+        key,
+      });
     },
 
-    delete<T>(path: string): Promise<T> {
-      return request<T>("DELETE", path);
+    delete<T>(path: string, key?: string): CancelableRequest<T> {
+      return request<T>({
+        method: "DELETE",
+        path,
+        key,
+      });
     },
 
-    postFormData<T>(path: string, formData: FormData): Promise<T> {
-      return request<T>("POST", path, formData, true);
+    postFormData<T>(
+      path: string,
+      formData: FormData,
+      key?: string,
+    ): CancelableRequest<T> {
+      return request<T>({
+        method: "POST",
+        path,
+        body: formData,
+        isFormData: true,
+        key,
+      });
     },
 
-    patchFormData<T>(path: string, formData: FormData): Promise<T> {
-      return request<T>("PATCH", path, formData, true);
+    patchFormData<T>(
+      path: string,
+      formData: FormData,
+      key?: string,
+    ): CancelableRequest<T> {
+      return request<T>({
+        method: "PATCH",
+        path,
+        body: formData,
+        isFormData: true,
+        key,
+      });
     },
 
     setAuthToken(token: string | null): void {

@@ -23,12 +23,25 @@ export interface SdkPaginatedCallbacks<T> {
   onError?: (error: SdkError) => void;
 }
 
+export interface RequestOptions {
+  method: string;
+  path: string;
+  body?: unknown;
+  isFormData?: boolean;
+  key?: string;
+}
+
 export interface HttpClient {
-  get<T>(path: string): Promise<T>;
-  post<T>(path: string, body?: unknown): Promise<T>;
-  patch<T>(path: string, body?: unknown): Promise<T>;
-  delete<T>(path: string): Promise<T>;
-  postFormData<T>(path: string, formData: FormData): Promise<T>;
-  patchFormData<T>(path: string, formData: FormData): Promise<T>;
+  get<T>(path: string, key?: string): CancelableRequest<T>;
+  post<T>(path: string, body?: unknown, key?: string): CancelableRequest<T>;
+  patch<T>(path: string, body?: unknown, key?: string): CancelableRequest<T>;
+  delete<T>(path: string, key?: string): CancelableRequest<T>;
+  postFormData<T>(path: string, formData: FormData, key?: string): CancelableRequest<T>;
+  patchFormData<T>(path: string, formData: FormData, key?: string): CancelableRequest<T>;
   setAuthToken(token: string | null): void;
 }
+
+export type CancelableRequest<T> = {
+  request: Promise<T>;
+  cancel: () => void;
+};

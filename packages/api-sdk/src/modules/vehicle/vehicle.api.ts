@@ -13,7 +13,6 @@ import type { SearchPaginationQuery } from "@garagely/shared/query.types";
 import type {
   CreateVehiclePayload,
   UpdateVehiclePayload,
-  CreateVehicleModelPayload,
   UpsertBrandModelPayload,
   UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
@@ -22,6 +21,7 @@ import type {
   SdkCallbacks,
   SdkPaginatedCallbacks,
   SdkError,
+  CancelableRequest,
 } from "../../types";
 
 export interface VehicleApi {
@@ -29,43 +29,60 @@ export interface VehicleApi {
   getBrands(
     query?: SearchPaginationQuery,
     callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   getModelsByBrand(
     brandId: string,
     query?: SearchPaginationQuery,
     callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   getTransmissionTypes(
     callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
-  ): Promise<void>;
-  getBodyTypes(callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>): Promise<void>;
-  getFuelTypes(callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
+  getBodyTypes(
+    callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
+    key?: string,
+  ): CancelableRequest<void>;
+  getFuelTypes(
+    callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
+    key?: string,
+  ): CancelableRequest<void>;
 
   // Upsert brand and model together
   upsertBrandAndModel(
     payload: UpsertBrandModelPayload,
     callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
 
   // Vehicle CRUD
-  getVehicles(callbacks?: SdkCallbacks<VehicleModel[]>): Promise<void>;
+  getVehicles(
+    callbacks?: SdkCallbacks<VehicleModel[]>,
+    key?: string,
+  ): CancelableRequest<void>;
   getVehicleById(
     vehicleId: string,
     callbacks?: SdkCallbacks<VehicleModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   createVehicle(
     payload: CreateVehiclePayload,
     callbacks?: SdkCallbacks<VehicleModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   updateVehicle(
     vehicleId: string,
     payload: UpdateVehiclePayload,
     callbacks?: SdkCallbacks<VehicleModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   deleteVehicle(
     vehicleId: string,
     callbacks?: SdkCallbacks<void>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
 
   // Vehicle images
   uploadImage(
@@ -73,244 +90,384 @@ export interface VehicleApi {
     imageType: VehicleImageType,
     file: File | Blob,
     callbacks?: SdkCallbacks<DocumentModel>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   getImage(
     vehicleId: string,
     imageType: VehicleImageType,
     callbacks?: SdkCallbacks<DocumentModel | null>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   removeImage(
     vehicleId: string,
     imageType: VehicleImageType,
     callbacks?: SdkCallbacks<void>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
   getAllImages(
     vehicleId: string,
     callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
-  ): Promise<void>;
+    key?: string,
+  ): CancelableRequest<void>;
 }
 
 export function createVehicleApi(client: HttpClient): VehicleApi {
   return {
     // Lookup methods
-    async getBrands(
+    getBrands(
       query?: SearchPaginationQuery,
       callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
-    ): Promise<void> {
-      try {
-        const params = new URLSearchParams();
-        if (query?.search) params.set("search", query.search);
-        if (query?.page) params.set("page", String(query.page));
-        if (query?.pageSize) params.set("pageSize", String(query.pageSize));
-        const queryString = params.toString();
-        const url = queryString
-          ? `/vehicles/brands?${queryString}`
-          : "/vehicles/brands";
-        const data = await client.get<PaginatedData<VehicleBrandModel>>(url);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const params = new URLSearchParams();
+      if (query?.search) params.set("search", query.search);
+      if (query?.page) params.set("page", String(query.page));
+      if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+      const queryString = params.toString();
+      const url = queryString
+        ? `/vehicles/brands?${queryString}`
+        : "/vehicles/brands";
+
+      const { request, cancel } = client.get<PaginatedData<VehicleBrandModel>>(
+        url,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getModelsByBrand(
+    getModelsByBrand(
       brandId: string,
       query?: SearchPaginationQuery,
       callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
-    ): Promise<void> {
-      try {
-        const params = new URLSearchParams();
-        if (query?.search) params.set("search", query.search);
-        if (query?.page) params.set("page", String(query.page));
-        if (query?.pageSize) params.set("pageSize", String(query.pageSize));
-        const queryString = params.toString();
-        const url = queryString
-          ? `/vehicles/brands/${brandId}/models?${queryString}`
-          : `/vehicles/brands/${brandId}/models`;
-        const data = await client.get<PaginatedData<VehicleModelModel>>(url);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const params = new URLSearchParams();
+      if (query?.search) params.set("search", query.search);
+      if (query?.page) params.set("page", String(query.page));
+      if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+      const queryString = params.toString();
+      const url = queryString
+        ? `/vehicles/brands/${brandId}/models?${queryString}`
+        : `/vehicles/brands/${brandId}/models`;
+
+      const { request, cancel } = client.get<PaginatedData<VehicleModelModel>>(
+        url,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getTransmissionTypes(
+    getTransmissionTypes(
       callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<VehicleTransmissionTypeModel[]>(
-          "/vehicles/transmission-types",
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<VehicleTransmissionTypeModel[]>(
+        "/vehicles/transmission-types",
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getBodyTypes(
+    getBodyTypes(
       callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<VehicleBodyTypeModel[]>(
-          "/vehicles/body-types",
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<VehicleBodyTypeModel[]>(
+        "/vehicles/body-types",
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getFuelTypes(
+    getFuelTypes(
       callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<VehicleFuelTypeModel[]>(
-          "/vehicles/fuel-types",
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<VehicleFuelTypeModel[]>(
+        "/vehicles/fuel-types",
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
     // Upsert brand and model together
-    async upsertBrandAndModel(
+    upsertBrandAndModel(
       payload: UpsertBrandModelPayload,
       callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<UpsertBrandModelResponse>(
-          "/vehicles/upsert-brand-model",
-          payload,
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.post<UpsertBrandModelResponse>(
+        "/vehicles/upsert-brand-model",
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
     // Vehicle CRUD
-    async getVehicles(callbacks?: SdkCallbacks<VehicleModel[]>): Promise<void> {
-      try {
-        const data = await client.get<VehicleModel[]>("/vehicles");
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+    getVehicles(
+      callbacks?: SdkCallbacks<VehicleModel[]>,
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<VehicleModel[]>("/vehicles", key);
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getVehicleById(
+    getVehicleById(
       vehicleId: string,
       callbacks?: SdkCallbacks<VehicleModel>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<VehicleModel>(`/vehicles/${vehicleId}`);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<VehicleModel>(
+        `/vehicles/${vehicleId}`,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async createVehicle(
+    createVehicle(
       payload: CreateVehiclePayload,
       callbacks?: SdkCallbacks<VehicleModel>,
-    ): Promise<void> {
-      try {
-        const data = await client.post<VehicleModel>("/vehicles", payload);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.post<VehicleModel>(
+        "/vehicles",
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async updateVehicle(
+    updateVehicle(
       vehicleId: string,
       payload: UpdateVehiclePayload,
       callbacks?: SdkCallbacks<VehicleModel>,
-    ): Promise<void> {
-      try {
-        const data = await client.patch<VehicleModel>(
-          `/vehicles/${vehicleId}`,
-          payload,
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.patch<VehicleModel>(
+        `/vehicles/${vehicleId}`,
+        payload,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async deleteVehicle(
+    deleteVehicle(
       vehicleId: string,
       callbacks?: SdkCallbacks<void>,
-    ): Promise<void> {
-      try {
-        await client.delete<void>(`/vehicles/${vehicleId}`);
-        callbacks?.onSuccess?.(undefined);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.delete<void>(
+        `/vehicles/${vehicleId}`,
+        key,
+      );
+
+      return {
+        request: request
+          .then(() => {
+            callbacks?.onSuccess?.(undefined);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
     // Vehicle images
-    async uploadImage(
+    uploadImage(
       vehicleId: string,
       imageType: VehicleImageType,
       file: File | Blob,
       callbacks?: SdkCallbacks<DocumentModel>,
-    ): Promise<void> {
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const data = await client.postFormData<DocumentModel>(
-          `/vehicles/${vehicleId}/images/${imageType}`,
-          formData,
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { request, cancel } = client.postFormData<DocumentModel>(
+        `/vehicles/${vehicleId}/images/${imageType}`,
+        formData,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getImage(
+    getImage(
       vehicleId: string,
       imageType: VehicleImageType,
       callbacks?: SdkCallbacks<DocumentModel | null>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<DocumentModel | null>(
-          `/vehicles/${vehicleId}/images/${imageType}`,
-        );
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<DocumentModel | null>(
+        `/vehicles/${vehicleId}/images/${imageType}`,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async removeImage(
+    removeImage(
       vehicleId: string,
       imageType: VehicleImageType,
       callbacks?: SdkCallbacks<void>,
-    ): Promise<void> {
-      try {
-        await client.delete<void>(`/vehicles/${vehicleId}/images/${imageType}`);
-        callbacks?.onSuccess?.(undefined);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.delete<void>(
+        `/vehicles/${vehicleId}/images/${imageType}`,
+        key,
+      );
+
+      return {
+        request: request
+          .then(() => {
+            callbacks?.onSuccess?.(undefined);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
 
-    async getAllImages(
+    getAllImages(
       vehicleId: string,
       callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
-    ): Promise<void> {
-      try {
-        const data = await client.get<
-          Record<VehicleImageType, DocumentModel | null>
-        >(`/vehicles/${vehicleId}/images`);
-        callbacks?.onSuccess?.(data);
-      } catch (error) {
-        callbacks?.onError?.(error as SdkError);
-      }
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<
+        Record<VehicleImageType, DocumentModel | null>
+      >(`/vehicles/${vehicleId}/images`, key);
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
     },
   };
 }

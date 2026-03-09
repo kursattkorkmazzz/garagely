@@ -56,7 +56,7 @@ Component → Zustand store → @garagely/api-sdk → backend (Express)
 ```
 
 - **Components never call APIs directly.** Every API call goes through a Zustand store, which calls `@garagely/api-sdk`.
-- **`@garagely/api-sdk`** exposes typed methods with `onSuccess`/`onError` callbacks. Auth token is set globally via `sdk.setAuthToken(token)`.
+- **`@garagely/api-sdk`** exposes typed methods returning `CancelableRequest<void>` with `onSuccess`/`onError` callbacks. Auth token is set globally via `sdk.setAuthToken(token)`.
 - **Stores** are Zustand v5. They hold UI state (`isLoading`, `error`) and domain data. They do not import `fetch`/`axios` directly.
 
 ### Auth Flow
@@ -165,9 +165,11 @@ Screen files import composites and call stores — no inline form logic, no busi
 
 ### API SDK usage pattern
 
+All SDK methods return `CancelableRequest<void>` with `{ request: Promise<void>, cancel: () => void }`.
+
 ```typescript
-// Zustand store — canonical pattern
-await sdk.auth.login(
+// Basic usage — Zustand store pattern
+const { request } = sdk.auth.login(
   { email, password },
   {
     onSuccess: (data) => {
@@ -180,4 +182,21 @@ await sdk.auth.login(
     },
   },
 );
+await request;
+
+// Race-condition safe — pass a key to auto-cancel previous requests with same key
+const { request, cancel } = sdk.vehicle.getBrands(
+  { search: searchText },
+  {
+    onSuccess: (data) => set({ brands: data.items }),
+    onError: (err) => set({ error: err.message }),
+  },
+  "brand-search", // key — new request cancels previous with same key
+);
+
+// Manual cancel (e.g., on component unmount)
+useEffect(() => {
+  const { cancel } = sdk.vehicle.getVehicles({ onSuccess, onError });
+  return () => cancel();
+}, []);
 ```
