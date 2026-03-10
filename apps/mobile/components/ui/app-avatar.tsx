@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { View, Image, StyleSheet, ImageSourcePropType } from "react-native";
 import { AppText } from "./app-text";
+import { AppSkeleton } from "./app-skeleton";
 import { useTheme } from "@/theme/theme-context";
 
 type AvatarSize = "sm" | "default" | "lg" | "xl";
@@ -33,10 +34,12 @@ const fontSizes: Record<AvatarSize, number> = {
 };
 
 // Context for sharing avatar state
+type ImageStatus = "idle" | "loading" | "loaded" | "error";
+
 interface AvatarContextProps {
   size: AvatarSize;
-  imageLoaded: boolean;
-  setImageLoaded: (loaded: boolean) => void;
+  imageStatus: ImageStatus;
+  setImageStatus: (status: ImageStatus) => void;
 }
 
 const AvatarContext = createContext<AvatarContextProps | null>(null);
@@ -56,11 +59,11 @@ type AppAvatarProps = {
 };
 
 export function AppAvatar({ children, size = "default" }: AppAvatarProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageStatus, setImageStatus] = useState<ImageStatus>("idle");
   const avatarSize = sizeValues[size];
 
   return (
-    <AvatarContext.Provider value={{ size, imageLoaded, setImageLoaded }}>
+    <AvatarContext.Provider value={{ size, imageStatus, setImageStatus }}>
       <View
         style={[styles.container, { width: avatarSize, height: avatarSize }]}
       >
@@ -77,14 +80,14 @@ type AppAvatarImageProps = {
 };
 
 export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
-  const { size, imageLoaded, setImageLoaded } = useAvatarContext();
+  const { size, imageStatus, setImageStatus } = useAvatarContext();
   const avatarSize = sizeValues[size];
 
-  // Reset imageLoaded state when src changes
+  // Reset to loading state when src changes
   const srcKey = typeof src === "string" ? src : "local";
   useEffect(() => {
-    setImageLoaded(false);
-  }, [srcKey, setImageLoaded]);
+    setImageStatus("loading");
+  }, [srcKey, setImageStatus]);
 
   // Don't render image if src is empty or invalid
   const isValidSrc =
@@ -95,6 +98,7 @@ export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
   }
 
   const imageSource = typeof src === "string" ? { uri: src } : src;
+  const isLoaded = imageStatus === "loaded";
 
   return (
     <Image
@@ -107,12 +111,12 @@ export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
           width: avatarSize,
           height: avatarSize,
           borderRadius: avatarSize / 2,
-          opacity: imageLoaded ? 1 : 0,
-          position: imageLoaded ? "relative" : "absolute",
+          opacity: isLoaded ? 1 : 0,
+          position: isLoaded ? "relative" : "absolute",
         },
       ]}
-      onLoad={() => setImageLoaded(true)}
-      onError={() => setImageLoaded(false)}
+      onLoad={() => setImageStatus("loaded")}
+      onError={() => setImageStatus("error")}
     />
   );
 }
@@ -137,14 +141,29 @@ export function AppAvatarFallback({
   fallbackColor,
 }: AppAvatarFallbackProps) {
   const { theme } = useTheme();
-  const { size, imageLoaded } = useAvatarContext();
+  const { size, imageStatus } = useAvatarContext();
   const avatarSize = sizeValues[size];
   const fontSize = fontSizes[size];
 
-  if (imageLoaded) {
+  // Don't render anything if image loaded successfully
+  if (imageStatus === "loaded") {
     return null;
   }
 
+  // Show skeleton while loading
+  if (imageStatus === "loading") {
+    return (
+      <AppSkeleton
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+        }}
+      />
+    );
+  }
+
+  // Show fallback on idle or error
   const initials = fallbackText ? getInitials(fallbackText) : "?";
   const backgroundColor = fallbackColor ?? theme.muted;
 

@@ -404,6 +404,7 @@ function SelectionListItem({
           borderColor: isSelected ? theme.accent : theme.border,
         },
       }),
+
     [isSelected],
   );
 
