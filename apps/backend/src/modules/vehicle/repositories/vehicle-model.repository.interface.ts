@@ -8,7 +8,7 @@ export interface IVehicleModelRepository<Tx = {}> {
   findByBrandIdPaginated(
     brandId: string,
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: Tx,
   ): Promise<PaginatedResult<VehicleModelModel>>;
   findByBrandNameYear(
@@ -26,7 +26,7 @@ export interface IVehicleModelRepository<Tx = {}> {
     brandId: string,
     search: string,
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: Tx,
   ): Promise<PaginatedResult<VehicleModelModel>>;
   create(

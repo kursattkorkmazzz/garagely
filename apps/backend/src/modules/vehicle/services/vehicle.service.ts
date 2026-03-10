@@ -19,7 +19,7 @@ import type {
   UpsertBrandModelResponse,
 } from "@garagely/shared/payloads/vehicle";
 import { NotFoundError, ForbiddenError } from "@garagely/shared/error.types";
-import type { PaginatedData } from "@garagely/shared/response.types";
+import type { PaginationMeta } from "@garagely/shared/response.types";
 import type { SearchPaginationQuery } from "@garagely/shared/query.types";
 import { buildPaginationMeta } from "../../../common/utils/pagination.util";
 import type { IVehicleRepository } from "../repositories/vehicle.repository.interface";
@@ -47,54 +47,54 @@ export class VehicleService {
   // Lookup methods
   async getBrands(
     query: Required<SearchPaginationQuery>,
-  ): Promise<PaginatedData<VehicleBrandModel>> {
-    const { search, page, pageSize } = query;
+  ): Promise<{ data: VehicleBrandModel[]; meta: PaginationMeta }> {
+    const { search, page, limit } = query;
 
     const result = search && search.trim()
       ? await this.vehicleBrandRepository.searchByNamePaginated(
           search.trim(),
           page,
-          pageSize,
+          limit,
         )
       : await this.vehicleBrandRepository.findSystemBrandsPaginated(
           page,
-          pageSize,
+          limit,
         );
 
     return {
-      items: result.items,
-      meta: buildPaginationMeta(page, pageSize, result.total),
+      data: result.items,
+      meta: buildPaginationMeta(page, limit, result.total),
     };
   }
 
   async getModelsByBrand(
     brandId: string,
     query: Required<SearchPaginationQuery>,
-  ): Promise<PaginatedData<VehicleModelModel>> {
+  ): Promise<{ data: VehicleModelModel[]; meta: PaginationMeta }> {
     const brand = await this.vehicleBrandRepository.findById(brandId);
 
     if (!brand) {
       throw new NotFoundError("Brand not found");
     }
 
-    const { search, page, pageSize } = query;
+    const { search, page, limit } = query;
 
     const result = search && search.trim()
       ? await this.vehicleModelRepository.searchByNameInBrandPaginated(
           brandId,
           search.trim(),
           page,
-          pageSize,
+          limit,
         )
       : await this.vehicleModelRepository.findByBrandIdPaginated(
           brandId,
           page,
-          pageSize,
+          limit,
         );
 
     return {
-      items: result.items,
-      meta: buildPaginationMeta(page, pageSize, result.total),
+      data: result.items,
+      meta: buildPaginationMeta(page, limit, result.total),
     };
   }
 

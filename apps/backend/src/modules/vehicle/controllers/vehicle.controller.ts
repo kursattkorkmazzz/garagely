@@ -13,14 +13,14 @@ export class VehicleController {
   getBrands = async (req: Request, res: Response): Promise<void> => {
     const query = extractSearchPaginationQuery(req);
     const result = await this.vehicleService.getBrands(query);
-    sendPaginated(res, result.items, result.meta);
+    sendPaginated(res, result.data, result.meta);
   };
 
   getModelsByBrand = async (req: Request, res: Response): Promise<void> => {
     const brandId = req.params.brandId as string;
     const query = extractSearchPaginationQuery(req);
     const result = await this.vehicleService.getModelsByBrand(brandId, query);
-    sendPaginated(res, result.items, result.meta);
+    sendPaginated(res, result.data, result.meta);
   };
 
   getTransmissionTypes = async (

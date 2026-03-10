@@ -15,14 +15,14 @@ export interface IVehicleBrandRepository<Tx = {}> {
   findSystemBrands(tx?: Tx): Promise<VehicleBrandModel[]>;
   findSystemBrandsPaginated(
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: Tx,
   ): Promise<PaginatedResult<VehicleBrandModel>>;
   searchByName(search: string, tx?: Tx): Promise<VehicleBrandModel[]>;
   searchByNamePaginated(
     search: string,
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: Tx,
   ): Promise<PaginatedResult<VehicleBrandModel>>;
   create(

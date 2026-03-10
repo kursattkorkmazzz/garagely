@@ -29,11 +29,5 @@ export interface PaginatedResponse<T = unknown> {
   meta: PaginationMeta;
 }
 
-// For SDK/client use - data without success wrapper
-export interface PaginatedData<T = unknown> {
-  items: T[];
-  meta: PaginationMeta;
-}
-
 export type ApiResult<T = unknown> = ApiResponse<T> | ErrorResponse;
 export type PaginatedResult<T = unknown> = PaginatedResponse<T> | ErrorResponse;

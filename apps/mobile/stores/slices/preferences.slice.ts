@@ -40,14 +40,14 @@ export const createPreferencesSlice = (
     set({ isUpdating: true, error: null });
 
     const { request, cancel } = sdk.user.updatePreferences(payload, {
-      onSuccess: (data) => {
+      onSuccess: (response) => {
         set({
           isUpdating: false,
           error: null,
         });
         // Directly update auth user for immediate UI update
-        setAuthUser(data);
-        callbacks?.onSuccess?.(data);
+        setAuthUser(response.data);
+        callbacks?.onSuccess?.(response.data);
       },
       onError: (err: SdkError) => {
         set({

@@ -91,16 +91,16 @@ export const createAuthSlice = (
     set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.auth.login(payload, {
-      onSuccess: async (data) => {
-        await saveToken(data.customToken);
+      onSuccess: async (response) => {
+        await saveToken(response.data.customToken);
         set({
-          user: data.user,
-          customToken: data.customToken,
+          user: response.data.user,
+          customToken: response.data.customToken,
           isAuthenticated: true,
           isLoading: false,
           error: null,
         });
-        sdk.setAuthToken(data.customToken);
+        sdk.setAuthToken(response.data.customToken);
         callbacks?.onSuccess?.();
       },
       onError: (err: SdkError) => {
@@ -122,16 +122,16 @@ export const createAuthSlice = (
     set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.auth.register(payload, {
-      onSuccess: async (data) => {
-        await saveToken(data.customToken);
+      onSuccess: async (response) => {
+        await saveToken(response.data.customToken);
         set({
-          user: data.user,
-          customToken: data.customToken,
+          user: response.data.user,
+          customToken: response.data.customToken,
           isAuthenticated: true,
           isLoading: false,
           error: null,
         });
-        sdk.setAuthToken(data.customToken);
+        sdk.setAuthToken(response.data.customToken);
         callbacks?.onSuccess?.();
       },
       onError: (err: SdkError) => {
@@ -171,9 +171,9 @@ export const createAuthSlice = (
       sdk.setAuthToken(token);
 
       const { request: getMeRequest, cancel } = sdk.user.getMe({
-        onSuccess: (data) => {
+        onSuccess: (response) => {
           set({
-            user: data,
+            user: response.data,
             customToken: token,
             isAuthenticated: true,
             isInitialized: true,

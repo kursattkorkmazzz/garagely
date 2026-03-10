@@ -75,7 +75,7 @@ export class VehicleBrandRepository implements IVehicleBrandRepository<FirebaseF
 
   async findSystemBrandsPaginated(
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: FirebaseFirestore.Transaction,
   ): Promise<PaginatedResult<VehicleBrandModel>> {
     const baseQuery = db
@@ -88,8 +88,8 @@ export class VehicleBrandRepository implements IVehicleBrandRepository<FirebaseF
     const total = countSnapshot.data().count;
 
     // Get paginated items
-    const offset = (page - 1) * pageSize;
-    const snapshotRef = baseQuery.orderBy("name").offset(offset).limit(pageSize);
+    const offset = (page - 1) * limit;
+    const snapshotRef = baseQuery.orderBy("name").offset(offset).limit(limit);
     const snapshot = tx ? await tx?.get(snapshotRef) : await snapshotRef.get();
 
     const items = snapshot.docs.map((doc) =>
@@ -123,7 +123,7 @@ export class VehicleBrandRepository implements IVehicleBrandRepository<FirebaseF
   async searchByNamePaginated(
     search: string,
     page: number,
-    pageSize: number,
+    limit: number,
     tx?: FirebaseFirestore.Transaction,
   ): Promise<PaginatedResult<VehicleBrandModel>> {
     const searchLower = search.toLowerCase();
@@ -141,11 +141,11 @@ export class VehicleBrandRepository implements IVehicleBrandRepository<FirebaseF
     const total = countSnapshot.data().count;
 
     // Get paginated items
-    const offset = (page - 1) * pageSize;
+    const offset = (page - 1) * limit;
     const snapshotRef = baseQuery
       .orderBy("nameLower")
       .offset(offset)
-      .limit(pageSize);
+      .limit(limit);
     const snapshot = tx ? await tx?.get(snapshotRef) : await snapshotRef.get();
 
     const items = snapshot.docs.map((doc) =>

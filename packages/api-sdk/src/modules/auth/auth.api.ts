@@ -4,6 +4,7 @@ import type {
   ChangePasswordPayload,
 } from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
+import type { ApiResponse } from "@garagely/shared/response.types";
 import type {
   HttpClient,
   SdkCallbacks,
@@ -11,14 +12,17 @@ import type {
   CancelableRequest,
 } from "../../types";
 
-export interface AuthResponse {
+export interface AuthResponseData {
   user: UserWithPreferences;
   customToken: string;
 }
 
-export interface ChangePasswordResponse {
+export interface ChangePasswordResponseData {
   message: string;
 }
+
+export type AuthResponse = ApiResponse<AuthResponseData>;
+export type ChangePasswordResponse = ApiResponse<ChangePasswordResponseData>;
 
 export interface AuthApi {
   register(

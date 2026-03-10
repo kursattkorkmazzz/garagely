@@ -54,9 +54,9 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
     const file = createReactNativeFile(uri);
 
     const { request, cancel } = sdk.user.uploadAvatar(file, {
-      onSuccess: (data) => {
+      onSuccess: (response) => {
         set({
-          avatar: data,
+          avatar: response.data,
           isUploadingAvatar: false,
           avatarError: null,
         });
@@ -76,8 +76,8 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
 
   getAvatar: (callbacks?: UserCallbacks): CancelableRequest<void> => {
     const { request, cancel } = sdk.user.getAvatar({
-      onSuccess: (data) => {
-        set({ avatar: data });
+      onSuccess: (response) => {
+        set({ avatar: response.data });
         callbacks?.onSuccess?.();
       },
       onError: (err: SdkError) => {

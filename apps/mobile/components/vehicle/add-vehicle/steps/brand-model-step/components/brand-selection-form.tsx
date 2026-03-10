@@ -37,7 +37,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 
 type SelectionStep = "brand" | "model";
 
-const PAGE_SIZE = 20;
+const PAGE_LIMIT = 20;
 
 type BrandSelectionFormProps = {
   onSwitchManualyButtonClick?: () => void;
@@ -83,26 +83,22 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
       }
 
       sdk.vehicle.getBrands(
-        { search: search || undefined, page, pageSize: PAGE_SIZE },
+        { search: search || undefined, page, limit: PAGE_LIMIT },
         {
-          onSuccess: (data) => {
-            console.log("DATA: ", data);
-
+          onSuccess: (response) => {
             if (append) {
-              setBrands((prev) => [...(prev ?? []), ...(data.items ?? [])]);
+              setBrands((prev) => [...(prev ?? []), ...(response.data ?? [])]);
             } else {
-              setBrands(data.items ?? []);
+              setBrands(response.data ?? []);
             }
-            setBrandsMeta(data.meta);
+            setBrandsMeta(response.meta);
             setIsLoading(false);
             setIsLoadingMore(false);
           },
           onError: (error) => {
-            //TODO: Add appropriate toast message
             setIsLoading(false);
             setIsLoadingMore(false);
-            console.log("Brand Selection Form - Fetch Brands Error");
-            console.log(error);
+            console.error("Brand Selection Form - Fetch Brands Error", error);
           },
         },
       );
@@ -126,22 +122,22 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
 
       sdk.vehicle.getModelsByBrand(
         brandId,
-        { search: search || undefined, page, pageSize: PAGE_SIZE },
+        { search: search || undefined, page, limit: PAGE_LIMIT },
         {
-          onSuccess: (data) => {
+          onSuccess: (response) => {
             if (append) {
-              setModels((prev) => [...prev, ...data.items]);
+              setModels((prev) => [...prev, ...response.data]);
             } else {
-              setModels(data.items);
+              setModels(response.data);
             }
-            setModelsMeta(data.meta);
+            setModelsMeta(response.meta);
             setIsLoading(false);
             setIsLoadingMore(false);
           },
-          onError: () => {
-            //TODO: Add appropriate toast message
+          onError: (error) => {
             setIsLoading(false);
             setIsLoadingMore(false);
+            console.error("Brand Selection Form - Fetch Models Error", error);
           },
         },
       );
@@ -253,11 +249,6 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
       },
     }),
   );
-  useEffect(() => {
-    console.log("brands changed", brands);
-  }, [brands]);
-  console.log(brands);
-
   // Show loading state
   if (isLoading && brands.length === 0) {
     return (
@@ -354,26 +345,25 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
             />
           )}
           contentContainerStyle={style.flatListContentContainerStyle}
-          ListEmptyComponent={() => (
-            <AppButton
-              variant="primary"
-              style={style.switchButton}
-              onPress={() => props.onSwitchManualyButtonClick?.()}
-            >
-              <AppIcon icon="Plus" size={24} color={theme.primaryForeground} />
-              <AppText style={style.switchButtonText}>
-                {t("addVehicle.addManually")}
-              </AppText>
-              <AppIcon
-                icon="ArrowRight"
-                size={24}
-                color={theme.primaryForeground}
-              />
-            </AppButton>
-          )}
+          ListEmptyComponent={
+            () => null //TODO: Add the empty list state message using AppText
+          }
           style={style.flatListStyle}
         />
       )}
+
+      {/* //TODO: Make this component a bit fancy. The look is bad */}
+      <AppButton
+        variant="primary"
+        style={style.switchButton}
+        onPress={() => props.onSwitchManualyButtonClick?.()}
+      >
+        <AppIcon icon="Plus" size={24} color={theme.primaryForeground} />
+        <AppText style={style.switchButtonText}>
+          {t("addVehicle.addManually")}
+        </AppText>
+        <AppIcon icon="ArrowRight" size={24} color={theme.primaryForeground} />
+      </AppButton>
     </>
   );
 }

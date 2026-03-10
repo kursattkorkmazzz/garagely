@@ -8,7 +8,10 @@ import type {
 } from "@garagely/shared/models/vehicle";
 import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
-import type { PaginatedData } from "@garagely/shared/response.types";
+import type {
+  ApiResponse,
+  PaginatedResponse,
+} from "@garagely/shared/response.types";
 import type { SearchPaginationQuery } from "@garagely/shared/query.types";
 import type {
   CreateVehiclePayload,
@@ -19,7 +22,6 @@ import type {
 import type {
   HttpClient,
   SdkCallbacks,
-  SdkPaginatedCallbacks,
   SdkError,
   CancelableRequest,
 } from "../../types";
@@ -28,59 +30,59 @@ export interface VehicleApi {
   // Lookup methods
   getBrands(
     query?: SearchPaginationQuery,
-    callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
+    callbacks?: SdkCallbacks<PaginatedResponse<VehicleBrandModel>>,
     key?: string,
   ): CancelableRequest<void>;
   getModelsByBrand(
     brandId: string,
     query?: SearchPaginationQuery,
-    callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
+    callbacks?: SdkCallbacks<PaginatedResponse<VehicleModelModel>>,
     key?: string,
   ): CancelableRequest<void>;
   getTransmissionTypes(
-    callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleTransmissionTypeModel[]>>,
     key?: string,
   ): CancelableRequest<void>;
   getBodyTypes(
-    callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleBodyTypeModel[]>>,
     key?: string,
   ): CancelableRequest<void>;
   getFuelTypes(
-    callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleFuelTypeModel[]>>,
     key?: string,
   ): CancelableRequest<void>;
 
   // Upsert brand and model together
   upsertBrandAndModel(
     payload: UpsertBrandModelPayload,
-    callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
+    callbacks?: SdkCallbacks<ApiResponse<UpsertBrandModelResponse>>,
     key?: string,
   ): CancelableRequest<void>;
 
   // Vehicle CRUD
   getVehicles(
-    callbacks?: SdkCallbacks<VehicleModel[]>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleModel[]>>,
     key?: string,
   ): CancelableRequest<void>;
   getVehicleById(
     vehicleId: string,
-    callbacks?: SdkCallbacks<VehicleModel>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
     key?: string,
   ): CancelableRequest<void>;
   createVehicle(
     payload: CreateVehiclePayload,
-    callbacks?: SdkCallbacks<VehicleModel>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
     key?: string,
   ): CancelableRequest<void>;
   updateVehicle(
     vehicleId: string,
     payload: UpdateVehiclePayload,
-    callbacks?: SdkCallbacks<VehicleModel>,
+    callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
     key?: string,
   ): CancelableRequest<void>;
   deleteVehicle(
     vehicleId: string,
-    callbacks?: SdkCallbacks<void>,
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
     key?: string,
   ): CancelableRequest<void>;
 
@@ -89,24 +91,24 @@ export interface VehicleApi {
     vehicleId: string,
     imageType: VehicleImageType,
     file: File | Blob,
-    callbacks?: SdkCallbacks<DocumentModel>,
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
     key?: string,
   ): CancelableRequest<void>;
   getImage(
     vehicleId: string,
     imageType: VehicleImageType,
-    callbacks?: SdkCallbacks<DocumentModel | null>,
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel | null>>,
     key?: string,
   ): CancelableRequest<void>;
   removeImage(
     vehicleId: string,
     imageType: VehicleImageType,
-    callbacks?: SdkCallbacks<void>,
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
     key?: string,
   ): CancelableRequest<void>;
   getAllImages(
     vehicleId: string,
-    callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
+    callbacks?: SdkCallbacks<ApiResponse<Record<VehicleImageType, DocumentModel | null>>>,
     key?: string,
   ): CancelableRequest<void>;
 }
@@ -116,22 +118,21 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     // Lookup methods
     getBrands(
       query?: SearchPaginationQuery,
-      callbacks?: SdkPaginatedCallbacks<VehicleBrandModel>,
+      callbacks?: SdkCallbacks<PaginatedResponse<VehicleBrandModel>>,
       key?: string,
     ): CancelableRequest<void> {
       const params = new URLSearchParams();
       if (query?.search) params.set("search", query.search);
       if (query?.page) params.set("page", String(query.page));
-      if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+      if (query?.limit) params.set("limit", String(query.limit));
       const queryString = params.toString();
       const url = queryString
         ? `/vehicles/brands?${queryString}`
         : "/vehicles/brands";
 
-      const { request, cancel } = client.get<PaginatedData<VehicleBrandModel>>(
-        url,
-        key,
-      );
+      const { request, cancel } = client.get<
+        PaginatedResponse<VehicleBrandModel>
+      >(url, key);
 
       return {
         request: request
@@ -148,22 +149,21 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     getModelsByBrand(
       brandId: string,
       query?: SearchPaginationQuery,
-      callbacks?: SdkPaginatedCallbacks<VehicleModelModel>,
+      callbacks?: SdkCallbacks<PaginatedResponse<VehicleModelModel>>,
       key?: string,
     ): CancelableRequest<void> {
       const params = new URLSearchParams();
       if (query?.search) params.set("search", query.search);
       if (query?.page) params.set("page", String(query.page));
-      if (query?.pageSize) params.set("pageSize", String(query.pageSize));
+      if (query?.limit) params.set("limit", String(query.limit));
       const queryString = params.toString();
       const url = queryString
         ? `/vehicles/brands/${brandId}/models?${queryString}`
         : `/vehicles/brands/${brandId}/models`;
 
-      const { request, cancel } = client.get<PaginatedData<VehicleModelModel>>(
-        url,
-        key,
-      );
+      const { request, cancel } = client.get<
+        PaginatedResponse<VehicleModelModel>
+      >(url, key);
 
       return {
         request: request
@@ -178,13 +178,12 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     },
 
     getTransmissionTypes(
-      callbacks?: SdkCallbacks<VehicleTransmissionTypeModel[]>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleTransmissionTypeModel[]>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<VehicleTransmissionTypeModel[]>(
-        "/vehicles/transmission-types",
-        key,
-      );
+      const { request, cancel } = client.get<
+        ApiResponse<VehicleTransmissionTypeModel[]>
+      >("/vehicles/transmission-types", key);
 
       return {
         request: request
@@ -199,13 +198,12 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     },
 
     getBodyTypes(
-      callbacks?: SdkCallbacks<VehicleBodyTypeModel[]>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleBodyTypeModel[]>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<VehicleBodyTypeModel[]>(
-        "/vehicles/body-types",
-        key,
-      );
+      const { request, cancel } = client.get<
+        ApiResponse<VehicleBodyTypeModel[]>
+      >("/vehicles/body-types", key);
 
       return {
         request: request
@@ -220,13 +218,12 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     },
 
     getFuelTypes(
-      callbacks?: SdkCallbacks<VehicleFuelTypeModel[]>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleFuelTypeModel[]>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<VehicleFuelTypeModel[]>(
-        "/vehicles/fuel-types",
-        key,
-      );
+      const { request, cancel } = client.get<
+        ApiResponse<VehicleFuelTypeModel[]>
+      >("/vehicles/fuel-types", key);
 
       return {
         request: request
@@ -243,14 +240,12 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     // Upsert brand and model together
     upsertBrandAndModel(
       payload: UpsertBrandModelPayload,
-      callbacks?: SdkCallbacks<UpsertBrandModelResponse>,
+      callbacks?: SdkCallbacks<ApiResponse<UpsertBrandModelResponse>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.post<UpsertBrandModelResponse>(
-        "/vehicles/upsert-brand-model",
-        payload,
-        key,
-      );
+      const { request, cancel } = client.post<
+        ApiResponse<UpsertBrandModelResponse>
+      >("/vehicles/upsert-brand-model", payload, key);
 
       return {
         request: request
@@ -266,10 +261,13 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     // Vehicle CRUD
     getVehicles(
-      callbacks?: SdkCallbacks<VehicleModel[]>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleModel[]>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<VehicleModel[]>("/vehicles", key);
+      const { request, cancel } = client.get<ApiResponse<VehicleModel[]>>(
+        "/vehicles",
+        key,
+      );
 
       return {
         request: request
@@ -285,10 +283,10 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     getVehicleById(
       vehicleId: string,
-      callbacks?: SdkCallbacks<VehicleModel>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<VehicleModel>(
+      const { request, cancel } = client.get<ApiResponse<VehicleModel>>(
         `/vehicles/${vehicleId}`,
         key,
       );
@@ -307,10 +305,10 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     createVehicle(
       payload: CreateVehiclePayload,
-      callbacks?: SdkCallbacks<VehicleModel>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.post<VehicleModel>(
+      const { request, cancel } = client.post<ApiResponse<VehicleModel>>(
         "/vehicles",
         payload,
         key,
@@ -331,10 +329,10 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     updateVehicle(
       vehicleId: string,
       payload: UpdateVehiclePayload,
-      callbacks?: SdkCallbacks<VehicleModel>,
+      callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.patch<VehicleModel>(
+      const { request, cancel } = client.patch<ApiResponse<VehicleModel>>(
         `/vehicles/${vehicleId}`,
         payload,
         key,
@@ -354,18 +352,18 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     deleteVehicle(
       vehicleId: string,
-      callbacks?: SdkCallbacks<void>,
+      callbacks?: SdkCallbacks<ApiResponse<void>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.delete<void>(
+      const { request, cancel } = client.delete<ApiResponse<void>>(
         `/vehicles/${vehicleId}`,
         key,
       );
 
       return {
         request: request
-          .then(() => {
-            callbacks?.onSuccess?.(undefined);
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
           })
           .catch((error) => {
             callbacks?.onError?.(error as SdkError);
@@ -379,17 +377,15 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
       vehicleId: string,
       imageType: VehicleImageType,
       file: File | Blob,
-      callbacks?: SdkCallbacks<DocumentModel>,
+      callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
       key?: string,
     ): CancelableRequest<void> {
       const formData = new FormData();
       formData.append("file", file);
 
-      const { request, cancel } = client.postFormData<DocumentModel>(
-        `/vehicles/${vehicleId}/images/${imageType}`,
-        formData,
-        key,
-      );
+      const { request, cancel } = client.postFormData<
+        ApiResponse<DocumentModel>
+      >(`/vehicles/${vehicleId}/images/${imageType}`, formData, key);
 
       return {
         request: request
@@ -406,13 +402,12 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     getImage(
       vehicleId: string,
       imageType: VehicleImageType,
-      callbacks?: SdkCallbacks<DocumentModel | null>,
+      callbacks?: SdkCallbacks<ApiResponse<DocumentModel | null>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.get<DocumentModel | null>(
-        `/vehicles/${vehicleId}/images/${imageType}`,
-        key,
-      );
+      const { request, cancel } = client.get<
+        ApiResponse<DocumentModel | null>
+      >(`/vehicles/${vehicleId}/images/${imageType}`, key);
 
       return {
         request: request
@@ -429,18 +424,18 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     removeImage(
       vehicleId: string,
       imageType: VehicleImageType,
-      callbacks?: SdkCallbacks<void>,
+      callbacks?: SdkCallbacks<ApiResponse<void>>,
       key?: string,
     ): CancelableRequest<void> {
-      const { request, cancel } = client.delete<void>(
+      const { request, cancel } = client.delete<ApiResponse<void>>(
         `/vehicles/${vehicleId}/images/${imageType}`,
         key,
       );
 
       return {
         request: request
-          .then(() => {
-            callbacks?.onSuccess?.(undefined);
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
           })
           .catch((error) => {
             callbacks?.onError?.(error as SdkError);
@@ -451,11 +446,13 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
 
     getAllImages(
       vehicleId: string,
-      callbacks?: SdkCallbacks<Record<VehicleImageType, DocumentModel | null>>,
+      callbacks?: SdkCallbacks<
+        ApiResponse<Record<VehicleImageType, DocumentModel | null>>
+      >,
       key?: string,
     ): CancelableRequest<void> {
       const { request, cancel } = client.get<
-        Record<VehicleImageType, DocumentModel | null>
+        ApiResponse<Record<VehicleImageType, DocumentModel | null>>
       >(`/vehicles/${vehicleId}/images`, key);
 
       return {

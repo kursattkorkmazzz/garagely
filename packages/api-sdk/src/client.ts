@@ -1,8 +1,5 @@
 import { ErrorCode } from "@garagely/shared/error.codes";
-import type {
-  ApiResponse,
-  ErrorResponse,
-} from "@garagely/shared/response.types";
+import type { ErrorResponse } from "@garagely/shared/response.types";
 import type {
   CancelableRequest,
   HttpClient,
@@ -110,7 +107,8 @@ export function createHttpClient(config: SdkConfig): HttpClient {
         throw sdkError;
       }
 
-      return (data as ApiResponse<T>).data;
+      // Return full response as-is (no extraction)
+      return data as T;
     })();
 
     return {

@@ -1,5 +1,4 @@
 import type { ErrorCode } from "@garagely/shared/error.codes";
-import type { PaginatedData } from "@garagely/shared/response.types";
 
 export interface SdkConfig {
   baseUrl: string;
@@ -15,11 +14,6 @@ export interface SdkError {
 
 export interface SdkCallbacks<T> {
   onSuccess?: (data: T) => void;
-  onError?: (error: SdkError) => void;
-}
-
-export interface SdkPaginatedCallbacks<T> {
-  onSuccess?: (data: PaginatedData<T>) => void;
   onError?: (error: SdkError) => void;
 }
 
