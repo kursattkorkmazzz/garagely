@@ -62,7 +62,7 @@ export function createHttpClient(config: SdkConfig): HttpClient {
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       if (options.body !== undefined) {
-        options.body = options.isFormData
+        requestInit.body = options.isFormData
           ? (options.body as FormData)
           : JSON.stringify(options.body);
       }

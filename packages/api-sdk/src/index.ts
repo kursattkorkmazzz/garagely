@@ -21,7 +21,12 @@ export function createSdk(config: SdkConfig): GaragelySdk {
   };
 }
 
-export type { SdkConfig, SdkCallbacks, SdkError } from "./types";
+export type {
+  SdkConfig,
+  SdkCallbacks,
+  SdkError,
+  CancelableRequest,
+} from "./types";
 export type { AuthApi, AuthResponse } from "./modules/auth";
 export type { UserApi } from "./modules/user";
 export type { VehicleApi } from "./modules/vehicle";

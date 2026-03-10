@@ -1,4 +1,8 @@
-import type { RegisterPayload, LoginPayload, ChangePasswordPayload } from "@garagely/shared/payloads/auth";
+import type {
+  RegisterPayload,
+  LoginPayload,
+  ChangePasswordPayload,
+} from "@garagely/shared/payloads/auth";
 import type { UserModel } from "@garagely/shared/models/user";
 import { InvalidCredentialsError } from "@garagely/shared/error.types";
 import { auth } from "../../../providers/firebase";
@@ -25,7 +29,10 @@ export class AuthService {
       fullName: data.fullName,
     });
 
-    const customToken = createToken({ uid: firebaseUser.uid, email: data.email });
+    const customToken = createToken({
+      uid: firebaseUser.uid,
+      email: data.email,
+    });
 
     return { user, customToken };
   }
@@ -37,12 +44,18 @@ export class AuthService {
     const firebaseUser = await auth.getUserByEmail(data.email);
 
     const user = await this.userService.getUserById(firebaseUser.uid);
-    const customToken = createToken({ uid: firebaseUser.uid, email: user.email });
+    const customToken = createToken({
+      uid: firebaseUser.uid,
+      email: user.email,
+    });
 
     return { user, customToken };
   }
 
-  async changePassword(userId: string, data: ChangePasswordPayload): Promise<void> {
+  async changePassword(
+    userId: string,
+    data: ChangePasswordPayload,
+  ): Promise<void> {
     const firebaseUser = await auth.getUser(userId);
 
     if (!firebaseUser.email) {
@@ -56,7 +69,8 @@ export class AuthService {
 
   private async verifyPassword(email: string, password: string): Promise<void> {
     const useEmulator = process.env.FIREBASE_USE_EMULATOR === "true";
-    const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST ?? "127.0.0.1:9099";
+    const emulatorHost =
+      process.env.FIREBASE_AUTH_EMULATOR_HOST ?? "127.0.0.1:9099";
 
     let url: string;
 
