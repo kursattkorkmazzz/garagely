@@ -3,10 +3,10 @@ import {
   AppAvatarFallback,
   AppAvatarImage,
 } from "@/components/ui/app-avatar";
-import { AppButton } from "@/components/ui/app-button";
 import {
   AppCard,
   AppCardAction,
+  AppCardDescription,
   AppCardHeader,
   AppCardTitle,
 } from "@/components/ui/app-card";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/app-input-v2";
 import { AppText } from "@/components/ui/app-text";
 import { AppView } from "@/components/ui/app-view";
+import { AppListEmpty } from "@/components/common/list-empty";
 import { useThemedStylesheet } from "@/theme/hooks/use-themed-stylesheet";
 import { useTheme } from "@/theme/theme-context";
 import { radius } from "@/theme/tokens/radius";
@@ -213,18 +214,6 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
         flexGrow: 1,
         gap: spacing.sm,
       },
-      switchButton: {
-        flexDirection: "row",
-        gap: spacing.sm,
-        paddingVertical: spacing.lg,
-        justifyContent: "flex-start",
-        paddingHorizontal: spacing.sm,
-      },
-      switchButtonText: {
-        flex: 1,
-        flexGrow: 1,
-        color: theme.primaryForeground,
-      },
       backButton: {
         flexDirection: "row",
         alignItems: "center",
@@ -236,16 +225,33 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
         color: theme.primary,
         fontWeight: "600",
       },
-      headerRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      },
       loadingContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         paddingVertical: spacing.xl,
+      },
+      manualAddCard: {
+        borderStyle: "dashed",
+        borderColor: theme.primary,
+        backgroundColor: theme.background,
+      },
+      manualAddIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: theme.primary,
+        alignItems: "center",
+        justifyContent: "center",
+      },
+      manualAddContent: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.md,
+      },
+      manualAddTextContainer: {
+        flex: 1,
       },
     }),
   );
@@ -311,21 +317,11 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
           )}
           contentContainerStyle={style.flatListContentContainerStyle}
           ListEmptyComponent={() => (
-            <AppButton
-              variant="primary"
-              style={style.switchButton}
-              onPress={() => props.onSwitchManualyButtonClick?.()}
-            >
-              <AppIcon icon="Plus" size={24} color={theme.primaryForeground} />
-              <AppText style={style.switchButtonText}>
-                {t("addVehicle.addManually")}
-              </AppText>
-              <AppIcon
-                icon="ArrowRight"
-                size={24}
-                color={theme.primaryForeground}
-              />
-            </AppButton>
+            <AppListEmpty
+              icon="Search"
+              title={t("addVehicle.noBrandsFound")}
+              description={t("addVehicle.noBrandsFoundDescription")}
+            />
           )}
           style={style.flatListStyle}
         />
@@ -345,25 +341,42 @@ export function BrandSelectionForm(props: BrandSelectionFormProps) {
             />
           )}
           contentContainerStyle={style.flatListContentContainerStyle}
-          ListEmptyComponent={
-            () => null //TODO: Add the empty list state message using AppText
-          }
+          ListEmptyComponent={() => (
+            <AppListEmpty
+              icon="Search"
+              title={t("addVehicle.noModelsFound")}
+              description={t("addVehicle.noModelsFoundDescription")}
+            />
+          )}
           style={style.flatListStyle}
         />
       )}
 
-      {/* //TODO: Make this component a bit fancy. The look is bad */}
-      <AppButton
-        variant="primary"
-        style={style.switchButton}
-        onPress={() => props.onSwitchManualyButtonClick?.()}
-      >
-        <AppIcon icon="Plus" size={24} color={theme.primaryForeground} />
-        <AppText style={style.switchButtonText}>
-          {t("addVehicle.addManually")}
-        </AppText>
-        <AppIcon icon="ArrowRight" size={24} color={theme.primaryForeground} />
-      </AppButton>
+      {/* Add Manually Card */}
+      <Pressable onPress={() => props.onSwitchManualyButtonClick?.()}>
+        <AppCard style={style.manualAddCard}>
+          <AppCardHeader>
+            <AppView style={style.manualAddContent}>
+              <AppView style={style.manualAddIconContainer}>
+                <AppIcon
+                  icon="Plus"
+                  size={20}
+                  color={theme.primaryForeground}
+                />
+              </AppView>
+              <AppView style={style.manualAddTextContainer}>
+                <AppCardTitle>{t("addVehicle.addManually")}</AppCardTitle>
+                <AppCardDescription>
+                  {t("addVehicle.addManuallyDescription")}
+                </AppCardDescription>
+              </AppView>
+            </AppView>
+            <AppCardAction>
+              <AppIcon icon="ChevronRight" size={20} color={theme.primary} />
+            </AppCardAction>
+          </AppCardHeader>
+        </AppCard>
+      </Pressable>
     </>
   );
 }

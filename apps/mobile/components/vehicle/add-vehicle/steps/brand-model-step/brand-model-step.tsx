@@ -12,7 +12,7 @@ type BrandModelStepProps = {};
 export function BrandModelStep(props: BrandModelStepProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const [isManualEntry, setIsManualEntry] = useState(true);
+  const [isManualEntry, setIsManualEntry] = useState(false);
   const formik = useFormikContext<AddVehicleFormState>();
   useEffect(() => {
     formik.setFieldValue("isCustomEntry", isManualEntry);
