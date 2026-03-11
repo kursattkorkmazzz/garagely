@@ -35,15 +35,26 @@ export function SpecsStep() {
       setIsLoading(true);
       await Promise.all([
         sdk.vehicle.getFuelTypes({
-          onSuccess: (data) => setFuelTypes(data),
+          onSuccess: (data) => {
+            console.log(data);
+
+            setFuelTypes(data.data);
+          },
           onError: () => {},
         }),
         sdk.vehicle.getTransmissionTypes({
-          onSuccess: (data) => setTransmissionTypes(data),
+          onSuccess: (data) => {
+            console.log(data);
+
+            setTransmissionTypes(data.data);
+          },
           onError: () => {},
         }),
         sdk.vehicle.getBodyTypes({
-          onSuccess: (data) => setBodyTypes(data),
+          onSuccess: (data) => {
+            console.log(data);
+            setBodyTypes(data.data);
+          },
           onError: () => {},
         }),
       ]);

@@ -161,7 +161,7 @@ async function upsertBrandAndModel(
 ): Promise<UpsertBrandModelResponse | null> {
   return new Promise((resolve) => {
     sdk.vehicle.upsertBrandAndModel(payload, {
-      onSuccess: (data) => resolve(data),
+      onSuccess: (res) => resolve(res.data),
       onError: (err) => {
         console.error("[AddVehicle] upsertBrandAndModel error:", err.message);
         resolve(null);
@@ -175,7 +175,7 @@ async function createVehicle(
 ): Promise<VehicleModel | null> {
   return new Promise((resolve) => {
     sdk.vehicle.createVehicle(payload, {
-      onSuccess: (data) => resolve(data),
+      onSuccess: (res) => resolve(res.data),
       onError: (err) => {
         console.error("[AddVehicle] createVehicle error:", err.message);
         resolve(null);
@@ -264,14 +264,22 @@ export function AddVehicleForm() {
 
       if (values.coverPhotoUri) {
         uploadPromises.push(
-          uploadVehicleImage(vehicle.id, VehicleImageType.COVER, values.coverPhotoUri),
+          uploadVehicleImage(
+            vehicle.id,
+            VehicleImageType.COVER,
+            values.coverPhotoUri,
+          ),
         );
       }
 
       Object.entries(values.additionalPhotos).forEach(([viewType, uri]) => {
         if (uri && VIEW_TYPE_TO_IMAGE_TYPE[viewType]) {
           uploadPromises.push(
-            uploadVehicleImage(vehicle.id, VIEW_TYPE_TO_IMAGE_TYPE[viewType], uri),
+            uploadVehicleImage(
+              vehicle.id,
+              VIEW_TYPE_TO_IMAGE_TYPE[viewType],
+              uri,
+            ),
           );
         }
       });
