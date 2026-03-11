@@ -145,7 +145,7 @@ export function VehicleCard({
         </View>
 
         {/* Row 2: Cost/KM and Last Service */}
-        <View style={[styles.statsRow, { borderBottomWidth: 0 }]}>
+        <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <View style={styles.statLabelRow}>
               <AppIcon icon="Fuel" size={14} color="#22C55E" />

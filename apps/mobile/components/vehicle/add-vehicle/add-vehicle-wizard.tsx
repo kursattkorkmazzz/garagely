@@ -10,7 +10,9 @@ import {
   vehicleBrandModelValidator,
   vehicleModelModelValidator,
   VehicleImageType,
+  vehicleImageTypeToEntityType,
 } from "@garagely/shared/models/vehicle";
+import { createReactNativeFile } from "@/utils/file.utils";
 import type { VehicleModel } from "@garagely/shared/models/vehicle";
 import type {
   UpsertBrandModelPayload,
@@ -142,19 +144,6 @@ const initialFormState: AddVehicleFormState = {
   },
 };
 
-// Helper to create React Native file for FormData uploads
-function createReactNativeFile(uri: string, imageType: VehicleImageType) {
-  const uriParts = uri.split(".");
-  const extension = uriParts[uriParts.length - 1]?.toLowerCase() || "jpg";
-  const mimeType = extension === "png" ? "image/png" : "image/jpeg";
-
-  return {
-    uri,
-    type: mimeType,
-    name: `${imageType}.${extension}`,
-  } as unknown as Blob;
-}
-
 // SDK wrapper functions
 async function upsertBrandAndModel(
   payload: UpsertBrandModelPayload,
@@ -189,7 +178,8 @@ async function uploadVehicleImage(
   imageType: VehicleImageType,
   uri: string,
 ): Promise<boolean> {
-  const file = createReactNativeFile(uri, imageType);
+  const entityType = vehicleImageTypeToEntityType[imageType];
+  const file = createReactNativeFile(uri, entityType);
   return new Promise((resolve) => {
     sdk.vehicle.uploadImage(vehicleId, imageType, file, {
       onSuccess: () => resolve(true),

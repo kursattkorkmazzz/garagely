@@ -1,6 +1,8 @@
 import type { DocumentModel } from "@garagely/shared/models/document";
 import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
+import { EntityType } from "@garagely/shared/models/entity-type";
 import { sdk } from "../sdk";
+import { createReactNativeFile } from "@/utils/file.utils";
 
 export interface UserCallbacks {
   onSuccess?: () => void;
@@ -25,19 +27,6 @@ export interface UserSlice {
 
 type SetUserState = (partial: Partial<UserSlice>) => void;
 
-// React Native file format for FormData uploads
-function createReactNativeFile(uri: string) {
-  const uriParts = uri.split(".");
-  const extension = uriParts[uriParts.length - 1]?.toLowerCase() || "jpg";
-  const mimeType = extension === "png" ? "image/png" : "image/jpeg";
-
-  return {
-    uri,
-    type: mimeType,
-    name: `avatar.${extension}`,
-  } as unknown as Blob; // Cast for React Native FormData compatibility
-}
-
 export const createUserSlice = (set: SetUserState): UserSlice => ({
   // Initial state
   avatar: null,
@@ -51,7 +40,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
   ): CancelableRequest<void> => {
     set({ isUploadingAvatar: true, avatarError: null });
 
-    const file = createReactNativeFile(uri);
+    const file = createReactNativeFile(uri, EntityType.USER_PROFILE);
 
     const { request, cancel } = sdk.user.uploadAvatar(file, {
       onSuccess: (response) => {
