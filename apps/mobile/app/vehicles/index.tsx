@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { ScrollView, View, StyleSheet, ActivityIndicator, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
 import { AppText } from "@/components/ui/app-text";
@@ -49,9 +49,11 @@ export default function VehicleListScreen() {
     });
   }, []);
 
-  useEffect(() => {
-    fetchVehicles();
-  }, [fetchVehicles]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchVehicles();
+    }, [fetchVehicles])
+  );
 
   const handleBackPress = () => {
     router.back();
