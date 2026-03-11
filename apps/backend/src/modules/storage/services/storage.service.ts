@@ -29,6 +29,7 @@ export class StorageService {
     userId: string,
     file: UploadedFile,
     payload: UploadDocumentPayload,
+    entityId?: string,
   ): Promise<DocumentModel> {
     const limits = getStorageLimits(payload.entityType);
 
@@ -42,7 +43,9 @@ export class StorageService {
 
     const bucket = storage.bucket();
     const timestamp = Date.now();
-    const storagePath = `documents/${userId}/${payload.entityType}/${timestamp}_${file.originalname}`;
+    const storagePath = entityId
+      ? `documents/${userId}/${entityId}/${payload.entityType}/${timestamp}_${file.originalname}`
+      : `documents/${userId}/${payload.entityType}/${timestamp}_${file.originalname}`;
 
     const fileRef = bucket.file(storagePath);
     await fileRef.save(file.buffer, {
@@ -184,7 +187,7 @@ export class StorageService {
     payload: UploadDocumentPayload,
     entityId: string,
   ): Promise<DocumentModel> {
-    const document = await this.uploadDocument(userId, file, payload);
+    const document = await this.uploadDocument(userId, file, payload, entityId);
 
     await this.documentRelationRepository.create({
       documentId: document.id,
