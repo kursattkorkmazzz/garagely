@@ -1,4 +1,5 @@
-import { ScrollView, View, StyleSheet, Pressable } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { ScrollView, View, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
@@ -6,40 +7,50 @@ import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
 import { AppIcon } from "@/components/ui/app-icon";
 import { VehicleCard, VehicleCardData } from "@/components/garage";
+import { AppListEmpty } from "@/components/common";
 import { spacing } from "@/theme/tokens/spacing";
+import { sdk } from "@/stores/sdk";
+import type { DetailedVehicleModel } from "@garagely/shared/models/vehicle";
 
-// TODO: Replace with actual data from store
-const mockVehicles: VehicleCardData[] = [
-  {
-    id: "1",
-    name: "BMW X5",
-    licensePlate: "ABC-1234",
-    modelYear: 2021,
-    mileage: 45200,
-    costPerKm: 0.42,
-    lastServiceDate: "Oct 12, 2023",
-    isOverdue: false,
-    coverImage:
-      "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-    color: "#4A5568",
-  },
-  {
-    id: "2",
-    name: "Tesla Model 3",
-    licensePlate: "ELC-9988",
-    modelYear: 2022,
-    mileage: 28500,
-    costPerKm: 0.18,
-    lastServiceDate: "Jan 15, 2023",
-    isOverdue: true,
-    color: "#1E3A5F",
-  },
-];
+function mapToVehicleCardData(vehicle: DetailedVehicleModel): VehicleCardData {
+  return {
+    id: vehicle.id,
+    name: `${vehicle.brand.name} ${vehicle.model.name}`,
+    licensePlate: vehicle.plate ?? "—",
+    modelYear: vehicle.model.year ?? 0,
+    mileage: vehicle.currentKm ?? 0,
+    costPerKm: 0, // Not available yet
+    lastServiceDate: undefined, // Not available yet
+    isOverdue: false, // Not available yet
+    coverImage: vehicle.coverPhoto?.url,
+    color: vehicle.color ?? undefined,
+  };
+}
 
 export default function VehicleListScreen() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
+
+  const [vehicles, setVehicles] = useState<DetailedVehicleModel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchVehicles = useCallback(() => {
+    setIsLoading(true);
+    sdk.vehicle.getDetailedVehicles({
+      onSuccess: (response) => {
+        setVehicles(response.data);
+        setIsLoading(false);
+      },
+      onError: () => {
+        setIsLoading(false);
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   const handleBackPress = () => {
     router.back();
@@ -57,6 +68,8 @@ export default function VehicleListScreen() {
     // TODO: Open camera/gallery to update vehicle cover
   };
 
+  const vehicleCards = vehicles.map(mapToVehicleCardData);
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
@@ -68,7 +81,7 @@ export default function VehicleListScreen() {
           <View>
             <AppText variant="heading2">{t("vehicles.title")}</AppText>
             <AppText variant="caption" color="muted">
-              {t("vehicles.total", { count: mockVehicles.length })}
+              {t("vehicles.total", { count: vehicles.length })}
             </AppText>
           </View>
         </View>
@@ -84,21 +97,41 @@ export default function VehicleListScreen() {
         </AppButton>
       </View>
 
-      {/* Vehicle List */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {mockVehicles.map((vehicle) => (
-          <VehicleCard
-            key={vehicle.id}
-            vehicle={vehicle}
-            onPress={() => handleVehiclePress(vehicle)}
-            onCameraPress={() => handleCameraPress(vehicle)}
+      {/* Loading State */}
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+        </View>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && vehicles.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <AppListEmpty
+            icon="Car"
+            title={t("vehicles.empty.title")}
+            description={t("vehicles.empty.description")}
           />
-        ))}
-      </ScrollView>
+        </View>
+      )}
+
+      {/* Vehicle List */}
+      {!isLoading && vehicles.length > 0 && (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {vehicleCards.map((vehicle) => (
+            <VehicleCard
+              key={vehicle.id}
+              vehicle={vehicle}
+              onPress={() => handleVehiclePress(vehicle)}
+              onCameraPress={() => handleCameraPress(vehicle)}
+            />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -119,13 +152,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
   },
-  backButton: {
-    padding: spacing.xs,
-  },
   addButtonContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.xl,
   },
   scrollView: {
     flex: 1,

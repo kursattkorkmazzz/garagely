@@ -78,6 +78,7 @@ router.post(
 
 // Vehicle CRUD
 router.get("/", asyncHandler(vehicleController.getVehicles));
+router.get("/detailed", asyncHandler(vehicleController.getDetailedVehicles));
 
 router.post(
   "/",

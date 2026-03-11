@@ -130,6 +130,10 @@
     "title": "My Vehicles",
     "total": "TOTAL: {{count}}",
     "add": "Add",
+    "empty": {
+      "title": "No vehicles yet",
+      "description": "Add your first vehicle to start tracking"
+    },
     "card": {
       "modelYear": "MODEL YEAR",
       "mileage": "MILEAGE",

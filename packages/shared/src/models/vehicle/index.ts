@@ -29,6 +29,11 @@ export {
 } from "./vehicle.model";
 
 export {
+  detailedVehicleModelValidator,
+  type DetailedVehicleModel,
+} from "./detailed-vehicle.model";
+
+export {
   VehicleImageType,
   vehicleImageTypeToEntityType,
 } from "./vehicle-image-type.model";

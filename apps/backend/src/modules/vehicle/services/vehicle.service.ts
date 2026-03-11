@@ -5,6 +5,7 @@ import type {
   VehicleTransmissionTypeModel,
   VehicleBodyTypeModel,
   VehicleFuelTypeModel,
+  DetailedVehicleModel,
 } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
 import { EntityType } from "@garagely/shared/models/entity-type";
@@ -183,6 +184,56 @@ export class VehicleService {
     );
 
     return vehiclesWithCover;
+  }
+
+  async getDetailedVehiclesByUser(
+    userId: string,
+  ): Promise<DetailedVehicleModel[]> {
+    const vehicles = await this.vehicleRepository.findByUserId(userId);
+
+    const detailedVehicles = await Promise.all(
+      vehicles.map(async (vehicle) => {
+        const [brand, model, fuelType, transmissionType, bodyType, coverPhoto] =
+          await Promise.all([
+            this.vehicleBrandRepository.findById(vehicle.vehicleBrandId),
+            this.vehicleModelRepository.findById(vehicle.vehicleModelId),
+            this.vehicleLookupRepository.findFuelTypeById(
+              vehicle.vehicleFuelTypeId,
+            ),
+            this.vehicleLookupRepository.findTransmissionTypeById(
+              vehicle.vehicleTransmissionTypeId,
+            ),
+            this.vehicleLookupRepository.findBodyTypeById(
+              vehicle.vehicleBodyTypeId,
+            ),
+            this.storageService
+              ? this.getImage(vehicle.id, VehicleImageType.COVER)
+              : null,
+          ]);
+
+        return {
+          id: vehicle.id,
+          userId: vehicle.userId,
+          color: vehicle.color,
+          plate: vehicle.plate,
+          vin: vehicle.vin,
+          currentKm: vehicle.currentKm,
+          coverPhoto,
+          purchaseDate: vehicle.purchaseDate,
+          purchasePrice: vehicle.purchasePrice,
+          purchaseKm: vehicle.purchaseKm,
+          createdAt: vehicle.createdAt,
+          updatedAt: vehicle.updatedAt,
+          brand: brand!,
+          model: model!,
+          fuelType: fuelType!,
+          transmissionType: transmissionType!,
+          bodyType: bodyType!,
+        };
+      }),
+    );
+
+    return detailedVehicles;
   }
 
   async getVehicleById(

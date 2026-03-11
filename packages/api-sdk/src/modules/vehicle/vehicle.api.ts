@@ -5,6 +5,7 @@ import type {
   VehicleTransmissionTypeModel,
   VehicleBodyTypeModel,
   VehicleFuelTypeModel,
+  DetailedVehicleModel,
 } from "@garagely/shared/models/vehicle";
 import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import type { DocumentModel } from "@garagely/shared/models/document";
@@ -62,6 +63,10 @@ export interface VehicleApi {
   // Vehicle CRUD
   getVehicles(
     callbacks?: SdkCallbacks<ApiResponse<VehicleModel[]>>,
+    key?: string,
+  ): CancelableRequest<void>;
+  getDetailedVehicles(
+    callbacks?: SdkCallbacks<ApiResponse<DetailedVehicleModel[]>>,
     key?: string,
   ): CancelableRequest<void>;
   getVehicleById(
@@ -268,6 +273,26 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
         "/vehicles",
         key,
       );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
+    },
+
+    getDetailedVehicles(
+      callbacks?: SdkCallbacks<ApiResponse<DetailedVehicleModel[]>>,
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<
+        ApiResponse<DetailedVehicleModel[]>
+      >("/vehicles/detailed", key);
 
       return {
         request: request

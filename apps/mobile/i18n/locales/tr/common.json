@@ -130,6 +130,10 @@
     "title": "Araçlarım",
     "total": "TOPLAM: {{count}}",
     "add": "Ekle",
+    "empty": {
+      "title": "Henüz araç yok",
+      "description": "Takip etmeye başlamak için ilk aracınızı ekleyin"
+    },
     "card": {
       "modelYear": "MODEL YILI",
       "mileage": "KİLOMETRE",
