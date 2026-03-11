@@ -24,13 +24,13 @@ export type VehicleCardData = {
 type VehicleCardProps = {
   vehicle: VehicleCardData;
   onPress?: () => void;
-  onCameraPress?: () => void;
+  onDeletePress?: () => void;
 };
 
 export function VehicleCard({
   vehicle,
   onPress,
-  onCameraPress,
+  onDeletePress,
 }: VehicleCardProps) {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
@@ -49,6 +49,17 @@ export function VehicleCard({
   const renderCoverSection = () => {
     const content = (
       <>
+        {/* Delete button */}
+        <Pressable
+          style={[
+            styles.deleteButton,
+            { backgroundColor: withOpacity("#000000", 0.4) },
+          ]}
+          onPress={onDeletePress}
+        >
+          <AppIcon icon="Trash2" size={18} color="#FFFFFF" />
+        </Pressable>
+
         {/* Vehicle name and plate */}
         <View style={styles.coverContent}>
           <AppText variant="heading2" style={styles.vehicleName}>
@@ -66,17 +77,6 @@ export function VehicleCard({
             </AppText>
           </AppBadge>
         </View>
-
-        {/* Camera button */}
-        <Pressable
-          style={[
-            styles.cameraButton,
-            { backgroundColor: withOpacity("#000000", 0.4) },
-          ]}
-          onPress={onCameraPress}
-        >
-          <AppIcon icon="Camera" size={20} color="#FFFFFF" />
-        </Pressable>
       </>
     );
 
@@ -241,15 +241,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
   },
-  cameraButton: {
+  deleteButton: {
     position: "absolute",
-    right: spacing.md,
-    bottom: spacing.md,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    right: spacing.sm,
+    top: spacing.sm,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 1,
   },
   statsSection: {
     padding: spacing.md,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ScrollView, View, StyleSheet, ActivityIndicator } from "react-native";
+import { ScrollView, View, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
@@ -8,6 +8,7 @@ import { AppButton } from "@/components/ui/app-button";
 import { AppIcon } from "@/components/ui/app-icon";
 import { VehicleCard, VehicleCardData } from "@/components/garage";
 import { AppListEmpty } from "@/components/common";
+import { appToast } from "@/components/ui/app-toast";
 import { spacing } from "@/theme/tokens/spacing";
 import { sdk } from "@/stores/sdk";
 import type { DetailedVehicleModel } from "@garagely/shared/models/vehicle";
@@ -64,8 +65,29 @@ export default function VehicleListScreen() {
     // TODO: Navigate to vehicle details
   };
 
-  const handleCameraPress = (vehicle: VehicleCardData) => {
-    // TODO: Open camera/gallery to update vehicle cover
+  const handleDeletePress = (vehicleId: string) => {
+    Alert.alert(
+      t("vehicles.deleteConfirm.title"),
+      t("vehicles.deleteConfirm.message"),
+      [
+        { text: t("buttons.cancel"), style: "cancel" },
+        {
+          text: t("buttons.delete"),
+          style: "destructive",
+          onPress: () => {
+            sdk.vehicle.deleteVehicle(vehicleId, {
+              onSuccess: () => {
+                setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
+                appToast.success(t("vehicles.deleted"));
+              },
+              onError: () => {
+                appToast.error(t("errors.generic"));
+              },
+            });
+          },
+        },
+      ],
+    );
   };
 
   const vehicleCards = vehicles.map(mapToVehicleCardData);
@@ -127,7 +149,7 @@ export default function VehicleListScreen() {
               key={vehicle.id}
               vehicle={vehicle}
               onPress={() => handleVehiclePress(vehicle)}
-              onCameraPress={() => handleCameraPress(vehicle)}
+              onDeletePress={() => handleDeletePress(vehicle.id)}
             />
           ))}
         </ScrollView>

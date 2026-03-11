@@ -134,6 +134,11 @@
       "title": "Henüz araç yok",
       "description": "Takip etmeye başlamak için ilk aracınızı ekleyin"
     },
+    "deleteConfirm": {
+      "title": "Aracı Sil",
+      "message": "Bu aracı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    },
+    "deleted": "Araç silindi",
     "card": {
       "modelYear": "MODEL YILI",
       "mileage": "KİLOMETRE",
