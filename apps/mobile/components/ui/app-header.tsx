@@ -31,7 +31,7 @@ export function AppHeader({
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
-  const user = useStore((state) => state.auth.user);
+  const user = useStore((state) => state.user.user);
   const avatar = useStore((state) => state.user.avatar);
 
   // TODO: Replace with actual vehicle data from store

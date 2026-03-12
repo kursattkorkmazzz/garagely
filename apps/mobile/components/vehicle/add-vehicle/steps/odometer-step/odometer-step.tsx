@@ -21,7 +21,7 @@ export function OdometerStep() {
   const formik = useFormikContext<AddVehicleFormState>();
 
   // Get user preferences from store
-  const user = useStore((state) => state.auth.user);
+  const user = useStore((state) => state.user.user);
   const distanceUnit = user?.preferences?.preferredDistanceUnit || "km";
   const currency = user?.preferences?.preferredCurrency || "usd";
 
