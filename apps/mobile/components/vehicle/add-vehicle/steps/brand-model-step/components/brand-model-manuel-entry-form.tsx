@@ -97,18 +97,21 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
           </AppInputErrorMessage>
         }
       />
-      <AppText
-        variant="caption"
-        color="accent"
-        onPress={() => {
-          props.onFindFromListButtonClick?.();
-        }}
-        style={{
-          textAlign: "right",
-        }}
-      >
-        {t("addVehicle.findFromList")}
-      </AppText>
+      {/* TODO: Re-enable when brand selection from list is ready */}
+      {props.onFindFromListButtonClick && (
+        <AppText
+          variant="caption"
+          color="accent"
+          onPress={() => {
+            props.onFindFromListButtonClick?.();
+          }}
+          style={{
+            textAlign: "right",
+          }}
+        >
+          {t("addVehicle.findFromList")}
+        </AppText>
+      )}
     </ScrollView>
   );
 }

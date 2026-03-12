@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
-import { useTheme } from "@/theme/theme-context";
-import { useI18n } from "@/hooks/use-i18n";
+import { useEffect } from "react";
 import { spacing } from "@/theme/tokens/spacing";
 import { useFormikContext } from "formik";
 import { AppView } from "@/components/ui/app-view";
-import { BrandSelectionForm } from "./components/brand-selection-form";
+// TODO: Re-enable brand selection from list when ready
+// import { BrandSelectionForm } from "./components/brand-selection-form";
 import { BrandModelManuelEntryForm } from "./components/brand-model-manuel-entry-form";
 import { AddVehicleFormState } from "../../add-vehicle-wizard";
 
 type BrandModelStepProps = {};
-export function BrandModelStep(props: BrandModelStepProps) {
-  const { theme } = useTheme();
-  const { t } = useI18n();
-  const [isManualEntry, setIsManualEntry] = useState(false);
+export function BrandModelStep(_props: BrandModelStepProps) {
   const formik = useFormikContext<AddVehicleFormState>();
+
+  // Always set to custom entry mode (manual entry only for now)
   useEffect(() => {
-    formik.setFieldValue("isCustomEntry", isManualEntry);
-  }, [isManualEntry]);
+    formik.setFieldValue("isCustomEntry", true);
+  }, []);
 
   return (
     <AppView
@@ -25,7 +23,10 @@ export function BrandModelStep(props: BrandModelStepProps) {
         gap: spacing.md,
       }}
     >
-      {/* Brand Search Field */}
+      {/* Manual Entry Only (Brand selection from list is disabled) */}
+      <BrandModelManuelEntryForm />
+
+      {/* TODO: Re-enable brand selection toggle when ready
       {isManualEntry ? (
         <BrandModelManuelEntryForm
           onFindFromListButtonClick={() => {
@@ -39,6 +40,7 @@ export function BrandModelStep(props: BrandModelStepProps) {
           }}
         />
       )}
+      */}
     </AppView>
   );
 }
