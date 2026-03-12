@@ -37,10 +37,16 @@ export const useI18nContext = () => useContext(I18nContext);
 
 interface I18nProviderProps {
   children: ReactNode;
+  initialLocale?: string;
 }
 
-export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(getCurrentLanguage());
+export const I18nProvider: React.FC<I18nProviderProps> = ({
+  children,
+  initialLocale,
+}) => {
+  const [language, setLanguage] = useState<Language>(
+    () => (initialLocale as Language) || "en",
+  );
   const [isReady, setIsReady] = useState(false);
 
   const user = useStore((state) => state.user.user);
@@ -48,13 +54,13 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const isUpdating = useStore((state) => state.user.isLoading);
 
   useEffect(() => {
-    initI18n().then(() => {
+    initI18n(initialLocale).then(() => {
       setLanguage(getCurrentLanguage());
       setIsReady(true);
     });
-  }, []);
+  }, [initialLocale]);
 
-  // Sync language from user preferences
+  // Sync language when user preferences change at runtime
   useEffect(() => {
     if (isReady && user?.preferences?.locale) {
       const userLocale = user.preferences.locale as Language;

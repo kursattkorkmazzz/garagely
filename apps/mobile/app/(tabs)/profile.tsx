@@ -55,9 +55,7 @@ export default function ProfileScreen() {
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
-  const updatePreferences = useStore(
-    (state) => state.user.updatePreferences,
-  );
+  const updatePreferences = useStore((state) => state.user.updatePreferences);
   const changePassword = useStore((state) => state.auth.changePassword);
   const isAuthLoading = useStore((state) => state.auth.isLoading);
 

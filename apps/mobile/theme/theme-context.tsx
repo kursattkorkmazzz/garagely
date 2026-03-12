@@ -70,18 +70,24 @@ function mapToBackendTheme(theme: Theme | "system"): BackendTheme {
 // Theme Provider Component
 interface ThemeProviderProps {
   children: ReactNode;
+  initialTheme?: string;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  initialTheme,
+}) => {
   const colorScheme = useColorScheme();
   const user = useStore((state) => state.user.user);
   const updatePreferences = useStore((state) => state.user.updatePreferences);
   const isUpdating = useStore((state) => state.user.isLoading);
 
-  // Theme preference from user preferences or default to system
-  const [themePreference, setThemePreference] = useState<Theme | "system">("system");
+  // Initialize from prop, fall back to "system"
+  const [themePreference, setThemePreference] = useState<Theme | "system">(
+    () => mapBackendTheme(initialTheme),
+  );
 
-  // Sync theme preference from user preferences
+  // Sync theme preference when user preferences change at runtime
   useEffect(() => {
     if (user?.preferences?.theme) {
       setThemePreference(mapBackendTheme(user.preferences.theme));

@@ -8,7 +8,6 @@
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "ios": {
       "supportsTablet": true
     },
@@ -45,7 +44,8 @@
         {
           "photosPermission": "The app accesses your photos to let you upload them."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

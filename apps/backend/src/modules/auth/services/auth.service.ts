@@ -3,14 +3,14 @@ import type {
   LoginPayload,
   ChangePasswordPayload,
 } from "@garagely/shared/payloads/auth";
-import type { UserModel } from "@garagely/shared/models/user";
+import type { UserWithPreferences } from "@garagely/shared/models/user";
 import { InvalidCredentialsError } from "@garagely/shared/error.types";
 import { auth } from "../../../providers/firebase";
 import { createToken } from "../../../common/utils/jwt.util";
 import { UserService } from "../../user/services/user.service";
 
 export interface AuthResult {
-  user: UserModel;
+  user: UserWithPreferences;
   customToken: string;
 }
 
@@ -24,10 +24,13 @@ export class AuthService {
       displayName: data.fullName,
     });
 
-    const user = await this.userService.createUser(firebaseUser.uid, {
+    await this.userService.createUser(firebaseUser.uid, {
       email: data.email,
       fullName: data.fullName,
     });
+
+    // Fetch user with preferences after creation
+    const user = await this.userService.getUserWithPreferences(firebaseUser.uid);
 
     const customToken = createToken({
       uid: firebaseUser.uid,
@@ -43,7 +46,7 @@ export class AuthService {
 
     const firebaseUser = await auth.getUserByEmail(data.email);
 
-    const user = await this.userService.getUserById(firebaseUser.uid);
+    const user = await this.userService.getUserWithPreferences(firebaseUser.uid);
     const customToken = createToken({
       uid: firebaseUser.uid,
       email: user.email,

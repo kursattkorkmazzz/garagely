@@ -1,11 +1,32 @@
 import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { DocumentModel } from "@garagely/shared/models/document";
-import type { UpdateUserPayload, UpdateUserPreferencesPayload } from "@garagely/shared/payloads/user";
-import type { SdkError, CancelableRequest, SdkCallbacks } from "@garagely/api-sdk";
+import type {
+  UpdateUserPayload,
+  UpdateUserPreferencesPayload,
+} from "@garagely/shared/payloads/user";
+import type {
+  SdkError,
+  CancelableRequest,
+  SdkCallbacks,
+} from "@garagely/api-sdk";
 import type { ApiResponse } from "@garagely/shared/response.types";
 import { EntityType } from "@garagely/shared/models/entity-type";
 import { sdk } from "../sdk";
 import { createReactNativeFile } from "@/utils/file.utils";
+import { setCachedPreferences } from "@/utils/preferences-cache";
+
+// Helper to cache preferences from user data
+function cacheUserPreferences(user: UserWithPreferences): void {
+  if (user.preferences) {
+    setCachedPreferences({
+      theme: user.preferences.theme,
+      locale: user.preferences.locale,
+      preferredDistanceUnit: user.preferences.preferredDistanceUnit,
+      preferredVolumeUnit: user.preferences.preferredVolumeUnit,
+      preferredCurrency: user.preferences.preferredCurrency,
+    });
+  }
+}
 
 export interface UserSlice {
   // State
@@ -65,6 +86,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
           isLoading: false,
           error: null,
         });
+        cacheUserPreferences(response.data);
         callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
@@ -119,6 +141,7 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
           isLoading: false,
           error: null,
         });
+        cacheUserPreferences(response.data);
         callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
@@ -208,10 +231,12 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
 
   setUser: (user: UserWithPreferences) => {
     set({ user });
+    cacheUserPreferences(user);
   },
 
   clearUser: () => {
     set({ user: null, avatar: null, error: null });
+    // Keep cached preferences so auth screens can use them
   },
 
   clearError: () => {

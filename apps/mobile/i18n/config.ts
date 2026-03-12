@@ -53,19 +53,24 @@ function getDeviceLanguage(): Language {
   return "en";
 }
 
-export async function initI18n(): Promise<void> {
-  let storedLanguage: Language | null = null;
+export async function initI18n(initialLocale?: string): Promise<void> {
+  // Priority: initialLocale (from user preferences) > stored > device
+  let language: Language;
 
-  try {
-    const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (stored === "en" || stored === "tr") {
-      storedLanguage = stored;
+  if (initialLocale === "en" || initialLocale === "tr") {
+    language = initialLocale;
+  } else {
+    let storedLanguage: Language | null = null;
+    try {
+      const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (stored === "en" || stored === "tr") {
+        storedLanguage = stored;
+      }
+    } catch {
+      // Ignore storage errors, will use device language
     }
-  } catch {
-    // Ignore storage errors, will use device language
+    language = storedLanguage ?? getDeviceLanguage();
   }
-
-  const language = storedLanguage ?? getDeviceLanguage();
 
   await i18n.use(initReactI18next).init({
     resources,
