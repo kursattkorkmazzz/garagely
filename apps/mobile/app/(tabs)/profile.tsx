@@ -29,6 +29,11 @@ import {
   ChangePasswordModal,
 } from "@/components/profile";
 import { spacing } from "@/theme/tokens/spacing";
+import {
+  DistanceUnit,
+  VolumeUnit,
+  Currency,
+} from "@garagely/shared/models/unit";
 
 export default function ProfileScreen() {
   const { theme, withOpacity, themePreference, changeTheme } = useTheme();
@@ -36,7 +41,7 @@ export default function ProfileScreen() {
   const { t } = useI18n();
   const { handleError } = useErrorHandler();
   const router = useRouter();
-  const user = useStore((state) => state.auth.user);
+  const user = useStore((state) => state.user.user);
   const logout = useStore((state) => state.auth.logout);
   const { avatar, isUploadingAvatar, uploadAvatar, removeAvatar } = useStore(
     (state) => state.user,
@@ -51,7 +56,7 @@ export default function ProfileScreen() {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const updatePreferences = useStore(
-    (state) => state.preferences.updatePreferences,
+    (state) => state.user.updatePreferences,
   );
   const changePassword = useStore((state) => state.auth.changePassword);
   const isAuthLoading = useStore((state) => state.auth.isLoading);
@@ -184,69 +189,113 @@ export default function ProfileScreen() {
   };
 
   // Distance unit options
-  const distanceUnits = [
-    { id: "km", label: t("profile.distanceUnits.km") },
-    { id: "mi", label: t("profile.distanceUnits.mi") },
-  ];
-
-  const distanceUnitOptions: ActionSheetOption[] = distanceUnits.map(
-    (unit) => ({
-      label: unit.label,
+  const distanceUnitOptions: ActionSheetOption[] = [
+    {
+      label: t("profile.distanceUnits.km"),
       onPress: async () => {
         const { request } = updatePreferences({
-          preferredDistanceUnit: unit.id,
+          preferredDistanceUnit: DistanceUnit.KM,
         });
         await request;
       },
-    }),
-  );
+    },
+    {
+      label: t("profile.distanceUnits.mi"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredDistanceUnit: DistanceUnit.MI,
+        });
+        await request;
+      },
+    },
+  ];
 
   const getCurrentDistanceUnitLabel = () => {
     const unitId = user?.preferences?.preferredDistanceUnit;
-    const unit = distanceUnits.find((u) => u.id === unitId);
-    return unit?.label || t("profile.distanceUnits.km");
+    if (unitId === DistanceUnit.MI) return t("profile.distanceUnits.mi");
+    return t("profile.distanceUnits.km");
   };
 
   // Volume unit options
-  const volumeUnits = [
-    { id: "l", label: t("profile.volumeUnits.l") },
-    { id: "gal", label: t("profile.volumeUnits.gal") },
-  ];
-
-  const volumeUnitOptions: ActionSheetOption[] = volumeUnits.map((unit) => ({
-    label: unit.label,
-    onPress: async () => {
-      const { request } = updatePreferences({ preferredVolumeUnit: unit.id });
-      await request;
+  const volumeUnitOptions: ActionSheetOption[] = [
+    {
+      label: t("profile.volumeUnits.l"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredVolumeUnit: VolumeUnit.L,
+        });
+        await request;
+      },
     },
-  }));
+    {
+      label: t("profile.volumeUnits.gal"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredVolumeUnit: VolumeUnit.GAL,
+        });
+        await request;
+      },
+    },
+  ];
 
   const getCurrentVolumeUnitLabel = () => {
     const unitId = user?.preferences?.preferredVolumeUnit;
-    const unit = volumeUnits.find((u) => u.id === unitId);
-    return unit?.label || t("profile.volumeUnits.l");
+    if (unitId === VolumeUnit.GAL) return t("profile.volumeUnits.gal");
+    return t("profile.volumeUnits.l");
   };
 
   // Currency options
-  const currencies = [
-    { id: "usd", label: t("profile.currencies.usd") },
-    { id: "eur", label: t("profile.currencies.eur") },
-    { id: "gbp", label: t("profile.currencies.gbp") },
-    { id: "try", label: t("profile.currencies.try") },
-  ];
-
-  const currencyOptions: ActionSheetOption[] = currencies.map((currency) => ({
-    label: currency.label,
-    onPress: async () => {
-      const { request } = updatePreferences({ preferredCurrency: currency.id });
-      await request;
+  const currencyOptions: ActionSheetOption[] = [
+    {
+      label: t("profile.currencies.usd"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredCurrency: Currency.USD,
+        });
+        await request;
+      },
     },
-  }));
+    {
+      label: t("profile.currencies.eur"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredCurrency: Currency.EUR,
+        });
+        await request;
+      },
+    },
+    {
+      label: t("profile.currencies.gbp"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredCurrency: Currency.GBP,
+        });
+        await request;
+      },
+    },
+    {
+      label: t("profile.currencies.try"),
+      onPress: async () => {
+        const { request } = updatePreferences({
+          preferredCurrency: Currency.TRY,
+        });
+        await request;
+      },
+    },
+  ];
 
   const getCurrentCurrencyLabel = () => {
     const currencyId = user?.preferences?.preferredCurrency;
-    const currency = currencies.find((c) => c.id === currencyId);
-    return currency?.label || t("profile.currencies.usd");
+    switch (currencyId) {
+      case Currency.EUR:
+        return t("profile.currencies.eur");
+      case Currency.GBP:
+        return t("profile.currencies.gbp");
+      case Currency.TRY:
+        return t("profile.currencies.try");
+      default:
+        return t("profile.currencies.usd");
+    }
   };
 
   const handleChangePassword = async (data: {

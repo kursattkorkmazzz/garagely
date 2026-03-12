@@ -1,60 +1,76 @@
+import type { UserWithPreferences } from "@garagely/shared/models/user";
 import type { DocumentModel } from "@garagely/shared/models/document";
-import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
+import type { UpdateUserPayload, UpdateUserPreferencesPayload } from "@garagely/shared/payloads/user";
+import type { SdkError, CancelableRequest, SdkCallbacks } from "@garagely/api-sdk";
+import type { ApiResponse } from "@garagely/shared/response.types";
 import { EntityType } from "@garagely/shared/models/entity-type";
 import { sdk } from "../sdk";
 import { createReactNativeFile } from "@/utils/file.utils";
 
-export interface UserCallbacks {
-  onSuccess?: () => void;
-  onError?: (error: SdkError) => void;
-}
-
 export interface UserSlice {
   // State
+  user: UserWithPreferences | null;
   avatar: DocumentModel | null;
+  isLoading: boolean;
   isUploadingAvatar: boolean;
-  avatarError: string | null;
+  error: string | null;
 
   // Actions
+  fetchUser: (
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
+  ) => CancelableRequest<void>;
+  updateUser: (
+    payload: UpdateUserPayload,
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
+  ) => CancelableRequest<void>;
+  updatePreferences: (
+    payload: UpdateUserPreferencesPayload,
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
+  ) => CancelableRequest<void>;
   uploadAvatar: (
     uri: string,
-    callbacks?: UserCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
   ) => CancelableRequest<void>;
-  getAvatar: (callbacks?: UserCallbacks) => CancelableRequest<void>;
-  removeAvatar: (callbacks?: UserCallbacks) => CancelableRequest<void>;
-  clearAvatarError: () => void;
+  getAvatar: (
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
+  ) => CancelableRequest<void>;
+  removeAvatar: (
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
+  ) => CancelableRequest<void>;
+  setUser: (user: UserWithPreferences) => void;
+  clearUser: () => void;
+  clearError: () => void;
 }
 
 type SetUserState = (partial: Partial<UserSlice>) => void;
 
 export const createUserSlice = (set: SetUserState): UserSlice => ({
   // Initial state
+  user: null,
   avatar: null,
+  isLoading: false,
   isUploadingAvatar: false,
-  avatarError: null,
+  error: null,
 
   // Actions
-  uploadAvatar: (
-    uri: string,
-    callbacks?: UserCallbacks,
+  fetchUser: (
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
   ): CancelableRequest<void> => {
-    set({ isUploadingAvatar: true, avatarError: null });
+    set({ isLoading: true, error: null });
 
-    const file = createReactNativeFile(uri, EntityType.USER_PROFILE);
-
-    const { request, cancel } = sdk.user.uploadAvatar(file, {
+    const { request, cancel } = sdk.user.getMe({
       onSuccess: (response) => {
         set({
-          avatar: response.data,
-          isUploadingAvatar: false,
-          avatarError: null,
+          user: response.data,
+          isLoading: false,
+          error: null,
         });
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         set({
-          isUploadingAvatar: false,
-          avatarError: err.message,
+          isLoading: false,
+          error: err.message,
         });
         callbacks?.onError?.(err);
       },
@@ -63,11 +79,96 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
     return { request, cancel };
   },
 
-  getAvatar: (callbacks?: UserCallbacks): CancelableRequest<void> => {
+  updateUser: (
+    payload: UpdateUserPayload,
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
+  ): CancelableRequest<void> => {
+    set({ isLoading: true, error: null });
+
+    const { request, cancel } = sdk.user.updateMe(payload, {
+      onSuccess: (response) => {
+        set({
+          user: response.data,
+          isLoading: false,
+          error: null,
+        });
+        callbacks?.onSuccess?.(response);
+      },
+      onError: (err: SdkError) => {
+        set({
+          isLoading: false,
+          error: err.message,
+        });
+        callbacks?.onError?.(err);
+      },
+    });
+
+    return { request, cancel };
+  },
+
+  updatePreferences: (
+    payload: UpdateUserPreferencesPayload,
+    callbacks?: SdkCallbacks<ApiResponse<UserWithPreferences>>,
+  ): CancelableRequest<void> => {
+    set({ isLoading: true, error: null });
+
+    const { request, cancel } = sdk.user.updatePreferences(payload, {
+      onSuccess: (response) => {
+        set({
+          user: response.data,
+          isLoading: false,
+          error: null,
+        });
+        callbacks?.onSuccess?.(response);
+      },
+      onError: (err: SdkError) => {
+        set({
+          isLoading: false,
+          error: err.message,
+        });
+        callbacks?.onError?.(err);
+      },
+    });
+
+    return { request, cancel };
+  },
+
+  uploadAvatar: (
+    uri: string,
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
+  ): CancelableRequest<void> => {
+    set({ isUploadingAvatar: true, error: null });
+
+    const file = createReactNativeFile(uri, EntityType.USER_PROFILE);
+
+    const { request, cancel } = sdk.user.uploadAvatar(file, {
+      onSuccess: (response) => {
+        set({
+          avatar: response.data,
+          isUploadingAvatar: false,
+          error: null,
+        });
+        callbacks?.onSuccess?.(response);
+      },
+      onError: (err: SdkError) => {
+        set({
+          isUploadingAvatar: false,
+          error: err.message,
+        });
+        callbacks?.onError?.(err);
+      },
+    });
+
+    return { request, cancel };
+  },
+
+  getAvatar: (
+    callbacks?: SdkCallbacks<ApiResponse<DocumentModel>>,
+  ): CancelableRequest<void> => {
     const { request, cancel } = sdk.user.getAvatar({
       onSuccess: (response) => {
         set({ avatar: response.data });
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         // If no avatar found, it's not an error - just no avatar
@@ -79,22 +180,24 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
     return { request, cancel };
   },
 
-  removeAvatar: (callbacks?: UserCallbacks): CancelableRequest<void> => {
-    set({ isUploadingAvatar: true, avatarError: null });
+  removeAvatar: (
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
+  ): CancelableRequest<void> => {
+    set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.user.removeAvatar({
-      onSuccess: () => {
+      onSuccess: (response) => {
         set({
           avatar: null,
-          isUploadingAvatar: false,
-          avatarError: null,
+          isLoading: false,
+          error: null,
         });
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         set({
-          isUploadingAvatar: false,
-          avatarError: err.message,
+          isLoading: false,
+          error: err.message,
         });
         callbacks?.onError?.(err);
       },
@@ -103,7 +206,15 @@ export const createUserSlice = (set: SetUserState): UserSlice => ({
     return { request, cancel };
   },
 
-  clearAvatarError: () => {
-    set({ avatarError: null });
+  setUser: (user: UserWithPreferences) => {
+    set({ user });
+  },
+
+  clearUser: () => {
+    set({ user: null, avatar: null, error: null });
+  },
+
+  clearError: () => {
+    set({ error: null });
   },
 });

@@ -1,3 +1,2 @@
-export { createAuthSlice, type AuthSlice, type AuthCallbacks } from "./auth.slice";
-export { createUserSlice, type UserSlice, type UserCallbacks } from "./user.slice";
-export { createPreferencesSlice, type PreferencesSlice, type PreferencesCallbacks } from "./preferences.slice";
+export { createAuthSlice, type AuthSlice } from "./auth.slice";
+export { createUserSlice, type UserSlice } from "./user.slice";

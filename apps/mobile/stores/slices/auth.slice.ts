@@ -5,19 +5,15 @@ import type {
   ChangePasswordPayload,
 } from "@garagely/shared/payloads/auth";
 import type { UserWithPreferences } from "@garagely/shared/models/user";
-import type { SdkError, CancelableRequest } from "@garagely/api-sdk";
+import type { SdkError, CancelableRequest, SdkCallbacks } from "@garagely/api-sdk";
+import type { ApiResponse } from "@garagely/shared/response.types";
+import type { AuthResponse } from "@garagely/shared/payloads/auth";
 import { sdk } from "../sdk";
 
 const AUTH_TOKEN_KEY = "@garagely/auth_token";
 
-export interface AuthCallbacks {
-  onSuccess?: () => void;
-  onError?: (error: SdkError) => void;
-}
-
 export interface AuthSlice {
   // State
-  user: UserWithPreferences | null;
   customToken: string | null;
   isLoading: boolean;
   error: string | null;
@@ -27,25 +23,25 @@ export interface AuthSlice {
   // Actions
   login: (
     payload: LoginPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<AuthResponse>>,
   ) => CancelableRequest<void>;
   register: (
     payload: RegisterPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<AuthResponse>>,
   ) => CancelableRequest<void>;
   logout: () => Promise<void>;
   restoreSession: () => CancelableRequest<void>;
   changePassword: (
     payload: ChangePasswordPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
   ) => CancelableRequest<void>;
   clearError: () => void;
   setAuthToken: (token: string | null) => void;
-  setUser: (user: UserWithPreferences) => void;
 }
 
 type SetAuthState = (partial: Partial<AuthSlice>) => void;
-type GetAuthState = () => AuthSlice;
+type SetUser = (user: UserWithPreferences) => void;
+type ClearUser = () => void;
 
 async function saveToken(token: string): Promise<void> {
   try {
@@ -73,10 +69,10 @@ async function getStoredToken(): Promise<string | null> {
 
 export const createAuthSlice = (
   set: SetAuthState,
-  get: GetAuthState,
+  setUser: SetUser,
+  clearUser: ClearUser,
 ): AuthSlice => ({
   // Initial state
-  user: null,
   customToken: null,
   isLoading: false,
   error: null,
@@ -86,22 +82,22 @@ export const createAuthSlice = (
   // Actions
   login: (
     payload: LoginPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<AuthResponse>>,
   ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.auth.login(payload, {
       onSuccess: async (response) => {
         await saveToken(response.data.customToken);
+        setUser(response.data.user);
         set({
-          user: response.data.user,
           customToken: response.data.customToken,
           isAuthenticated: true,
           isLoading: false,
           error: null,
         });
         sdk.setAuthToken(response.data.customToken);
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         set({
@@ -117,22 +113,22 @@ export const createAuthSlice = (
 
   register: (
     payload: RegisterPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<AuthResponse>>,
   ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.auth.register(payload, {
       onSuccess: async (response) => {
         await saveToken(response.data.customToken);
+        setUser(response.data.user);
         set({
-          user: response.data.user,
           customToken: response.data.customToken,
           isAuthenticated: true,
           isLoading: false,
           error: null,
         });
         sdk.setAuthToken(response.data.customToken);
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         set({
@@ -148,8 +144,8 @@ export const createAuthSlice = (
 
   logout: async () => {
     await clearToken();
+    clearUser();
     set({
-      user: null,
       customToken: null,
       isAuthenticated: false,
       error: null,
@@ -172,8 +168,8 @@ export const createAuthSlice = (
 
       const { request: getMeRequest, cancel } = sdk.user.getMe({
         onSuccess: (response) => {
+          setUser(response.data);
           set({
-            user: response.data,
             customToken: token,
             isAuthenticated: true,
             isInitialized: true,
@@ -199,17 +195,17 @@ export const createAuthSlice = (
 
   changePassword: (
     payload: ChangePasswordPayload,
-    callbacks?: AuthCallbacks,
+    callbacks?: SdkCallbacks<ApiResponse<void>>,
   ): CancelableRequest<void> => {
     set({ isLoading: true, error: null });
 
     const { request, cancel } = sdk.auth.changePassword(payload, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         set({
           isLoading: false,
           error: null,
         });
-        callbacks?.onSuccess?.();
+        callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
         set({
@@ -230,9 +226,5 @@ export const createAuthSlice = (
   setAuthToken: (token: string | null) => {
     set({ customToken: token });
     sdk.setAuthToken(token);
-  },
-
-  setUser: (user: UserWithPreferences) => {
-    set({ user });
   },
 });

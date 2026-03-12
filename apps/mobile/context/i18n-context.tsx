@@ -43,10 +43,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(getCurrentLanguage());
   const [isReady, setIsReady] = useState(false);
 
-  const user = useStore((state) => state.auth.user);
-  const updatePreferences = useStore((state) => state.preferences.updatePreferences);
-  const setUser = useStore((state) => state.auth.setUser);
-  const isUpdating = useStore((state) => state.preferences.isUpdating);
+  const user = useStore((state) => state.user.user);
+  const updatePreferences = useStore((state) => state.user.updatePreferences);
+  const isUpdating = useStore((state) => state.user.isLoading);
 
   useEffect(() => {
     initI18n().then(() => {
@@ -73,18 +72,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
       // Update backend if user is authenticated
       if (user) {
-        const { request } = updatePreferences(
-          { locale: newLanguage },
-          {
-            onSuccess: (updatedUser) => {
-              setUser(updatedUser);
-            },
-          },
-        );
+        const { request } = updatePreferences({ locale: newLanguage });
         await request;
       }
     },
-    [user, updatePreferences, setUser],
+    [user, updatePreferences],
   );
 
   const value = useMemo(

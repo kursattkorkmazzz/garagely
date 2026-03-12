@@ -75,11 +75,11 @@
     },
     "distanceUnits": {
       "km": "Kilometers (km)",
-      "miles": "Miles (mi)"
+      "mi": "Miles (mi)"
     },
     "distanceUnitsShort": {
       "km": "KM",
-      "miles": "MI"
+      "mi": "MI"
     },
     "volumeUnits": {
       "l": "Liters (L)",

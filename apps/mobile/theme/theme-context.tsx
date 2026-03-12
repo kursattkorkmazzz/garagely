@@ -74,10 +74,9 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const colorScheme = useColorScheme();
-  const user = useStore((state) => state.auth.user);
-  const updatePreferences = useStore((state) => state.preferences.updatePreferences);
-  const setUser = useStore((state) => state.auth.setUser);
-  const isUpdating = useStore((state) => state.preferences.isUpdating);
+  const user = useStore((state) => state.user.user);
+  const updatePreferences = useStore((state) => state.user.updatePreferences);
+  const isUpdating = useStore((state) => state.user.isLoading);
 
   // Theme preference from user preferences or default to system
   const [themePreference, setThemePreference] = useState<Theme | "system">("system");
@@ -105,18 +104,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
       // Update backend if user is authenticated
       if (user) {
-        const { request } = updatePreferences(
-          { theme: mapToBackendTheme(newTheme) },
-          {
-            onSuccess: (updatedUser) => {
-              setUser(updatedUser);
-            },
-          },
-        );
+        const { request } = updatePreferences({ theme: mapToBackendTheme(newTheme) });
         await request;
       }
     },
-    [user, updatePreferences, setUser],
+    [user, updatePreferences],
   );
 
   const toggleTheme = useCallback(() => {
