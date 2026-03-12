@@ -33,10 +33,11 @@ export function OdometerStep() {
     return value.replace(/[^0-9]/g, "");
   };
 
-  const handleCurrentKmChange = (value: string) => {
-    const numericValue = formatNumericInput(value);
-    formik.setFieldValue("currentKm", numericValue ? parseInt(numericValue, 10) : 0);
-  };
+  // TODO: Re-enable when current KM tracking is needed
+  // const handleCurrentKmChange = (value: string) => {
+  //   const numericValue = formatNumericInput(value);
+  //   formik.setFieldValue("currentKm", numericValue ? parseInt(numericValue, 10) : 0);
+  // };
 
   const handlePurchasePriceChange = (value: string) => {
     const numericValue = formatNumericInput(value);
@@ -58,7 +59,7 @@ export function OdometerStep() {
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-      {/* Current Odometer */}
+      {/* TODO: Re-enable when current KM tracking is needed
       <AppInput
           AppInputLabel={
             <AppInputLabel>
@@ -85,6 +86,7 @@ export function OdometerStep() {
             </AppInputErrorMessage>
           }
       />
+      */}
 
       {/* Purchase Date */}
       <AppDatePicker

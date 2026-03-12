@@ -87,12 +87,7 @@ export function VehicleCard({
           style={styles.coverSection}
           imageStyle={styles.coverImage}
         >
-          <LinearGradient
-            colors={["transparent", withOpacity("#000000", 0.7)]}
-            style={styles.imageOverlay}
-          >
-            {content}
-          </LinearGradient>
+          {content}
         </ImageBackground>
       );
     }
