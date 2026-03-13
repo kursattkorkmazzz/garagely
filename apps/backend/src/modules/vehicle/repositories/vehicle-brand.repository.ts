@@ -160,18 +160,57 @@ export class VehicleBrandRepository implements IVehicleBrandRepository<FirebaseF
       name: string;
       isSystem: boolean;
       isActive: boolean;
+      logoUrl: string | null;
     },
     tx?: FirebaseFirestore.Transaction,
   ): Promise<VehicleBrandModel> {
-    const docRef = await db.collection(VEHICLE_BRANDS_COLLECTION).add({
+    const docRef = db.collection(VEHICLE_BRANDS_COLLECTION).doc();
+    const docData = {
       name: data.name,
       nameLower: data.name.toLowerCase(),
-      logoUrl: null,
+      logoUrl: data.logoUrl,
       isSystem: data.isSystem,
       isActive: data.isActive,
-    });
+    };
 
-    const doc = tx ? await tx?.get(docRef) : await docRef.get();
-    return vehicleBrandModelValidator.cast({ id: doc.id, ...doc.data() });
+    if (tx) {
+      tx.set(docRef, docData);
+    } else {
+      await docRef.set(docData);
+    }
+
+    return vehicleBrandModelValidator.cast({ id: docRef.id, ...docData });
+  }
+
+  generateId(): string {
+    return db.collection(VEHICLE_BRANDS_COLLECTION).doc().id;
+  }
+
+  createWithId(
+    id: string,
+    data: {
+      name: string;
+      isSystem: boolean;
+      isActive: boolean;
+      logoUrl: string | null;
+    },
+    tx?: FirebaseFirestore.Transaction,
+  ): VehicleBrandModel {
+    const docRef = db.collection(VEHICLE_BRANDS_COLLECTION).doc(id);
+    const docData = {
+      name: data.name,
+      nameLower: data.name.toLowerCase(),
+      logoUrl: data.logoUrl,
+      isSystem: data.isSystem,
+      isActive: data.isActive,
+    };
+
+    if (tx) {
+      tx.set(docRef, docData);
+    } else {
+      throw new Error("createWithId requires a transaction");
+    }
+
+    return vehicleBrandModelValidator.cast({ id, ...docData });
   }
 }

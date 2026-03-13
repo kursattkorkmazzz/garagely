@@ -152,7 +152,6 @@ async function upsertBrandAndModel(
     sdk.vehicle.upsertBrandAndModel(payload, {
       onSuccess: (res) => resolve(res.data),
       onError: (err) => {
-        console.error("[AddVehicle] upsertBrandAndModel error:", err.message);
         resolve(null);
       },
     });

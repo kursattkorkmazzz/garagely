@@ -29,4 +29,10 @@ export interface IVehicleBrandRepository<Tx = {}> {
     data: Omit<VehicleBrandModel, "id">,
     tx?: Tx,
   ): Promise<VehicleBrandModel>;
+  createWithId(
+    id: string,
+    data: Omit<VehicleBrandModel, "id">,
+    tx?: Tx,
+  ): VehicleBrandModel;
+  generateId(): string;
 }

@@ -10,7 +10,10 @@ import { AppView } from "@/components/ui/app-view";
 import { AppText } from "@/components/ui/app-text";
 import { AppIcon } from "@/components/ui/app-icon";
 import { AppButton } from "@/components/ui/app-button";
-import { AppActionSheet, type ActionSheetOption } from "@/components/ui/app-action-sheet";
+import {
+  AppActionSheet,
+  type ActionSheetOption,
+} from "@/components/ui/app-action-sheet";
 import { appToast } from "@/components/ui/app-toast";
 import { AddVehicleFormState } from "../../add-vehicle-wizard";
 
@@ -31,10 +34,12 @@ export function PhotoStep() {
   const { t } = useI18n();
   const formik = useFormikContext<AddVehicleFormState>();
   const [showActionSheet, setShowActionSheet] = useState(false);
-  const [activeTarget, setActiveTarget] = useState<"cover" | ViewType | null>(null);
+  const [activeTarget, setActiveTarget] = useState<"cover" | ViewType | null>(
+    null,
+  );
 
   const additionalPhotosCount = VIEW_TYPES.filter(
-    (type) => formik.values.additionalPhotos[type]
+    (type) => formik.values.additionalPhotos[type],
   ).length;
 
   const requestCameraPermission = async () => {
@@ -149,6 +154,7 @@ export function PhotoStep() {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingBottom: spacing.sm,
     },
     sectionTitle: {
       fontWeight: "600",
@@ -296,7 +302,11 @@ export function PhotoStep() {
       {/* Main Exterior View */}
       <AppView>
         <AppView style={styles.sectionHeader}>
-          <AppText variant="bodySmall" color="muted" style={styles.sectionTitle}>
+          <AppText
+            variant="bodySmall"
+            color="muted"
+            style={styles.sectionTitle}
+          >
             {t("addVehicle.mainExteriorView")}
           </AppText>
         </AppView>
@@ -317,13 +327,19 @@ export function PhotoStep() {
               />
               <AppView style={styles.coverActions}>
                 <Pressable
-                  style={[styles.coverActionButton, { backgroundColor: theme.primary }]}
+                  style={[
+                    styles.coverActionButton,
+                    { backgroundColor: theme.primary },
+                  ]}
                   onPress={() => openPicker("cover")}
                 >
                   <AppIcon icon="Pencil" size={18} color="#FFFFFF" />
                 </Pressable>
                 <Pressable
-                  style={[styles.coverActionButton, { backgroundColor: theme.destructive }]}
+                  style={[
+                    styles.coverActionButton,
+                    { backgroundColor: theme.destructive },
+                  ]}
                   onPress={() => {
                     formik.setFieldValue("coverPhotoUri", null);
                   }}
@@ -351,7 +367,11 @@ export function PhotoStep() {
       {/* Additional Views */}
       <AppView>
         <AppView style={styles.sectionHeader}>
-          <AppText variant="bodySmall" color="muted" style={styles.sectionTitle}>
+          <AppText
+            variant="bodySmall"
+            color="muted"
+            style={styles.sectionTitle}
+          >
             {t("addVehicle.additionalViews")}
           </AppText>
           <AppText variant="bodySmall" color="muted">
@@ -384,7 +404,10 @@ export function PhotoStep() {
                     <Pressable
                       style={styles.viewRemoveButton}
                       onPress={() => {
-                        formik.setFieldValue(`additionalPhotos.${viewType}`, null);
+                        formik.setFieldValue(
+                          `additionalPhotos.${viewType}`,
+                          null,
+                        );
                       }}
                     >
                       <AppIcon icon="X" size={14} color="#FFFFFF" />
@@ -392,7 +415,11 @@ export function PhotoStep() {
                   </>
                 ) : (
                   <AppView style={styles.viewPlaceholder}>
-                    <AppIcon icon="Plus" size={24} color={theme.mutedForeground} />
+                    <AppIcon
+                      icon="Plus"
+                      size={24}
+                      color={theme.mutedForeground}
+                    />
                     <AppText variant="caption" color="muted">
                       {t(`addVehicle.photoViews.${viewType}`)}
                     </AppText>
@@ -410,7 +437,10 @@ export function PhotoStep() {
           <AppIcon icon="Lightbulb" size={20} color={theme.primary} />
         </AppView>
         <AppView style={styles.tipContent}>
-          <AppText variant="bodyMedium" style={{ fontWeight: "600", marginBottom: spacing.xs }}>
+          <AppText
+            variant="bodyMedium"
+            style={{ fontWeight: "600", marginBottom: spacing.xs }}
+          >
             {t("addVehicle.photographyTip.title")}
           </AppText>
           <AppText variant="bodySmall" color="muted">

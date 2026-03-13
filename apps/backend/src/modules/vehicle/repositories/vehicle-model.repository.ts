@@ -176,4 +176,34 @@ export class VehicleModelRepository implements IVehicleModelRepository<FirebaseF
 
     return vehicleModelModelValidator.cast({ id: docRef.id, ...modelData });
   }
+
+  generateId(): string {
+    return db.collection(VEHICLE_MODELS_COLLECTION).doc().id;
+  }
+
+  createWithId(
+    id: string,
+    data: CreateVehicleModelPayload & { isSystem: boolean; isActive: boolean },
+    tx?: FirebaseFirestore.Transaction,
+  ): VehicleModelModel {
+    const modelData = {
+      brandId: data.brandId,
+      name: data.name,
+      nameLower: data.name.toLowerCase(),
+      coverPhotoUrl: null,
+      year: data.year ?? null,
+      isSystem: data.isSystem,
+      isActive: data.isActive,
+    };
+
+    const docRef = db.collection(VEHICLE_MODELS_COLLECTION).doc(id);
+
+    if (tx) {
+      tx.set(docRef, modelData);
+    } else {
+      throw new Error("createWithId requires a transaction");
+    }
+
+    return vehicleModelModelValidator.cast({ id, ...modelData });
+  }
 }

@@ -34,6 +34,7 @@ import {
   IVehicleModelRepository,
 } from "../repositories";
 import { FirestoreTransactionManager } from "../../../providers/firebase/firestore-transaction-manager";
+import { logger } from "../../../common/logger";
 
 export class VehicleService {
   constructor(
@@ -51,16 +52,17 @@ export class VehicleService {
   ): Promise<{ data: VehicleBrandModel[]; meta: PaginationMeta }> {
     const { search, page, limit } = query;
 
-    const result = search && search.trim()
-      ? await this.vehicleBrandRepository.searchByNamePaginated(
-          search.trim(),
-          page,
-          limit,
-        )
-      : await this.vehicleBrandRepository.findSystemBrandsPaginated(
-          page,
-          limit,
-        );
+    const result =
+      search && search.trim()
+        ? await this.vehicleBrandRepository.searchByNamePaginated(
+            search.trim(),
+            page,
+            limit,
+          )
+        : await this.vehicleBrandRepository.findSystemBrandsPaginated(
+            page,
+            limit,
+          );
 
     return {
       data: result.items,
@@ -80,18 +82,19 @@ export class VehicleService {
 
     const { search, page, limit } = query;
 
-    const result = search && search.trim()
-      ? await this.vehicleModelRepository.searchByNameInBrandPaginated(
-          brandId,
-          search.trim(),
-          page,
-          limit,
-        )
-      : await this.vehicleModelRepository.findByBrandIdPaginated(
-          brandId,
-          page,
-          limit,
-        );
+    const result =
+      search && search.trim()
+        ? await this.vehicleModelRepository.searchByNameInBrandPaginated(
+            brandId,
+            search.trim(),
+            page,
+            limit,
+          )
+        : await this.vehicleModelRepository.findByBrandIdPaginated(
+            brandId,
+            page,
+            limit,
+          );
 
     return {
       data: result.items,
@@ -115,14 +118,34 @@ export class VehicleService {
   async upsertBrandAndModel(
     data: UpsertBrandModelPayload,
   ): Promise<UpsertBrandModelResponse> {
+    // Pre-generate IDs outside transaction
+    const newBrandId = this.vehicleBrandRepository.generateId();
+    const newModelId = this.vehicleModelRepository.generateId();
+
     return this.transactionManager.run<UpsertBrandModelResponse>(async (tx) => {
-      // Find or create brand
-      let brand = await this.vehicleBrandRepository.findByNameLower(
+      // === READ PHASE (all reads first) ===
+      const existingBrand = await this.vehicleBrandRepository.findByNameLower(
         data.brand.name.toLowerCase(),
         tx,
       );
-      if (!brand) {
-        brand = await this.vehicleBrandRepository.create(
+
+      // Use existing brand ID or pre-generated one for model lookup
+      const brandId = existingBrand?.id ?? newBrandId;
+
+      const existingModel = await this.vehicleModelRepository.findByBrandNameYear(
+        brandId,
+        data.model.name.toLowerCase(),
+        null,
+        tx,
+      );
+
+      // === WRITE PHASE (all writes after reads) ===
+      let brand: VehicleBrandModel;
+      if (existingBrand) {
+        brand = existingBrand;
+      } else {
+        brand = this.vehicleBrandRepository.createWithId(
+          newBrandId,
           {
             name: data.brand.name.trim(),
             isSystem: false,
@@ -133,15 +156,12 @@ export class VehicleService {
         );
       }
 
-      // Find or create model
-      let model = await this.vehicleModelRepository.findByBrandNameYear(
-        brand.id,
-        data.model.name.toLowerCase(),
-        null,
-      );
-
-      if (!model) {
-        model = await this.vehicleModelRepository.create(
+      let model: VehicleModelModel;
+      if (existingModel) {
+        model = existingModel;
+      } else {
+        model = this.vehicleModelRepository.createWithId(
+          newModelId,
           {
             brandId: brand.id,
             name: data.model.name.trim(),
@@ -153,10 +173,8 @@ export class VehicleService {
           tx,
         );
       }
-      return {
-        brand: brand,
-        model: model,
-      };
+
+      return { brand, model };
     });
   }
 

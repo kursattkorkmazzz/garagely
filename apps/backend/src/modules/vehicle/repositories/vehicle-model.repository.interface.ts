@@ -33,4 +33,10 @@ export interface IVehicleModelRepository<Tx = {}> {
     data: Omit<VehicleModelModel, "id">,
     tx?: Tx,
   ): Promise<VehicleModelModel>;
+  createWithId(
+    id: string,
+    data: Omit<VehicleModelModel, "id">,
+    tx?: Tx,
+  ): VehicleModelModel;
+  generateId(): string;
 }
