@@ -141,10 +141,10 @@
     "deleted": "Vehicle deleted",
     "card": {
       "modelYear": "MODEL YEAR",
-      "mileage": "MILEAGE",
       "costPerKm": "COST/KM",
-      "lastService": "LAST SERVICE",
-      "overdue": "OVERDUE"
+      "inspectionExpire": "INSPECTION",
+      "insuranceExpire": "INSURANCE",
+      "unknown": "Unknown"
     }
   },
   "addVehicle": {

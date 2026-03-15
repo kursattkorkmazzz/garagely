@@ -12,11 +12,10 @@ export type VehicleCardData = {
   id: string;
   name: string;
   licensePlate: string;
-  modelYear: number;
-  mileage: number;
-  costPerKm: number;
-  lastServiceDate?: string;
-  isOverdue?: boolean;
+  modelYear: number | null;
+  costPerKm: string; // Formatted with currency symbol
+  inspectionExpireDate?: string;
+  insuranceExpireDate?: string;
   coverImage?: string;
   color?: string; // Hex color for gradient when no cover image
 };
@@ -37,14 +36,6 @@ export function VehicleCard({
 
   const defaultColor = "#3B82F6";
   const vehicleColor = vehicle.color || defaultColor;
-
-  const formatMileage = (km: number) => {
-    return km.toLocaleString() + " km";
-  };
-
-  const formatCost = (cost: number) => {
-    return "$" + cost.toFixed(2);
-  };
 
   const renderCoverSection = () => {
     const content = (
@@ -119,28 +110,16 @@ export function VehicleCard({
 
       {/* Stats Section */}
       <View style={styles.statsSection}>
-        {/* Row 1: Model Year and Mileage */}
+        {/* Row 1: Model Year and Cost/KM */}
         <View style={[styles.statsRow, { borderBottomColor: theme.border }]}>
           <View style={styles.statItem}>
             <AppText variant="caption" color="muted" style={styles.statLabel}>
               {t("vehicles.card.modelYear")}
             </AppText>
             <AppText variant="bodyLarge" style={styles.statValue}>
-              {vehicle.modelYear}
+              {vehicle.modelYear || t("vehicles.card.unknown")}
             </AppText>
           </View>
-          <View style={styles.statItem}>
-            <AppText variant="caption" color="muted" style={styles.statLabel}>
-              {t("vehicles.card.mileage")}
-            </AppText>
-            <AppText variant="bodyLarge" style={styles.statValue}>
-              {formatMileage(vehicle.mileage)}
-            </AppText>
-          </View>
-        </View>
-
-        {/* Row 2: Cost/KM and Last Service */}
-        <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <View style={styles.statLabelRow}>
               <AppIcon icon="Fuel" size={14} color="#22C55E" />
@@ -149,51 +128,34 @@ export function VehicleCard({
               </AppText>
             </View>
             <AppText variant="bodyLarge" style={styles.statValue}>
-              {formatCost(vehicle.costPerKm)}
+              {vehicle.costPerKm}
+            </AppText>
+          </View>
+        </View>
+
+        {/* Row 2: Inspection Expire and Insurance Expire */}
+        <View style={[styles.statsRow, { borderBottomWidth: 0 }]}>
+          <View style={styles.statItem}>
+            <View style={styles.statLabelRow}>
+              <AppIcon icon="FileCheck" size={14} color="#F59E0B" />
+              <AppText variant="caption" color="muted" style={styles.statLabel}>
+                {t("vehicles.card.inspectionExpire")}
+              </AppText>
+            </View>
+            <AppText variant="bodyLarge" style={styles.statValue}>
+              {vehicle.inspectionExpireDate || "-"}
             </AppText>
           </View>
           <View style={styles.statItem}>
             <View style={styles.statLabelRow}>
-              <AppIcon
-                icon={vehicle.isOverdue ? "AlertTriangle" : "Wrench"}
-                size={14}
-                color={vehicle.isOverdue ? theme.destructive : "#8B5CF6"}
-              />
-              <AppText
-                variant="caption"
-                style={[
-                  styles.statLabel,
-                  {
-                    color: vehicle.isOverdue
-                      ? theme.destructive
-                      : theme.mutedForeground,
-                  },
-                ]}
-              >
-                {vehicle.isOverdue
-                  ? t("vehicles.card.overdue")
-                  : t("vehicles.card.lastService")}
+              <AppIcon icon="Shield" size={14} color="#8B5CF6" />
+              <AppText variant="caption" color="muted" style={styles.statLabel}>
+                {t("vehicles.card.insuranceExpire")}
               </AppText>
             </View>
-            <View style={styles.serviceRow}>
-              <AppText
-                variant="bodyLarge"
-                style={[
-                  styles.statValue,
-                  vehicle.isOverdue && { color: theme.destructive },
-                ]}
-              >
-                {vehicle.lastServiceDate || "-"}
-              </AppText>
-              {vehicle.isOverdue && (
-                <View
-                  style={[
-                    styles.overdueDot,
-                    { backgroundColor: theme.destructive },
-                  ]}
-                />
-              )}
-            </View>
+            <AppText variant="bodyLarge" style={styles.statValue}>
+              {vehicle.insuranceExpireDate || "-"}
+            </AppText>
           </View>
         </View>
       </View>
@@ -270,15 +232,5 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontWeight: "600",
-  },
-  serviceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  overdueDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
 });

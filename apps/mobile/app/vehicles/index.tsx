@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ScrollView, View, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
+import { useStore } from "@/stores";
 import { AppText } from "@/components/ui/app-text";
 import { AppButton } from "@/components/ui/app-button";
 import { AppIcon } from "@/components/ui/app-icon";
@@ -11,18 +12,35 @@ import { AppListEmpty } from "@/components/common";
 import { appToast } from "@/components/ui/app-toast";
 import { spacing } from "@/theme/tokens/spacing";
 import { sdk } from "@/stores/sdk";
+import { Currency } from "@garagely/shared/models/unit";
 import type { DetailedVehicleModel } from "@garagely/shared/models/vehicle";
 
-function mapToVehicleCardData(vehicle: DetailedVehicleModel): VehicleCardData {
+function getCurrencySymbol(currency: Currency | undefined): string {
+  switch (currency) {
+    case Currency.EUR:
+      return "€";
+    case Currency.GBP:
+      return "£";
+    case Currency.TRY:
+      return "₺";
+    case Currency.USD:
+    default:
+      return "$";
+  }
+}
+
+function mapToVehicleCardData(
+  vehicle: DetailedVehicleModel,
+  currencySymbol: string,
+): VehicleCardData {
   return {
     id: vehicle.id,
     name: `${vehicle.brand.name} ${vehicle.model.name}`,
     licensePlate: vehicle.plate ?? "—",
-    modelYear: vehicle.model.year ?? 0,
-    mileage: vehicle.currentKm ?? 0,
-    costPerKm: 0, // Not available yet
-    lastServiceDate: undefined, // Not available yet
-    isOverdue: false, // Not available yet
+    modelYear: vehicle.model.year ?? null,
+    costPerKm: `${currencySymbol}0`, // Placeholder until implemented
+    inspectionExpireDate: undefined, // Placeholder until implemented
+    insuranceExpireDate: undefined, // Placeholder until implemented
     coverImage: vehicle.coverPhoto?.url,
     color: vehicle.color ?? undefined,
   };
@@ -32,9 +50,15 @@ export default function VehicleListScreen() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const router = useRouter();
+  const user = useStore((state) => state.user.user);
 
   const [vehicles, setVehicles] = useState<DetailedVehicleModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const currencySymbol = useMemo(
+    () => getCurrencySymbol(user?.preferences?.preferredCurrency),
+    [user?.preferences?.preferredCurrency],
+  );
 
   const fetchVehicles = useCallback(() => {
     setIsLoading(true);
@@ -92,7 +116,7 @@ export default function VehicleListScreen() {
     );
   };
 
-  const vehicleCards = vehicles.map(mapToVehicleCardData);
+  const vehicleCards = vehicles.map((v) => mapToVehicleCardData(v, currencySymbol));
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>

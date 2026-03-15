@@ -141,10 +141,10 @@
     "deleted": "Araç silindi",
     "card": {
       "modelYear": "MODEL YILI",
-      "mileage": "KİLOMETRE",
       "costPerKm": "MALİYET/KM",
-      "lastService": "SON SERVİS",
-      "overdue": "GECİKMİŞ"
+      "inspectionExpire": "MUAYENE",
+      "insuranceExpire": "SİGORTA",
+      "unknown": "Bilinmiyor"
     }
   },
   "addVehicle": {
