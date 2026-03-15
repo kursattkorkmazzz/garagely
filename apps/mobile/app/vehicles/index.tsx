@@ -87,8 +87,8 @@ export default function VehicleListScreen() {
     router.push("/vehicles/add");
   };
 
-  const handleVehiclePress = (vehicle: VehicleCardData) => {
-    // TODO: Navigate to vehicle details
+  const handleVehiclePress = (vehicleId: string) => {
+    router.push(`/vehicles/${vehicleId}`);
   };
 
   const handleDeletePress = (vehicleId: string) => {
@@ -174,7 +174,7 @@ export default function VehicleListScreen() {
             <VehicleCard
               key={vehicle.id}
               vehicle={vehicle}
-              onPress={() => handleVehiclePress(vehicle)}
+              onPress={() => handleVehiclePress(vehicle.id)}
               onDeletePress={() => handleDeletePress(vehicle.id)}
             />
           ))}

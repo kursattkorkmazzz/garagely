@@ -292,5 +292,31 @@
       "digitalVault": "Dijital Kasa",
       "digitalVaultSubtitle": "Kılavuzlar, PDF dışa aktarımlar"
     }
-  }
+  },
+  "vehicleDetail": {
+    "title": "Araç Detayları",
+    "status": {
+      "active": "AKTİF"
+    },
+    "sections": {
+      "technicalSpecs": "Teknik Özellikler",
+      "statusId": "Durum ve Kimlik",
+      "ownershipHistory": "Sahiplik Geçmişi"
+    },
+    "fields": {
+      "brand": "Marka",
+      "model": "Model",
+      "year": "Yıl",
+      "transmission": "Şanzıman",
+      "bodyType": "Kasa Tipi",
+      "fuelType": "Yakıt Tipi",
+      "currentKm": "Güncel KM",
+      "vin": "Şasi No",
+      "color": "Renk",
+      "purchaseDate": "Satın Alma Tarihi",
+      "purchasePrice": "Satın Alma Fiyatı",
+      "purchaseKm": "Satın Alma KM"
+    }
+  },
+  "unknown": "Bilinmiyor"
 }

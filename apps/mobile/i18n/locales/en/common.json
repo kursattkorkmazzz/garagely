@@ -292,5 +292,31 @@
       "digitalVault": "Digital Vault",
       "digitalVaultSubtitle": "Manuals, PDF exports"
     }
-  }
+  },
+  "vehicleDetail": {
+    "title": "Vehicle Details",
+    "status": {
+      "active": "ACTIVE"
+    },
+    "sections": {
+      "technicalSpecs": "Technical Specs",
+      "statusId": "Status & ID",
+      "ownershipHistory": "Ownership History"
+    },
+    "fields": {
+      "brand": "Brand",
+      "model": "Model",
+      "year": "Year",
+      "transmission": "Transmission",
+      "bodyType": "Body Type",
+      "fuelType": "Fuel Type",
+      "currentKm": "Current KM",
+      "vin": "VIN",
+      "color": "Color",
+      "purchaseDate": "Purchase Date",
+      "purchasePrice": "Purchase Price",
+      "purchaseKm": "Purchase KM"
+    }
+  },
+  "unknown": "Unknown"
 }
