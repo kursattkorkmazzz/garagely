@@ -74,6 +74,11 @@ export interface VehicleApi {
     callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
     key?: string,
   ): CancelableRequest<void>;
+  getDetailedVehicleById(
+    vehicleId: string,
+    callbacks?: SdkCallbacks<ApiResponse<DetailedVehicleModel>>,
+    key?: string,
+  ): CancelableRequest<void>;
   createVehicle(
     payload: CreateVehiclePayload,
     callbacks?: SdkCallbacks<ApiResponse<VehicleModel>>,
@@ -313,6 +318,28 @@ export function createVehicleApi(client: HttpClient): VehicleApi {
     ): CancelableRequest<void> {
       const { request, cancel } = client.get<ApiResponse<VehicleModel>>(
         `/vehicles/${vehicleId}`,
+        key,
+      );
+
+      return {
+        request: request
+          .then((data) => {
+            callbacks?.onSuccess?.(data);
+          })
+          .catch((error) => {
+            callbacks?.onError?.(error as SdkError);
+          }),
+        cancel,
+      };
+    },
+
+    getDetailedVehicleById(
+      vehicleId: string,
+      callbacks?: SdkCallbacks<ApiResponse<DetailedVehicleModel>>,
+      key?: string,
+    ): CancelableRequest<void> {
+      const { request, cancel } = client.get<ApiResponse<DetailedVehicleModel>>(
+        `/vehicles/${vehicleId}/detailed`,
         key,
       );
 

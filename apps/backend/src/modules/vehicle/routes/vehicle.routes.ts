@@ -87,6 +87,7 @@ router.post(
 );
 
 router.get("/:id", asyncHandler(vehicleController.getVehicleById));
+router.get("/:id/detailed", asyncHandler(vehicleController.getDetailedVehicleById));
 
 router.patch(
   "/:id",

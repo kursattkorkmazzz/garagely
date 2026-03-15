@@ -275,6 +275,55 @@ export class VehicleService {
     return { ...vehicle, coverPhoto };
   }
 
+  async getDetailedVehicleById(
+    userId: string,
+    vehicleId: string,
+  ): Promise<DetailedVehicleModel> {
+    const vehicle = await this.vehicleRepository.findById(vehicleId);
+
+    if (!vehicle) {
+      throw new NotFoundError("Vehicle not found");
+    }
+
+    if (vehicle.userId !== userId) {
+      throw new ForbiddenError("You do not have access to this vehicle");
+    }
+
+    const [brand, model, fuelType, transmissionType, bodyType, coverPhoto] =
+      await Promise.all([
+        this.vehicleBrandRepository.findById(vehicle.vehicleBrandId),
+        this.vehicleModelRepository.findById(vehicle.vehicleModelId),
+        this.vehicleLookupRepository.findFuelTypeById(vehicle.vehicleFuelTypeId),
+        this.vehicleLookupRepository.findTransmissionTypeById(
+          vehicle.vehicleTransmissionTypeId,
+        ),
+        this.vehicleLookupRepository.findBodyTypeById(vehicle.vehicleBodyTypeId),
+        this.storageService
+          ? this.getImage(vehicleId, VehicleImageType.COVER)
+          : null,
+      ]);
+
+    return {
+      id: vehicle.id,
+      userId: vehicle.userId,
+      color: vehicle.color,
+      plate: vehicle.plate,
+      vin: vehicle.vin,
+      currentKm: vehicle.currentKm,
+      coverPhoto,
+      purchaseDate: vehicle.purchaseDate,
+      purchasePrice: vehicle.purchasePrice,
+      purchaseKm: vehicle.purchaseKm,
+      createdAt: vehicle.createdAt,
+      updatedAt: vehicle.updatedAt,
+      brand: brand!,
+      model: model!,
+      fuelType: fuelType!,
+      transmissionType: transmissionType!,
+      bodyType: bodyType!,
+    };
+  }
+
   async updateVehicle(
     userId: string,
     vehicleId: string,

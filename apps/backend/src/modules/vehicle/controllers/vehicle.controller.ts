@@ -73,6 +73,13 @@ export class VehicleController {
     sendSuccess(res, vehicle);
   };
 
+  getDetailedVehicleById = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user!.uid;
+    const id = req.params.id as string;
+    const vehicle = await this.vehicleService.getDetailedVehicleById(userId, id);
+    sendSuccess(res, vehicle);
+  };
+
   updateVehicle = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.uid;
     const id = req.params.id as string;
