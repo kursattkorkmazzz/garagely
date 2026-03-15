@@ -147,7 +147,7 @@ export default function VehicleDetailScreen() {
   };
 
   // Selected vehicle logic - hardcoded to false for now
-  const isSelected = false;
+  const isSelected = true;
 
   if (isLoading) {
     return (
@@ -243,15 +243,29 @@ export default function VehicleDetailScreen() {
             />
             <VehicleDetailRow
               label={t("vehicleDetail.fields.transmission")}
-              value={vehicle.transmissionType?.type || unknown}
+              value={
+                vehicle.transmissionType?.type
+                  ? t(
+                      `vehicles:transmissionTypes.${vehicle.transmissionType.type}`,
+                    )
+                  : unknown
+              }
             />
             <VehicleDetailRow
               label={t("vehicleDetail.fields.bodyType")}
-              value={vehicle.bodyType?.type || unknown}
+              value={
+                vehicle.bodyType?.type
+                  ? t(`vehicles:bodyTypes.${vehicle.bodyType.type}`)
+                  : unknown
+              }
             />
             <VehicleDetailRow
               label={t("vehicleDetail.fields.fuelType")}
-              value={vehicle.fuelType?.type || unknown}
+              value={
+                vehicle.fuelType?.type
+                  ? t(`fuel_types:${vehicle.fuelType.type}`)
+                  : unknown
+              }
             />
           </AppCardContent>
         </AppCard>
@@ -274,11 +288,6 @@ export default function VehicleDetailScreen() {
             </View>
           </AppCardHeader>
           <AppCardContent>
-            <VehicleDetailRow
-              label={t("vehicleDetail.fields.currentKm")}
-              value={formatKm(vehicle.currentKm) || unknown}
-              valueColor="#22C55E"
-            />
             <VehicleDetailRow
               label={t("vehicleDetail.fields.vin")}
               value={maskVin(vehicle.vin) || unknown}
@@ -333,6 +342,7 @@ export default function VehicleDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: spacing.sm,
   },
   centered: {
     justifyContent: "center",
@@ -352,6 +362,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginTop: spacing.sm,
   },
   scrollContent: {
     padding: spacing.lg,

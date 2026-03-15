@@ -122,16 +122,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   infoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    flexDirection: "column",
+    gap: spacing.sm,
   },
   vehicleName: {
     color: "#FFFFFF",
-    flex: 1,
+    alignSelf: "flex-start",
   },
   plateBadge: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    alignSelf: "flex-start",
   },
 });

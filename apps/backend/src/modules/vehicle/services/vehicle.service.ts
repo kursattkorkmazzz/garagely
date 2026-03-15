@@ -34,7 +34,6 @@ import {
   IVehicleModelRepository,
 } from "../repositories";
 import { FirestoreTransactionManager } from "../../../providers/firebase/firestore-transaction-manager";
-import { logger } from "../../../common/logger";
 
 export class VehicleService {
   constructor(
@@ -132,12 +131,13 @@ export class VehicleService {
       // Use existing brand ID or pre-generated one for model lookup
       const brandId = existingBrand?.id ?? newBrandId;
 
-      const existingModel = await this.vehicleModelRepository.findByBrandNameYear(
-        brandId,
-        data.model.name.toLowerCase(),
-        null,
-        tx,
-      );
+      const existingModel =
+        await this.vehicleModelRepository.findByBrandNameYear(
+          brandId,
+          data.model.name.toLowerCase(),
+          data.model.year,
+          tx,
+        );
 
       // === WRITE PHASE (all writes after reads) ===
       let brand: VehicleBrandModel;
@@ -165,7 +165,7 @@ export class VehicleService {
           {
             brandId: brand.id,
             name: data.model.name.trim(),
-            year: null,
+            year: data.model.year,
             isSystem: false,
             isActive: true,
             coverPhotoUrl: null,
@@ -293,11 +293,15 @@ export class VehicleService {
       await Promise.all([
         this.vehicleBrandRepository.findById(vehicle.vehicleBrandId),
         this.vehicleModelRepository.findById(vehicle.vehicleModelId),
-        this.vehicleLookupRepository.findFuelTypeById(vehicle.vehicleFuelTypeId),
+        this.vehicleLookupRepository.findFuelTypeById(
+          vehicle.vehicleFuelTypeId,
+        ),
         this.vehicleLookupRepository.findTransmissionTypeById(
           vehicle.vehicleTransmissionTypeId,
         ),
-        this.vehicleLookupRepository.findBodyTypeById(vehicle.vehicleBodyTypeId),
+        this.vehicleLookupRepository.findBodyTypeById(
+          vehicle.vehicleBodyTypeId,
+        ),
         this.storageService
           ? this.getImage(vehicleId, VehicleImageType.COVER)
           : null,

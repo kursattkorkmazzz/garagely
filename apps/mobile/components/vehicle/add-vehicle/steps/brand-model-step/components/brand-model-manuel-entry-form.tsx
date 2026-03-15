@@ -18,7 +18,7 @@ type BrandModeManuelEntryform = {
 };
 export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
   const { t } = useI18n();
-  const { handleChange, handleBlur, errors, touched } =
+  const { handleChange, handleBlur, setFieldValue, errors, touched } =
     useFormikContext<AddVehicleFormState>();
 
   const styles = StyleSheet.create({
@@ -82,7 +82,10 @@ export function BrandModelManuelEntryForm(props: BrandModeManuelEntryform) {
             id="customYear"
             placeholder={t("addVehicle.yearPlaceholder")}
             inputMode="numeric"
-            onChangeText={handleChange("customYear")}
+            onChangeText={(text) => {
+              const num = parseInt(text, 10);
+              setFieldValue("customYear", isNaN(num) ? undefined : num);
+            }}
             onBlur={handleBlur("customYear")}
             InputLeftAction={
               <AppInputLeftAction>

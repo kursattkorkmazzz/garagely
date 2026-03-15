@@ -1,7 +1,10 @@
 import type { Request, Response } from "express";
 import type { VehicleService } from "../services/vehicle.service";
 import type { UploadedFile } from "../../storage/services/storage.service";
-import { sendSuccess, sendPaginated } from "../../../common/utils/response.util";
+import {
+  sendSuccess,
+  sendPaginated,
+} from "../../../common/utils/response.util";
 import { ValidationError } from "@garagely/shared/error.types";
 import { VehicleImageType } from "@garagely/shared/models/vehicle";
 import { extractSearchPaginationQuery } from "../../../common/utils/pagination.util";
@@ -43,6 +46,8 @@ export class VehicleController {
 
   // Upsert brand and model together
   upsertBrandAndModel = async (req: Request, res: Response): Promise<void> => {
+    console.log("Backend: req", req.body);
+
     const result = await this.vehicleService.upsertBrandAndModel(req.body);
     sendSuccess(res, result, 200);
   };
@@ -62,7 +67,8 @@ export class VehicleController {
 
   getDetailedVehicles = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.uid;
-    const vehicles = await this.vehicleService.getDetailedVehiclesByUser(userId);
+    const vehicles =
+      await this.vehicleService.getDetailedVehiclesByUser(userId);
     sendSuccess(res, vehicles);
   };
 
@@ -73,10 +79,16 @@ export class VehicleController {
     sendSuccess(res, vehicle);
   };
 
-  getDetailedVehicleById = async (req: Request, res: Response): Promise<void> => {
+  getDetailedVehicleById = async (
+    req: Request,
+    res: Response,
+  ): Promise<void> => {
     const userId = req.user!.uid;
     const id = req.params.id as string;
-    const vehicle = await this.vehicleService.getDetailedVehicleById(userId, id);
+    const vehicle = await this.vehicleService.getDetailedVehicleById(
+      userId,
+      id,
+    );
     sendSuccess(res, vehicle);
   };
 
@@ -111,9 +123,13 @@ export class VehicleController {
       });
     }
 
-    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+    if (
+      !Object.values(VehicleImageType).includes(imageType as VehicleImageType)
+    ) {
       throw new ValidationError("Invalid image type", {
-        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+        imageType: [
+          `Must be one of: ${Object.values(VehicleImageType).join(", ")}`,
+        ],
       });
     }
 
@@ -130,9 +146,13 @@ export class VehicleController {
     const id = req.params.id as string;
     const imageType = req.params.imageType as string;
 
-    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+    if (
+      !Object.values(VehicleImageType).includes(imageType as VehicleImageType)
+    ) {
       throw new ValidationError("Invalid image type", {
-        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+        imageType: [
+          `Must be one of: ${Object.values(VehicleImageType).join(", ")}`,
+        ],
       });
     }
 
@@ -148,9 +168,13 @@ export class VehicleController {
     const id = req.params.id as string;
     const imageType = req.params.imageType as string;
 
-    if (!Object.values(VehicleImageType).includes(imageType as VehicleImageType)) {
+    if (
+      !Object.values(VehicleImageType).includes(imageType as VehicleImageType)
+    ) {
       throw new ValidationError("Invalid image type", {
-        imageType: [`Must be one of: ${Object.values(VehicleImageType).join(", ")}`],
+        imageType: [
+          `Must be one of: ${Object.values(VehicleImageType).join(", ")}`,
+        ],
       });
     }
 
