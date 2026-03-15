@@ -15,7 +15,7 @@ import {
   type ActionSheetOption,
 } from "@/components/ui/app-action-sheet";
 import { appToast } from "@/components/ui/app-toast";
-import { AddVehicleFormState } from "../../add-vehicle-wizard";
+import type { VehicleWizardCommonFields } from "../../../types/vehicle-form.types";
 
 const VIEW_TYPES = [
   "interior",
@@ -32,7 +32,7 @@ type ViewType = (typeof VIEW_TYPES)[number];
 export function PhotoStep() {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
-  const formik = useFormikContext<AddVehicleFormState>();
+  const formik = useFormikContext<VehicleWizardCommonFields>();
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [activeTarget, setActiveTarget] = useState<"cover" | ViewType | null>(
     null,

@@ -13,12 +13,12 @@ import {
   AppInputLeftAction,
 } from "@/components/ui/app-input-v2";
 import { AppDatePicker } from "@/components/ui/app-date-picker";
-import { AddVehicleFormState } from "../../add-vehicle-wizard";
+import type { VehicleWizardCommonFields } from "../../../types/vehicle-form.types";
 
 export function OdometerStep() {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const formik = useFormikContext<AddVehicleFormState>();
+  const formik = useFormikContext<VehicleWizardCommonFields>();
 
   // Get user preferences from store
   const user = useStore((state) => state.user.user);

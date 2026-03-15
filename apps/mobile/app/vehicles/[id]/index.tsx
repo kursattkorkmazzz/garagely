@@ -89,7 +89,8 @@ export default function VehicleDetailScreen() {
   };
 
   const handleEditPress = () => {
-    appToast(t("toast.comingSoon", { feature: t("buttons.edit") }));
+    if (!id) return;
+    router.push(`/vehicles/${id}/edit`);
   };
 
   const handleDeletePress = () => {

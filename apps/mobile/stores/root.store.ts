@@ -14,6 +14,8 @@ export const useStore = create<RootState>()((set, get) => ({
     (user) => get().user.setUser(user),
     // clearUser - delegate to user slice
     () => get().user.clearUser(),
+    // getAvatar - delegate to user slice
+    () => get().user.getAvatar(),
   ),
   user: createUserSlice((partial) =>
     set((state) => ({ user: { ...state.user, ...partial } })),

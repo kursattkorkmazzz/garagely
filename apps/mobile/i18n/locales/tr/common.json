@@ -263,6 +263,14 @@
     },
     "success": "Araç başarıyla eklendi!"
   },
+  "editVehicle": {
+    "title": "Araç Düzenle",
+    "saveChanges": "Değişiklikleri Kaydet",
+    "success": "Araç başarıyla güncellendi!",
+    "errors": {
+      "updateFailed": "Araç güncellenemedi"
+    }
+  },
   "garage": {
     "title": "Garaj",
     "selectVehicle": "Araç Seçin",

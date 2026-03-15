@@ -15,7 +15,7 @@ import {
   AppInputErrorMessage,
   AppInputRightAction,
 } from "@/components/ui/app-input-v2";
-import { AddVehicleFormState } from "../../add-vehicle-wizard";
+import type { VehicleWizardCommonFields } from "../../../types/vehicle-form.types";
 
 const VEHICLE_COLORS = [
   { id: "white", value: "#FFFFFF" },
@@ -37,7 +37,7 @@ const INITIAL_VISIBLE_COUNT = 5;
 export function DetailsStep() {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const formik = useFormikContext<AddVehicleFormState>();
+  const formik = useFormikContext<VehicleWizardCommonFields>();
   const [showAllColors, setShowAllColors] = useState(false);
 
   const visibleColors = showAllColors

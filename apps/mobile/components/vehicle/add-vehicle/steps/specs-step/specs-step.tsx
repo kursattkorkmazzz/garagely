@@ -9,7 +9,7 @@ import { AppIcon, type IconName } from "@/components/ui/app-icon";
 import { ListItem } from "@/components/common/list-item";
 import { AppView } from "@/components/ui/app-view";
 import { useFormikContext } from "formik";
-import { AddVehicleFormState } from "../../add-vehicle-wizard";
+import type { VehicleWizardCommonFields } from "../../../types/vehicle-form.types";
 import type {
   VehicleFuelTypeModel,
   VehicleTransmissionTypeModel,
@@ -19,7 +19,7 @@ import type {
 export function SpecsStep() {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const formik = useFormikContext<AddVehicleFormState>();
+  const formik = useFormikContext<VehicleWizardCommonFields>();
 
   // Local state for lookups
   const [fuelTypes, setFuelTypes] = useState<VehicleFuelTypeModel[]>([]);

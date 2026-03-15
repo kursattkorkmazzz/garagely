@@ -42,6 +42,7 @@ export interface AuthSlice {
 type SetAuthState = (partial: Partial<AuthSlice>) => void;
 type SetUser = (user: UserWithPreferences) => void;
 type ClearUser = () => void;
+type GetAvatar = () => void;
 
 async function saveToken(token: string): Promise<void> {
   try {
@@ -71,6 +72,7 @@ export const createAuthSlice = (
   set: SetAuthState,
   setUser: SetUser,
   clearUser: ClearUser,
+  getAvatar: GetAvatar,
 ): AuthSlice => ({
   // Initial state
   customToken: null,
@@ -97,6 +99,7 @@ export const createAuthSlice = (
           error: null,
         });
         sdk.setAuthToken(response.data.customToken);
+        getAvatar();
         callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
@@ -128,6 +131,7 @@ export const createAuthSlice = (
           error: null,
         });
         sdk.setAuthToken(response.data.customToken);
+        getAvatar();
         callbacks?.onSuccess?.(response);
       },
       onError: (err: SdkError) => {
@@ -174,6 +178,7 @@ export const createAuthSlice = (
             isAuthenticated: true,
             isInitialized: true,
           });
+          getAvatar();
         },
         onError: async () => {
           // Token is invalid or expired, clear it

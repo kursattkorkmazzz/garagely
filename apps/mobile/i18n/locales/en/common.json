@@ -263,6 +263,14 @@
     },
     "success": "Vehicle added successfully!"
   },
+  "editVehicle": {
+    "title": "Edit Vehicle",
+    "saveChanges": "Save Changes",
+    "success": "Vehicle updated successfully!",
+    "errors": {
+      "updateFailed": "Failed to update vehicle"
+    }
+  },
   "garage": {
     "title": "Garage",
     "selectVehicle": "Select Vehicle",
