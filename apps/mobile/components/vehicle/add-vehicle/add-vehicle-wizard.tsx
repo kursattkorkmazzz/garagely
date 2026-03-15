@@ -26,6 +26,11 @@ import { SpecsStep } from "./steps/specs-step/specs-step";
 import { DetailsStep } from "./steps/details-step/details-step";
 import { OdometerStep } from "./steps/odometer-step/odometer-step";
 import { PhotoStep } from "./steps/photo-step/photo-step";
+import { showApiError } from "@/utils/show-api-error";
+import {
+  getCurrentYear,
+  VEHICLE_MODEL_YEAR_MIN,
+} from "@garagely/shared/models/vehicle";
 
 // Map form view types to SDK VehicleImageType
 const VIEW_TYPE_TO_IMAGE_TYPE: Record<string, VehicleImageType> = {
@@ -38,8 +43,17 @@ const VIEW_TYPE_TO_IMAGE_TYPE: Record<string, VehicleImageType> = {
   other: VehicleImageType.OTHER,
 };
 
-const createAddVehicleValidator = (t: (key: string) => string) =>
-  object({
+const createAddVehicleValidator = (t: (key: string) => string) => {
+  // Create year validator with localized messages for Formik
+  const currentYear = getCurrentYear();
+  const yearValidator = number()
+    .typeError(t("addVehicle.validation.yearTypeError"))
+    .integer(t("addVehicle.validation.yearInteger"))
+    .min(VEHICLE_MODEL_YEAR_MIN, t("addVehicle.validation.yearMin"))
+    .max(currentYear, t("addVehicle.validation.yearMax"))
+    .nullable();
+
+  return object({
     // Step 1: Brand & Model
     selectedBrand: vehicleBrandModelValidator,
     selectedModel: vehicleModelModelValidator,
@@ -49,7 +63,7 @@ const createAddVehicleValidator = (t: (key: string) => string) =>
     customModelName: string().required(
       t("addVehicle.validation.modelNameRequired"),
     ),
-    customYear: number().required(t("addVehicle.validation.yearRequired")),
+    customYear: yearValidator.required(t("addVehicle.validation.yearRequired")),
     isCustomEntry: bool(),
 
     // Step 2: Specs
@@ -82,6 +96,8 @@ const createAddVehicleValidator = (t: (key: string) => string) =>
       other: string().nullable(),
     }),
   });
+};
+
 export type AddVehicleFormState = {
   selectedBrand: string;
   selectedModel: string;
@@ -152,6 +168,7 @@ async function upsertBrandAndModel(
     sdk.vehicle.upsertBrandAndModel(payload, {
       onSuccess: (res) => resolve(res.data),
       onError: (err) => {
+        showApiError(err);
         resolve(null);
       },
     });
@@ -165,7 +182,7 @@ async function createVehicle(
     sdk.vehicle.createVehicle(payload, {
       onSuccess: (res) => resolve(res.data),
       onError: (err) => {
-        console.error("[AddVehicle] createVehicle error:", err.message);
+        showApiError(err);
         resolve(null);
       },
     });
@@ -183,7 +200,7 @@ async function uploadVehicleImage(
     sdk.vehicle.uploadImage(vehicleId, imageType, file, {
       onSuccess: () => resolve(true),
       onError: (err) => {
-        console.error("[AddVehicle] uploadImage error:", err.message);
+        showApiError(err);
         resolve(false);
       },
     });
@@ -217,7 +234,6 @@ export function AddVehicleForm() {
         });
 
         if (!result) {
-          appToast.error(t("addVehicle.errors.createModelFailed"));
           setIsSubmitting(false);
           return;
         }
@@ -243,7 +259,6 @@ export function AddVehicleForm() {
       });
 
       if (!vehicle) {
-        appToast.error(t("addVehicle.errors.createFailed"));
         setIsSubmitting(false);
         return;
       }
@@ -253,22 +268,14 @@ export function AddVehicleForm() {
 
       if (values.coverPhotoUri) {
         uploadPromises.push(
-          uploadVehicleImage(
-            vehicle.id,
-            VehicleImageType.COVER,
-            values.coverPhotoUri,
-          ),
+          uploadVehicleImage(vehicle.id, VehicleImageType.COVER, values.coverPhotoUri),
         );
       }
 
       Object.entries(values.additionalPhotos).forEach(([viewType, uri]) => {
         if (uri && VIEW_TYPE_TO_IMAGE_TYPE[viewType]) {
           uploadPromises.push(
-            uploadVehicleImage(
-              vehicle.id,
-              VIEW_TYPE_TO_IMAGE_TYPE[viewType],
-              uri,
-            ),
+            uploadVehicleImage(vehicle.id, VIEW_TYPE_TO_IMAGE_TYPE[viewType], uri),
           );
         }
       });

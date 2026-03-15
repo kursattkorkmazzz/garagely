@@ -19,7 +19,7 @@ import { appToast } from "@/components/ui/app-toast";
 import { useStore } from "@/stores";
 import { useTheme } from "@/theme/theme-context";
 import { useI18n } from "@/hooks/use-i18n";
-import { useErrorHandler } from "@/hooks/use-error-handler";
+import { showApiError } from "@/utils/show-api-error";
 import { spacing } from "@/theme/tokens/spacing";
 import { useRouter } from "expo-router";
 import { AppSpinner } from "../ui/app-spinner";
@@ -36,7 +36,6 @@ const initialValues: SignUpFormValues = {
 export function SignUpForm() {
   const { theme } = useTheme();
   const { t } = useI18n(["common", "auth"]);
-  const { handleError } = useErrorHandler();
   const router = useRouter();
   const { register, isLoading } = useStore((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +47,7 @@ export function SignUpForm() {
         appToast.success(t("auth:signUp.success"));
         router.replace("/(tabs)");
       },
-      onError: handleError,
+      onError: showApiError,
     });
     await request;
   };

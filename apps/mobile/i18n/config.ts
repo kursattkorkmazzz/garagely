@@ -5,14 +5,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import en_common from "./locales/en/common.json";
 import en_auth from "./locales/en/auth.json";
-import en_backend from "./locales/en/backend.json";
+import en_errors from "./locales/en/errors.json";
 import en_fuel_types from "./locales/en/fuel_types.json";
 import en_vehicles from "./locales/en/vehicles.json";
 import en_dates from "./locales/en/dates.json";
 
 import tr_common from "./locales/tr/common.json";
 import tr_auth from "./locales/tr/auth.json";
-import tr_backend from "./locales/tr/backend.json";
+import tr_errors from "./locales/tr/errors.json";
 import tr_fuel_types from "./locales/tr/fuel_types.json";
 import tr_vehicles from "./locales/tr/vehicles.json";
 import tr_dates from "./locales/tr/dates.json";
@@ -25,7 +25,7 @@ const resources = {
   en: {
     common: en_common,
     auth: en_auth,
-    backend: en_backend,
+    errors: en_errors,
     fuel_types: en_fuel_types,
     vehicles: en_vehicles,
     dates: en_dates,
@@ -33,7 +33,7 @@ const resources = {
   tr: {
     common: tr_common,
     auth: tr_auth,
-    backend: tr_backend,
+    errors: tr_errors,
     fuel_types: tr_fuel_types,
     vehicles: tr_vehicles,
     dates: tr_dates,
@@ -77,7 +77,7 @@ export async function initI18n(initialLocale?: string): Promise<void> {
     lng: language,
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "auth", "backend", "fuel_types", "vehicles", "dates"],
+    ns: ["common", "auth", "errors", "fuel_types", "vehicles", "dates"],
     interpolation: {
       escapeValue: false,
     },

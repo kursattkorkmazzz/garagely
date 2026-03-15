@@ -5,6 +5,9 @@ export {
 
 export {
   vehicleModelModelValidator,
+  vehicleModelYearValidator,
+  getCurrentYear,
+  VEHICLE_MODEL_YEAR_MIN,
   type VehicleModelModel,
 } from "./vehicle-model.model";
 
