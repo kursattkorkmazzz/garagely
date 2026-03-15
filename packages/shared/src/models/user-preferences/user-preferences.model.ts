@@ -11,6 +11,7 @@ export const userPreferencesModelValidator = yup.object({
   id: yup.string().required(),
   userId: yup.string().required(),
   locale: yup.string().min(2).max(10).required(),
+  dateLocale: yup.string().min(2).max(10).required(),
   preferredDistanceUnit: distanceUnitValidator,
   preferredVolumeUnit: volumeUnitValidator,
   preferredCurrency: currencyValidator,

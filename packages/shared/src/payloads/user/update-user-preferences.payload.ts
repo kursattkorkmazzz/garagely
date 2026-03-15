@@ -4,6 +4,7 @@ import { DistanceUnit, VolumeUnit, Currency } from "../../models/unit";
 
 export const updateUserPreferencesPayloadValidator = yup.object({
   locale: yup.string().min(2).max(10).optional(),
+  dateLocale: yup.string().min(2).max(10).optional(),
   preferredDistanceUnit: yup
     .string()
     .oneOf(Object.values(DistanceUnit) as DistanceUnit[])

@@ -143,11 +143,21 @@ export default function ProfileScreen() {
     setShowActionSheet(true);
   };
 
+  // Language to date locale mapping
+  const languageToDateLocale: Record<string, string> = {
+    en: "en-US",
+    tr: "tr-TR",
+  };
+
   // Language options
   const languageOptions: ActionSheetOption[] = supportedLanguages.map(
     (lang) => ({
       label: lang.label,
-      onPress: () => changeLanguage(lang.code),
+      onPress: async () => {
+        changeLanguage(lang.code);
+        const dateLocale = languageToDateLocale[lang.code] || "en-US";
+        await updatePreferences({ dateLocale }).request;
+      },
     }),
   );
 

@@ -12,22 +12,8 @@ import { AppListEmpty } from "@/components/common";
 import { appToast } from "@/components/ui/app-toast";
 import { spacing } from "@/theme/tokens/spacing";
 import { sdk } from "@/stores/sdk";
-import { Currency } from "@garagely/shared/models/unit";
 import type { DetailedVehicleModel } from "@garagely/shared/models/vehicle";
-
-function getCurrencySymbol(currency: Currency | undefined): string {
-  switch (currency) {
-    case Currency.EUR:
-      return "€";
-    case Currency.GBP:
-      return "£";
-    case Currency.TRY:
-      return "₺";
-    case Currency.USD:
-    default:
-      return "$";
-  }
-}
+import { getCurrencySymbol } from "@/utils/currency.utils";
 
 function mapToVehicleCardData(
   vehicle: DetailedVehicleModel,

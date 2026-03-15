@@ -29,6 +29,7 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
     const data = {
       userId,
       locale: "en",
+      dateLocale: "en-US",
       preferredDistanceUnit: "km",
       preferredVolumeUnit: "l",
       preferredCurrency: "usd",
@@ -63,6 +64,9 @@ export class UserPreferencesRepository implements IUserPreferencesRepository {
 
     if (data.locale !== undefined) {
       updateData.locale = data.locale;
+    }
+    if (data.dateLocale !== undefined) {
+      updateData.dateLocale = data.dateLocale;
     }
     if (data.preferredDistanceUnit !== undefined) {
       updateData.preferredDistanceUnit = data.preferredDistanceUnit;

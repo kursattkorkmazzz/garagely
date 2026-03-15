@@ -24,49 +24,18 @@ import { showApiError } from "@/utils/show-api-error";
 import { spacing } from "@/theme/tokens/spacing";
 import { radius } from "@/theme/tokens/radius";
 import { sdk } from "@/stores/sdk";
-import { Currency } from "@garagely/shared/models/unit";
 import type { DetailedVehicleModel } from "@garagely/shared/models/vehicle";
 import {
   VehicleDetailHero,
   VehicleDetailRow,
 } from "@/components/vehicle/vehicle-detail";
-
-function getCurrencySymbol(currency: Currency | undefined): string {
-  switch (currency) {
-    case Currency.EUR:
-      return "\u20AC";
-    case Currency.GBP:
-      return "\u00A3";
-    case Currency.TRY:
-      return "\u20BA";
-    case Currency.USD:
-    default:
-      return "$";
-  }
-}
+import { getCurrencySymbol, formatPrice } from "@/utils/currency.utils";
+import { formatDate } from "@/utils/date.utils";
 
 function maskVin(vin: string | null | undefined): string {
   if (!vin) return "";
   if (vin.length <= 5) return vin;
   return vin.slice(0, -5) + "*****";
-}
-
-function formatDate(date: Date | string | null | undefined): string | null {
-  if (!date) return null;
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatPrice(
-  price: number | null | undefined,
-  symbol: string,
-): string | null {
-  if (price === null || price === undefined) return null;
-  return `${symbol}${price.toLocaleString()}`;
 }
 
 function formatKm(km: number | null | undefined): string | null {
@@ -89,6 +58,7 @@ export default function VehicleDetailScreen() {
     [user?.preferences?.preferredCurrency],
   );
 
+  const dateLocale = user?.preferences?.dateLocale;
   const unknown = t("unknown");
 
   const fetchVehicle = useCallback(() => {
@@ -320,7 +290,7 @@ export default function VehicleDetailScreen() {
           <AppCardContent>
             <VehicleDetailRow
               label={t("vehicleDetail.fields.purchaseDate")}
-              value={formatDate(vehicle.purchaseDate) || unknown}
+              value={formatDate(vehicle.purchaseDate, dateLocale) || unknown}
             />
             <VehicleDetailRow
               label={t("vehicleDetail.fields.purchasePrice")}
