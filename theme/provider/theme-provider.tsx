@@ -8,14 +8,14 @@ export interface ThemeContextProps {
   theme: ThemeColors;
   selectedTheme: ThemeType;
   changeTheme: (theme: ThemeType) => Promise<void>;
-  withOpacity: (color: keyof ThemeColors) => (opacityValue: number) => string;
+  withOpacity: (color: keyof ThemeColors, opacityValue: number) => string;
 }
 
 export const ThemeContext = createContext<ThemeContextProps>({
   theme: colors.light,
   selectedTheme: ThemeTypes.LIGHT,
   changeTheme: () => Promise.resolve(),
-  withOpacity: () => () => "",
+  withOpacity: () => "",
 });
 
 type ThemeProviderProps = {
@@ -38,7 +38,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setSelectedTheme(theme);
   };
 
-  const withOpacity = (color: keyof ThemeColors) => (opacityValue: number) => {
+  const withOpacity = (color: keyof ThemeColors, opacityValue: number) => {
     return hexToRgba(theme[color] as string, opacityValue);
   };
 
