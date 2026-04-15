@@ -8,7 +8,7 @@ export default function RootLayout() {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Button
         onPress={() => {
-          console.log("4e5rfgvb");
+          console.log("Hello World!");
         }}
       >
         <ButtonText>Button</ButtonText>
