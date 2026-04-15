@@ -2,7 +2,6 @@ import { Button, ButtonText } from "@/components/ui/button";
 import "@/styles/global.css";
 import { View } from "react-native";
 import "react-native-reanimated";
-import "../styles/global.css";
 
 export default function RootLayout() {
   return (
