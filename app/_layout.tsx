@@ -1,5 +1,6 @@
 import GaragelyApp from "@/app";
 import { LocalizationProvider } from "@/i18n";
+import { ThemeProvider } from "@/theme/provider/theme-provider";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import "react-native-reanimated";
@@ -15,9 +16,11 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   return (
     <LocalizationProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <GaragelyApp />
-      </SafeAreaView>
+      <ThemeProvider>
+        <SafeAreaView style={{ flex: 1 }}>
+          <GaragelyApp />
+        </SafeAreaView>
+      </ThemeProvider>
     </LocalizationProvider>
   );
 }
