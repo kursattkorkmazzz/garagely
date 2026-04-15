@@ -1,4 +1,4 @@
-import { ThemeContext } from "@react-navigation/native";
+import { ThemeContext } from "@/theme/provider/theme-provider";
 import { useContext } from "react";
 
 export function useTheme() {

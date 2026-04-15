@@ -1,5 +1,6 @@
 import { IconName } from "@/components/ui/icon";
 import { TabIcon } from "@/layouts/tabs/tab-icon";
+import { useTheme } from "@/theme/hooks/use-theme";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 
 type TabOptionsProps = {
@@ -7,13 +8,26 @@ type TabOptionsProps = {
   icon: IconName;
 };
 export function TabOptions(props: TabOptionsProps): BottomTabNavigationOptions {
-  console.log("var(--color-secondary)");
+  const { theme } = useTheme();
 
   return {
     headerShown: false,
     title: props.title,
     tabBarIcon: TabIcon({ name: props.icon }),
-    tabBarActiveTintColor: "var(--color-secondary)",
-    tabBarInactiveTintColor: "var(--color-gray-500)",
+    tabBarStyle: {
+      backgroundColor: theme.background,
+      borderTopWidth: 0,
+
+      // Android
+      elevation: 0,
+
+      // iOS
+      shadowColor: "transparent",
+      shadowOpacity: 0,
+      shadowOffset: { width: 0, height: 0 },
+      shadowRadius: 0,
+    },
+    tabBarActiveTintColor: theme.primary,
+    tabBarInactiveTintColor: theme.muted,
   };
 }

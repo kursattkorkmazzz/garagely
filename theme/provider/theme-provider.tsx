@@ -11,7 +11,7 @@ export interface ThemeContextProps {
   withOpacity: (color: keyof ThemeColors) => (opacityValue: number) => string;
 }
 
-const ThemeContext = createContext<ThemeContextProps>({
+export const ThemeContext = createContext<ThemeContextProps>({
   theme: colors.light,
   selectedTheme: ThemeTypes.LIGHT,
   changeTheme: () => Promise.resolve(),
