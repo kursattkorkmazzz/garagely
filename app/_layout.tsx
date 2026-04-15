@@ -1,6 +1,5 @@
 import GaragelyApp from "@/app";
 import { LocalizationProvider } from "@/i18n";
-import "@/styles/global.css";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import "react-native-reanimated";
