@@ -1,6 +1,19 @@
-import { Text } from "react-native";
+import { Button, ButtonText } from "@/components/ui/button";
+import "@/styles/global.css";
+import { View } from "react-native";
 import "react-native-reanimated";
 import "../styles/global.css";
+
 export default function RootLayout() {
-  return <Text className="text-red-500">RootLayout</Text>;
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Button
+        onPress={() => {
+          console.log("4e5rfgvb");
+        }}
+      >
+        <ButtonText>Button</ButtonText>
+      </Button>
+    </View>
+  );
 }
