@@ -103,6 +103,7 @@ const buttonIconStyle = tva({
     },
   },
 });
+
 const buttonGroupStyle = tva({
   base: "",
   variants: {
@@ -127,6 +128,7 @@ const buttonGroupStyle = tva({
     },
   },
 });
+
 type IButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof UIButton>,
   "context"
@@ -179,7 +181,7 @@ const ButtonSpinner = React.forwardRef<
       className={buttonSpinnerStyle({
         parentVariants: { size: parentSize },
         class: className,
-        size,
+        size: size as any,
       })}
     />
   );
