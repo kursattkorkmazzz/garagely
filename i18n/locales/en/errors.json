@@ -1,0 +1,6 @@
+{
+  "FORBIDDEN": "You don't have permission to access this resource.",
+  "UNAUTHORIZED": "You need to log in to access this resource.",
+  "NETWORK_ERROR": "A network error occurred. Please check your connection and try again.",
+  "UNKNOWN_ERROR": "An unknown error occurred. Please notify support and try again later."
+}
