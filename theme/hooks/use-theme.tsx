@@ -1,10 +1,10 @@
-import { ThemeContext } from "@/theme/provider/theme-provider";
-import { useContext } from "react";
+import { ThemeService } from "@/theme/theme-service";
+import { useSyncExternalStore } from "react";
 
 export function useTheme() {
-  const themeContext = useContext(ThemeContext);
-  if (!themeContext) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return themeContext;
+  return useSyncExternalStore(
+    ThemeService.subscribe,
+    ThemeService.getState,
+    ThemeService.getState,
+  );
 }
