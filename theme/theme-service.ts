@@ -35,6 +35,9 @@ export class ThemeService {
     return ThemeService._cachedState;
   };
 
+  static getTheme = (): ThemeColors => ThemeService._theme;
+  static getSelectedTheme = (): ThemeType => ThemeService._selectedTheme;
+
   static changeTheme = async (theme: ThemeType) => {
     ThemeService._selectedTheme = theme;
 
@@ -50,8 +53,14 @@ export class ThemeService {
     ThemeService._notify();
   };
 
-  static withOpacity = (color: keyof ThemeColors, opacityValue: number): string => {
-    return ThemeService._hexToRgba(ThemeService._theme[color] as string, opacityValue);
+  static withOpacity = (
+    color: keyof ThemeColors,
+    opacityValue: number,
+  ): string => {
+    return ThemeService._hexToRgba(
+      ThemeService._theme[color] as string,
+      opacityValue,
+    );
   };
 
   private static _notify() {
