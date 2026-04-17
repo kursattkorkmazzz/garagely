@@ -1,6 +1,7 @@
 import { ThemeService } from "@/theme";
 import { radius } from "@/theme/tokens/radius";
 import { spacing } from "@/theme/tokens/spacing";
+import { typography } from "@/theme/tokens/typography";
 import sva from "@/utils/sva/sva";
 import { VariantProps } from "@/utils/sva/types";
 import { ReactNode } from "react";
@@ -9,63 +10,80 @@ import { AppText } from "./app-text";
 
 const ButtonVariantStyles = sva({
   base: {
-    borderRadius: radius.xl,
-    alignItems: "center",
-    justifyContent: "center",
+    root: {
+      borderRadius: radius.xl,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    text: {},
   },
   variants: {
     variant: {
       primary: {
-        backgroundColor: ThemeService.getTheme().primary,
-        color: ThemeService.getTheme().primaryForeground,
+        root: { backgroundColor: ThemeService.getTheme().primary },
+        text: { color: ThemeService.getTheme().primaryForeground },
       },
       secondary: {
-        backgroundColor: ThemeService.getTheme().secondary,
-        color: ThemeService.getTheme().secondaryForeground,
+        root: { backgroundColor: ThemeService.getTheme().secondary },
+        text: { color: ThemeService.getTheme().secondaryForeground },
       },
       outline: {
-        backgroundColor: "transparent",
-        borderWidth: 1,
-        borderColor: ThemeService.getTheme().border,
+        root: {
+          backgroundColor: "transparent",
+          borderWidth: 1,
+          borderColor: ThemeService.getTheme().border,
+        },
+        text: { color: ThemeService.getTheme().foreground },
       },
       ghost: {
-        backgroundColor: "transparent",
-        color: ThemeService.getTheme().foreground,
+        root: { backgroundColor: "transparent" },
+        text: { color: ThemeService.getTheme().foreground },
       },
       destructive: {
-        backgroundColor: ThemeService.getTheme().destructive,
-        color: ThemeService.getTheme().destructiveForeground,
+        root: { backgroundColor: ThemeService.getTheme().destructive },
+        text: { color: ThemeService.getTheme().destructiveForeground },
       },
       link: {
-        backgroundColor: "transparent",
-        color: ThemeService.getTheme().primary,
-        textDecorationLine: "underline",
+        root: { backgroundColor: "transparent" },
+        text: {
+          color: ThemeService.getTheme().primary,
+          textDecorationLine: "underline",
+        },
       },
     },
     size: {
       default: {
-        paddingVertical: spacing.sm + spacing.xs,
-        paddingHorizontal: spacing.lg,
-        minHeight: 48,
-        fontSize: 16,
+        root: {
+          paddingVertical: spacing.sm + spacing.xs,
+          paddingHorizontal: spacing.lg,
+          minHeight: 48,
+        },
+        text: typography.buttonLarge,
       },
       sm: {
-        paddingVertical: spacing.xs,
-        paddingHorizontal: spacing.sm,
-        minHeight: 36,
-        fontSize: 14,
+        root: {
+          paddingVertical: spacing.xs,
+          paddingHorizontal: spacing.sm,
+          minHeight: 36,
+        },
+        text: typography.buttonMedium,
       },
       lg: {
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.xl,
-        minHeight: 56,
-        fontSize: 18,
+        root: {
+          paddingVertical: spacing.md,
+          paddingHorizontal: spacing.xl,
+          minHeight: 56,
+        },
+        text: typography.buttonLarge,
       },
       icon: {
-        width: 44,
-        height: 44,
-        paddingVertical: 0,
-        paddingHorizontal: 0,
+        root: {
+          width: 44,
+          height: 44,
+          paddingVertical: 0,
+          paddingHorizontal: 0,
+        },
+        text: {},
       },
     },
   },
@@ -91,27 +109,20 @@ export function AppButton({
   ...rest
 }: AppButtonProps) {
   const isTextChild = typeof children === "string";
+  const { root, text } = ButtonVariantStyles({ variant, size });
 
   return (
     <Pressable
       {...rest}
       disabled={disabled || loading}
       style={(state) => [
-        ButtonVariantStyles({ variant, size }),
+        root(),
         state.pressed && { opacity: 0.8 },
+        disabled || loading ? { opacity: 0.5 } : undefined,
         typeof style === "function" ? style(state) : style,
-        { opacity: disabled || loading ? 0.5 : 1 },
       ]}
     >
-      {isTextChild ? (
-        <AppText
-          style={ButtonVariantStyles({ variant }, { padding: 0.2, height: 5 })}
-        >
-          {children}
-        </AppText>
-      ) : (
-        children
-      )}
+      {isTextChild ? <AppText style={text()}>{children}</AppText> : children}
     </Pressable>
   );
 }

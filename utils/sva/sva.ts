@@ -1,52 +1,74 @@
-import type { Config, ConfigSchema, Props, StyleValue } from "./types";
+import type {
+  SlotConfig,
+  SlotConfigVariants,
+  SlotFn,
+  SlotResult,
+  SlotVariantsSchema,
+  SlotsSchema,
+  StyleValue,
+} from "./types";
 
-function falsyToString<T extends unknown>(value: T) {
-  if (typeof value == "boolean") {
-    return `${value}`;
-  }
-
-  if (value === 0) {
-    return "0";
-  }
-
+function falsyToString<T>(value: T) {
+  if (typeof value === "boolean") return `${value}`;
+  if (value === 0) return "0";
   return value;
 }
 
-export default function sva<T extends ConfigSchema>(
-  config?: Config<T>,
-): (props?: Props<T>, ...styles: StyleValue[]) => StyleValue {
-  return function (props?: Props<T>, ...extraStyles: StyleValue[]) {
-    if (!config?.variants) {
-      return extraStyles.length
-        ? [config?.base, ...extraStyles]
-        : config?.base;
+export default function sva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+>(
+  config: SlotConfig<S, V>,
+): (props?: SlotConfigVariants<S, V>, ...styles: Partial<Record<keyof S, StyleValue>>[]) => SlotResult<S> {
+  return function (
+    props?: SlotConfigVariants<S, V>,
+    ...extraSlotStyles: Partial<Record<keyof S, StyleValue>>[]
+  ): SlotResult<S> {
+    const { base, variants, defaultVariants } = config;
+
+    // Her slot için variant stilleri biriktir
+    const accumulated: Record<string, StyleValue[]> = {};
+    for (const slotName of Object.keys(base)) {
+      accumulated[slotName] = [];
     }
 
-    const { variants, defaultVariants } = config;
+    if (variants) {
+      for (const variantName of Object.keys(variants)) {
+        const variantProp = props?.[variantName as keyof typeof props];
+        const defaultProp = defaultVariants?.[variantName as keyof typeof defaultVariants];
 
-    const variantStyles = Object.keys(variants).map(
-      (variant: keyof typeof variants) => {
-        // e.g: variant = size
+        const key = (falsyToString(variantProp) ||
+          falsyToString(defaultProp)) as string;
 
-        // e.g: variantProp = md
-        const variantProp = props?.[variant];
-
-        // e.g: variantProp = sm
-        const defaultVariantProp = defaultVariants?.[variant];
-
-        const variantKey = (falsyToString(variantProp) ||
-          falsyToString(
-            defaultVariantProp,
-          )) as keyof (typeof variants)[typeof variant];
-
-        return variants[variant][variantKey];
-      },
-    );
-
-    if (config.base) {
-      return [config.base, ...variantStyles, ...extraStyles];
+        const slotStyles = variants[variantName][key];
+        if (slotStyles) {
+          for (const [slotName, style] of Object.entries(slotStyles)) {
+            accumulated[slotName]?.push(style as StyleValue);
+          }
+        }
+      }
     }
 
-    return [...variantStyles, ...extraStyles];
+    // Her slot için closure üret
+    const result = {} as SlotResult<S>;
+
+    for (const slotName of Object.keys(base) as (keyof S)[]) {
+      const baseStyle = base[slotName];
+      const variantStyles = accumulated[slotName as string];
+      const extraStyles = extraSlotStyles
+        .map((s) => s[slotName])
+        .filter(Boolean) as StyleValue[];
+
+      const slotFn: SlotFn = (...inlineStyles: StyleValue[]) => [
+        baseStyle,
+        ...variantStyles,
+        ...extraStyles,
+        ...inlineStyles,
+      ];
+
+      result[slotName] = slotFn;
+    }
+
+    return result;
   };
 }
