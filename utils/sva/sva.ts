@@ -1,3 +1,4 @@
+import type { ThemeColors } from "@/theme/tokens/colors";
 import type {
   SlotConfig,
   SlotConfigVariants,
@@ -5,7 +6,9 @@ import type {
   SlotResult,
   SlotVariantsSchema,
   SlotsSchema,
+  StaticSva,
   StyleValue,
+  ThemedSva,
 } from "./types";
 
 function falsyToString<T>(value: T) {
@@ -14,32 +17,27 @@ function falsyToString<T>(value: T) {
   return value;
 }
 
-export default function sva<
-  S extends SlotsSchema,
-  V extends SlotVariantsSchema<S>,
->(
+function buildSva<S extends SlotsSchema, V extends SlotVariantsSchema<S>>(
   config: SlotConfig<S, V>,
-): (props?: SlotConfigVariants<S, V>, ...styles: Partial<Record<keyof S, StyleValue>>[]) => SlotResult<S> {
+): StaticSva<S, V> {
+  const { base, variants, defaultVariants } = config;
+  const slotNames = Object.keys(base) as (keyof S)[];
+
   return function (
     props?: SlotConfigVariants<S, V>,
     ...extraSlotStyles: Partial<Record<keyof S, StyleValue>>[]
   ): SlotResult<S> {
-    const { base, variants, defaultVariants } = config;
-
-    // Her slot için variant stilleri biriktir
+    // Her slot için variant stillerini biriktir
     const accumulated: Record<string, StyleValue[]> = {};
-    for (const slotName of Object.keys(base)) {
-      accumulated[slotName] = [];
-    }
+    for (const name of slotNames) accumulated[name as string] = [];
 
     if (variants) {
       for (const variantName of Object.keys(variants)) {
         const variantProp = props?.[variantName as keyof typeof props];
-        const defaultProp = defaultVariants?.[variantName as keyof typeof defaultVariants];
-
+        const defaultProp =
+          defaultVariants?.[variantName as keyof typeof defaultVariants];
         const key = (falsyToString(variantProp) ||
           falsyToString(defaultProp)) as string;
-
         const slotStyles = variants[variantName][key];
         if (slotStyles) {
           for (const [slotName, style] of Object.entries(slotStyles)) {
@@ -49,10 +47,9 @@ export default function sva<
       }
     }
 
-    // Her slot için closure üret
     const result = {} as SlotResult<S>;
 
-    for (const slotName of Object.keys(base) as (keyof S)[]) {
+    for (const slotName of slotNames) {
       const baseStyle = base[slotName];
       const variantStyles = accumulated[slotName as string];
       const extraStyles = extraSlotStyles
@@ -71,4 +68,30 @@ export default function sva<
 
     return result;
   };
+}
+
+// Overload: statik config
+export default function sva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+>(config: SlotConfig<S, V>): StaticSva<S, V>;
+
+// Overload: tema factory
+export default function sva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+>(factory: (theme: ThemeColors) => SlotConfig<S, V>): ThemedSva<S, V>;
+
+export default function sva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+>(
+  input: SlotConfig<S, V> | ((theme: ThemeColors) => SlotConfig<S, V>),
+): StaticSva<S, V> | ThemedSva<S, V> {
+  if (typeof input === "function") {
+    // Factory mod: her theme değişiminde yeniden hesaplanır
+    return (theme: ThemeColors) => buildSva(input(theme));
+  }
+  // Statik mod: bir kez derlenir
+  return buildSva(input);
 }

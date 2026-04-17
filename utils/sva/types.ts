@@ -1,18 +1,15 @@
+import type { ThemeColors } from "@/theme/tokens/colors";
 import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 export type StyleValue = StyleProp<ViewStyle & TextStyle & ImageStyle>;
+export type StringToBoolean<T> = T extends "true" | "false" ? boolean : T;
 
-type StringToBoolean<T> = T extends "true" | "false" ? boolean : T;
-
-// Slot tanımları: slot ismi → base StyleValue
 export type SlotsSchema = Record<string, StyleValue>;
 
-// Bir variant değeri için slot stilleri (tüm slot'ları doldurmak zorunda değil)
 export type SlotVariantValue<S extends SlotsSchema> = Partial<
   Record<keyof S, StyleValue>
 >;
 
-// Variants: variant ismi → (değer → slot stilleri)
 export type SlotVariantsSchema<S extends SlotsSchema> = Record<
   string,
   Record<string, SlotVariantValue<S>>
@@ -34,16 +31,31 @@ export interface SlotConfig<
   defaultVariants?: SlotConfigVariants<S, V>;
 }
 
-// Her slot için rest-style kabul eden fonksiyon
 export type SlotFn = (...styles: StyleValue[]) => StyleValue;
 
-// sva() çağrısının dönüş tipi: slot ismi → SlotFn
-export type SlotResult<S extends SlotsSchema> = {
-  [K in keyof S]: SlotFn;
-};
+export type SlotResult<S extends SlotsSchema> = { [K in keyof S]: SlotFn };
+
+export type StaticSva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+> = (
+  props?: SlotConfigVariants<S, V>,
+  ...styles: Partial<Record<keyof S, StyleValue>>[]
+) => SlotResult<S>;
+
+export type ThemedSva<
+  S extends SlotsSchema,
+  V extends SlotVariantsSchema<S>,
+> = (theme: ThemeColors) => StaticSva<S, V>;
 
 export type OmitUndefined<T> = T extends undefined ? never : T;
 
-// VariantProps<typeof buttonSva> → { variant?: "primary"|"outline", size?: "sm"|"lg" }
+// ThemedSva ve StaticSva her ikisini de destekler:
+// - StaticSva        → Parameters[0] = variant props
+// - ThemedSva        → (theme) => StaticSva → iç fonksiyonun Parameters[0] = variant props
 export type VariantProps<Component extends (...args: any) => any> =
-  OmitUndefined<Parameters<Component>[0]>;
+  Component extends (theme: ThemeColors) => infer Inner
+    ? Inner extends (...args: any) => any
+      ? OmitUndefined<Parameters<Inner>[0]>
+      : never
+    : OmitUndefined<Parameters<Component>[0]>;
