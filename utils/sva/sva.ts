@@ -14,15 +14,17 @@ function falsyToString<T extends unknown>(value: T) {
 
 export default function sva<T extends ConfigSchema>(
   config?: Config<T>,
-): (props?: Props<T>) => StyleValue {
-  return function (props?: Props<T>) {
+): (props?: Props<T>, ...styles: StyleValue[]) => StyleValue {
+  return function (props?: Props<T>, ...extraStyles: StyleValue[]) {
     if (!config?.variants) {
-      return config?.base;
+      return extraStyles.length
+        ? [config?.base, ...extraStyles]
+        : config?.base;
     }
 
     const { variants, defaultVariants } = config;
 
-    const styles = Object.keys(variants).map(
+    const variantStyles = Object.keys(variants).map(
       (variant: keyof typeof variants) => {
         // e.g: variant = size
 
@@ -42,9 +44,9 @@ export default function sva<T extends ConfigSchema>(
     );
 
     if (config.base) {
-      return [config.base, ...styles];
+      return [config.base, ...variantStyles, ...extraStyles];
     }
 
-    return styles;
+    return [...variantStyles, ...extraStyles];
   };
 }

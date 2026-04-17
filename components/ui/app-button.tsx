@@ -105,10 +105,7 @@ export function AppButton({
     >
       {isTextChild ? (
         <AppText
-          style={[
-            ButtonVariantStyles({ variant }),
-            { padding: 1, minHeight: 0 },
-          ]}
+          style={ButtonVariantStyles({ variant }, { padding: 0.2, height: 5 })}
         >
           {children}
         </AppText>
