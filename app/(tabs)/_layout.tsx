@@ -17,6 +17,7 @@ export default function TabLayout() {
         options={TabOptions({
           icon: "Settings",
           title: "Settings",
+          theme,
         })}
       />
     </Tabs>

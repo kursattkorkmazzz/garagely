@@ -5,6 +5,8 @@ type TabIconProps = {
   name: IconName;
 };
 export function TabIcon({ name }: TabIconProps) {
-  const { theme } = useUnistyles();
-  return () => <Icon name={name} size={24} color={theme.colors.primary} />;
+  return () => {
+    const { theme } = useUnistyles();
+    return <Icon name={name} size={24} color={theme.colors.primary} />;
+  };
 }

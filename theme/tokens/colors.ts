@@ -56,6 +56,8 @@ export const AppLightColors = {
   },
 };
 
+export type ThemeColors = typeof AppLightColors;
+
 export const AppDarkColors = {
   primary: "#fb2c36",
   primaryForeground: "#fafafa",

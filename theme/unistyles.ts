@@ -6,6 +6,8 @@ declare module "react-native-unistyles" {
   export interface UnistylesThemes extends AppThemeType {}
 }
 
+console.log("[+] Stylesheet configured!");
+
 StyleSheet.configure({
   // Your theme styles here
   themes: AppTheme,

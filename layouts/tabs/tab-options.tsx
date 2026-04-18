@@ -1,19 +1,22 @@
 import { IconName } from "@/components/ui/icon";
 import { TabIcon } from "@/layouts/tabs/tab-icon";
+import { AppTheme } from "@/theme/theme";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import { useUnistyles } from "react-native-unistyles";
+
+type Theme = (typeof AppTheme)[keyof typeof AppTheme];
 
 type TabOptionsProps = {
   title: string;
   icon: IconName;
+  theme: Theme;
 };
 export function TabOptions(props: TabOptionsProps): BottomTabNavigationOptions {
-  const { theme } = useUnistyles();
+  const { theme, title, icon } = props;
 
   return {
     headerShown: false,
-    title: props.title,
-    tabBarIcon: TabIcon({ name: props.icon }),
+    title,
+    tabBarIcon: TabIcon({ name: icon }),
     tabBarStyle: {
       backgroundColor: theme.colors.background,
       borderTopWidth: 0,
