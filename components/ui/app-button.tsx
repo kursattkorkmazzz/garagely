@@ -6,7 +6,11 @@ import {
   PressableProps,
   Text,
 } from "react-native";
-import { StyleSheet, UnistylesVariants, useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesVariants,
+  useUnistyles,
+} from "react-native-unistyles";
 
 // 1. Stylesheet önce tanımlanır
 const stylesheet = StyleSheet.create((theme) => ({
