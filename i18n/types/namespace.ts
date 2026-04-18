@@ -3,6 +3,7 @@ export const TranslationNamespaces = {
   ERRORS: "errors",
   LANGUAGES: "languages",
   SETTINGS: "settings",
+  UNITS: "units",
 } as const;
 
 export type TranslationNamespace =

@@ -1,0 +1,22 @@
+{
+  "distance": {
+    "km": {
+      "short": "km",
+      "long": "Kilometer"
+    },
+    "mi": {
+      "short": "mi",
+      "long": "Mile"
+    }
+  },
+  "volume": {
+    "L": {
+      "short": "L",
+      "long": "Liter"
+    },
+    "GAL": {
+      "short": "gal",
+      "long": "Gallon"
+    }
+  }
+}

@@ -1,6 +1,3 @@
-// Settings — Variant 1 (Modern Minimal)
-// iOS tarzı gruplu liste. Tüm ikonlar rose tint; hiyerarşi tipografi + spacing ile.
-
 import { AppListGroup } from "@/components/list/list-group";
 import { AppListItem } from "@/components/list/list-item";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
