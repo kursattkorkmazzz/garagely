@@ -1,14 +1,14 @@
 import { TabOptions } from "@/layouts/tabs/tab-options";
-import { useTheme } from "@/theme/hooks/use-theme";
 import { Tabs } from "expo-router";
+import { useUnistyles } from "react-native-unistyles";
 export default function TabLayout() {
-  const { theme } = useTheme();
+  const { theme } = useUnistyles();
 
   return (
     <Tabs
       screenOptions={{
         sceneStyle: {
-          backgroundColor: theme.background,
+          backgroundColor: theme.colors.background,
         },
       }}
     >
