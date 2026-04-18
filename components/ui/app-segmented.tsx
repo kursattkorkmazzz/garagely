@@ -65,8 +65,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: 2,
   },
   segment: {
-    paddingVertical: 5,
-    paddingHorizontal: theme.spacing.sm + 2,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radius.md,
   },
   label: {

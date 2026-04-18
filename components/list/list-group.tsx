@@ -41,7 +41,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   divider: {
     height: 1,
-    marginLeft: theme.spacing.md + 30 + (theme.spacing.md - 2), // inset: padding + icon + gap
     backgroundColor: theme.colors.border,
   },
 }));

@@ -4,7 +4,6 @@
 import { AppListGroup } from "@/components/list/list-group";
 import { AppListItem } from "@/components/list/list-item";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
-import { AppBadge } from "@/components/ui/app-badge";
 import { AppSegmented } from "@/components/ui/app-segmented";
 import { AppText } from "@/components/ui/app-text";
 import { AppToggle } from "@/components/ui/app-toggle";
@@ -154,11 +153,6 @@ export default function SettingsPage() {
       <AppListSectionHeader title={t("informations")} />
       <AppListGroup>
         <AppListItem
-          icon="Info"
-          label={t("version")}
-          trailing={<AppBadge tone="success">{version}</AppBadge>}
-        />
-        <AppListItem
           icon="MessageCircleCheck"
           label={t("supportAndSuggestions")}
           chevron
@@ -167,16 +161,8 @@ export default function SettingsPage() {
         <AppListItem icon="ShieldCheck" label={t("privacyPolicy")} chevron />
       </AppListGroup>
 
-      {/* Danger zone */}
-      <View style={styles.dangerZone}>
-        <AppListGroup>
-          <AppListItem icon="LogOut" iconColor="#78716C" label={t("signOut")} />
-          <AppListItem icon="Trash2" label={t("deleteAccount")} destructive />
-        </AppListGroup>
-      </View>
-
       <AppText style={styles.footer}>
-        {t("footerBuild", { build: "284" })}
+        {t("footerVersion", { build: "284" })}
       </AppText>
     </ScrollView>
   );

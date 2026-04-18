@@ -11,7 +11,7 @@ type BackgroundedIconProps = {
 export function BackgroundedIcon({
   icon,
   iconColor,
-  size = 18,
+  size = 24,
 }: BackgroundedIconProps) {
   const { theme } = useUnistyles();
 
@@ -31,8 +31,7 @@ export function BackgroundedIcon({
 
 const styles = StyleSheet.create((theme) => ({
   iconBackground: {
-    width: 30,
-    height: 30,
+    padding: theme.spacing.sm,
     borderRadius: theme.radius.md,
     alignItems: "center",
     justifyContent: "center",

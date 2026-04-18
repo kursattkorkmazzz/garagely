@@ -30,13 +30,9 @@
   "locationValue": "While using the app",
 
   "informations": "About",
-  "version": "Version",
   "privacyPolicy": "Privacy policy",
   "termsOfService": "Terms & conditions",
   "supportAndSuggestions": "Help & support",
 
-  "signOut": "Sign out",
-  "deleteAccount": "Delete my account",
-
-  "footerBuild": "GARAGELY · Build {{build}}"
+  "footerVersion": "GARAGELY · Version {{build}}"
 }
