@@ -1,0 +1,13 @@
+{
+  "preferences": "Preferences",
+  "theme": "Theme",
+  "language": "Language",
+  "currency": "Currency",
+  "distanceUnit": "Distance Unit",
+  "volumeUnit": "Volume Unit",
+
+  "informations": "Informations",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "supportAndSuggestions": "Support and Suggestions"
+}

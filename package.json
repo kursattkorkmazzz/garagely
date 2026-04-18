@@ -1,10 +1,9 @@
 {
   "name": "garagely",
-  "main": "expo-router/entry",
+  "main": "index.ts",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "build:android": "eas --platform android --profile development --local",
     "lint": "expo lint"
   },

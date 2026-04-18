@@ -1,0 +1,13 @@
+{
+  "preferences": "Tercihler",
+  "theme": "Tema",
+  "language": "Dil",
+  "currency": "Para Birimi",
+  "distanceUnit": "Mesafe Birimi",
+  "volumeUnit": "Hacim Birimi",
+
+  "informations": "Bilgiler",
+  "privacyPolicy": "Gizlilik Politikası",
+  "termsOfService": "Hizmet Koşulları",
+  "supportAndSuggestions": "Destek ve Öneriler"
+}
