@@ -1,7 +1,7 @@
-export const ThemeTypes = {
+export const AppThemeTypes = {
   LIGHT: "light",
   DARK: "dark",
   SYSTEM: "system",
 } as const;
 
-export type ThemeType = (typeof ThemeTypes)[keyof typeof ThemeTypes];
+export type AppThemeType = (typeof AppThemeTypes)[keyof typeof AppThemeTypes];
