@@ -1,13 +1,42 @@
 {
-  "preferences": "Preferences",
+  "title": "Settings",
+  "subtitle": "Tailor the app to your needs",
+
+  "proBadge": "PRO",
+  "vehicleCount": "{{count}} vehicles",
+  "proMember": "Pro member",
+
+  "preferences": "Appearance",
   "theme": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "Auto",
   "language": "Language",
   "currency": "Currency",
-  "distanceUnit": "Distance Unit",
-  "volumeUnit": "Volume Unit",
+  "distanceUnit": "Distance unit",
+  "volumeUnit": "Fuel consumption",
 
-  "informations": "Informations",
-  "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service",
-  "supportAndSuggestions": "Support and Suggestions"
+  "dataGroup": "Backup & Sync",
+  "autoBackup": "Auto backup",
+  "autoBackupSub": "Last backup: 2 hours ago",
+  "exportData": "Export data",
+  "exportDataSub": "CSV · PDF · JSON",
+  "syncAcrossDevices": "Sync across devices",
+
+  "privacyGroup": "Privacy",
+  "analytics": "Anonymous analytics",
+  "analyticsSub": "Help us improve the app",
+  "location": "Location services",
+  "locationValue": "While using the app",
+
+  "informations": "About",
+  "version": "Version",
+  "privacyPolicy": "Privacy policy",
+  "termsOfService": "Terms & conditions",
+  "supportAndSuggestions": "Help & support",
+
+  "signOut": "Sign out",
+  "deleteAccount": "Delete my account",
+
+  "footerBuild": "GARAGELY · Build {{build}}"
 }

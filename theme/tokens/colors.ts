@@ -1,117 +1,130 @@
+// theme/tokens/colors.ts
+// Variant 1 (Modern Minimal) — Rose primary, dark-first, warm neutrals
+
 export const AppLightColors = {
-  primary: "#fb2c36",
-  primaryForeground: "#fafafa",
+  // Primary — Rose 500
+  primary: "#F43F5E",
+  primaryForeground: "#ffffff",
 
-  secondary: "#f7f7f7",
-  secondaryForeground: "#262626",
+  // Secondary — subtle neutral surface
+  secondary: "#F5F5F4",
+  secondaryForeground: "#14110F",
 
-  accent: "#fb2c36",
-  accentForeground: "#fafafa",
+  accent: "#F43F5E",
+  accentForeground: "#ffffff",
 
-  background: "#fafafa",
-  foreground: "#0a0a0a",
+  // Surfaces
+  background: "#FAFAF9",
+  foreground: "#14110F",
 
-  card: "#ffffff",
-  cardForeground: "#0a0a0a",
+  card: "#FFFFFF",
+  cardForeground: "#14110F",
 
-  popover: "#ffffff",
-  popoverForeground: "#0a0a0a",
+  popover: "#FFFFFF",
+  popoverForeground: "#14110F",
 
-  muted: "#d2d1e9",
-  mutedForeground: "#8b84c4",
+  muted: "#A8A29E",
+  mutedForeground: "#57534E",
 
-  destructive: "#e64d5a",
+  destructive: "#E11D48",
   destructiveForeground: "#ffffff",
 
-  border: "#ededff",
-  input: "#ededff",
-  ring: "#fb2c36",
+  border: "#E7E5E4",
+  input: "#E7E5E4",
+  ring: "#F43F5E",
 
   bottomBar: {
-    background: "#f7f7f7",
-    foreground: "#0a0a0a",
+    background: "#FFFFFF",
+    foreground: "#14110F",
 
-    primary: "#fb2c36",
-    primaryForeground: "#fafafa",
+    primary: "#F43F5E",
+    primaryForeground: "#ffffff",
 
-    accent: "#ededff",
-    accentForeground: "#0a0a0a",
+    accent: "#F5F5F4",
+    accentForeground: "#14110F",
 
-    border: "#ededff",
+    border: "#E7E5E4",
 
-    ring: "#fb2c36",
+    ring: "#F43F5E",
   },
 
+  // Semantic icon background pool (Variant 1 — tüm ikonlar rose; bu alan
+  // istisnai durumlar için korunuyor)
   color: {
-    red: "#ff7b74",
+    red: "#EF4444",
     redForeground: "#ffffff",
-    orange: "#ff9711",
+    orange: "#F59E0B",
     orangeForeground: "#ffffff",
-    cyan: "#00b7c0",
+    cyan: "#06B6D4",
     cyanForeground: "#ffffff",
-    green: "#4cb332",
+    green: "#10B981",
     greenForeground: "#ffffff",
-    purple: "#9499fa",
+    purple: "#8B5CF6",
     purpleForeground: "#ffffff",
+    rose: "#F43F5E",
+    roseForeground: "#ffffff",
   },
 };
 
 export type ThemeColors = typeof AppLightColors;
 
 export const AppDarkColors = {
-  primary: "#fb2c36",
-  primaryForeground: "#fafafa",
+  primary: "#F43F5E",
+  primaryForeground: "#ffffff",
 
-  secondary: "#262626",
-  secondaryForeground: "#fafafa",
+  secondary: "#1C1A19",
+  secondaryForeground: "#FAFAF9",
 
-  accent: "#fb2c36",
-  accentForeground: "#fafafa",
+  accent: "#F43F5E",
+  accentForeground: "#ffffff",
 
-  background: "#0a0a0a",
-  foreground: "#fafafa",
+  // Dark-first warm neutrals
+  background: "#0B0908",
+  foreground: "#FAFAF9",
 
-  card: "#18181b",
-  cardForeground: "#fafafa",
+  card: "#14110F",
+  cardForeground: "#FAFAF9",
 
-  popover: "#262626",
-  popoverForeground: "#fafafa",
+  popover: "#1C1A19",
+  popoverForeground: "#FAFAF9",
 
-  muted: "#27272a",
-  mutedForeground: "#e7e5e4",
+  muted: "#78716C",
+  mutedForeground: "#A8A29E",
 
-  destructive: "#ff6467",
-  destructiveForeground: "#fafafa",
+  destructive: "#FB7185",
+  destructiveForeground: "#ffffff",
 
-  border: "#404040",
-  input: "#404040",
-  ring: "#fb2c36",
+  border: "#292524",
+  input: "#292524",
+  ring: "#F43F5E",
 
   bottomBar: {
-    background: "#171717",
-    foreground: "#fafafa",
+    background: "#14110F",
+    foreground: "#FAFAF9",
 
-    primary: "#ff6467",
-    primaryForeground: "#fafafa",
+    primary: "#F43F5E",
+    primaryForeground: "#ffffff",
 
-    accent: "#262626",
-    accentForeground: "#fafafa",
+    accent: "#1C1A19",
+    accentForeground: "#FAFAF9",
 
-    border: "#404040",
+    border: "#292524",
 
-    ring: "#ff6467",
+    ring: "#F43F5E",
   },
 
   color: {
-    red: "#ff7b74",
+    red: "#F87171",
     redForeground: "#ffffff",
-    orange: "#ff9711",
+    orange: "#FBBF24",
     orangeForeground: "#ffffff",
-    cyan: "#00b7c0",
+    cyan: "#22D3EE",
     cyanForeground: "#ffffff",
-    green: "#4cb332",
+    green: "#34D399",
     greenForeground: "#ffffff",
-    purple: "#9499fa",
+    purple: "#A78BFA",
     purpleForeground: "#ffffff",
+    rose: "#FB7185",
+    roseForeground: "#ffffff",
   },
 };

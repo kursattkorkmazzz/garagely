@@ -5,8 +5,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 type BackgroundedIconProps = {
   icon: IconName;
   iconColor: string;
+  size?: number;
 };
-export function BackgroundedIcon(props: BackgroundedIconProps) {
+
+export function BackgroundedIcon({
+  icon,
+  iconColor,
+  size = 18,
+}: BackgroundedIconProps) {
   const { theme } = useUnistyles();
 
   return (
@@ -14,18 +20,21 @@ export function BackgroundedIcon(props: BackgroundedIconProps) {
       style={[
         styles.iconBackground,
         {
-          backgroundColor: theme.utils.withOpacity(props.iconColor, 0.1),
+          backgroundColor: theme.utils.withOpacity(iconColor, 0.14),
         },
       ]}
     >
-      <Icon name={props.icon} color={props.iconColor} size={24} />
+      <Icon name={icon} color={iconColor} size={size} />
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   iconBackground: {
-    padding: theme.spacing.sm,
+    width: 30,
+    height: 30,
     borderRadius: theme.radius.md,
+    alignItems: "center",
+    justifyContent: "center",
   },
 }));

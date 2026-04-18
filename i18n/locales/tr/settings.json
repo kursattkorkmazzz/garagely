@@ -1,13 +1,42 @@
 {
-  "preferences": "Tercihler",
-  "theme": "Tema",
-  "language": "Dil",
-  "currency": "Para Birimi",
-  "distanceUnit": "Mesafe Birimi",
-  "volumeUnit": "Hacim Birimi",
+  "title": "Ayarlar",
+  "subtitle": "Uygulamayı kendine göre özelleştir",
 
-  "informations": "Bilgiler",
-  "privacyPolicy": "Gizlilik Politikası",
-  "termsOfService": "Hizmet Koşulları",
-  "supportAndSuggestions": "Destek ve Öneriler"
+  "proBadge": "PRO",
+  "vehicleCount": "{{count}} araç",
+  "proMember": "Pro üye",
+
+  "preferences": "Görünüm",
+  "theme": "Tema",
+  "themeLight": "Açık",
+  "themeDark": "Koyu",
+  "themeSystem": "Sistem",
+  "language": "Dil",
+  "currency": "Para birimi",
+  "distanceUnit": "Mesafe birimi",
+  "volumeUnit": "Yakıt tüketimi",
+
+  "dataGroup": "Yedekleme & Senkronizasyon",
+  "autoBackup": "Otomatik yedekleme",
+  "autoBackupSub": "Son yedekleme: 2 saat önce",
+  "exportData": "Verileri dışa aktar",
+  "exportDataSub": "CSV · PDF · JSON",
+  "syncAcrossDevices": "Cihazlar arası senkron",
+
+  "privacyGroup": "Gizlilik",
+  "analytics": "Anonim analitikler",
+  "analyticsSub": "Uygulamayı iyileştirmemize yardım et",
+  "location": "Konum servisleri",
+  "locationValue": "Uygulama açıkken",
+
+  "informations": "Hakkında",
+  "version": "Sürüm",
+  "privacyPolicy": "Gizlilik politikası",
+  "termsOfService": "Koşullar ve şartlar",
+  "supportAndSuggestions": "Yardım & destek",
+
+  "signOut": "Oturumu kapat",
+  "deleteAccount": "Hesabımı sil",
+
+  "footerBuild": "GARAGELY · Build {{build}}"
 }
