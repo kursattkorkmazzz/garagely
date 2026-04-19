@@ -19,7 +19,7 @@ export function AppSegmented<T extends string>({
   const { theme } = useUnistyles();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.input }]}>
+    <View style={styles.container}>
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -63,6 +63,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: 3,
     borderRadius: theme.radius.md + 2,
     gap: 2,
+    backgroundColor: theme.colors.input,
   },
   segment: {
     paddingVertical: theme.spacing.sm,
