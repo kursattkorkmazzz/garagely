@@ -11,25 +11,10 @@ import { AppThemeType, AppThemeTypes } from "@/shared/theme";
 import { VolumeTypes, type VolumeType } from "@/shared/volume";
 import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import Constants from "expo-constants";
+import { Image } from "expo-image";
 import { ScrollView, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-const CURRENCY_LABELS: Record<string, string> = {
-  TRY: "₺ TRY",
-  USD: "$ USD",
-  EUR: "€ EUR",
-};
-
-const VOLUME_LABELS: Record<string, string> = {
-  L: "L / 100 km",
-  gal: "MPG",
-};
-
-const LANGUAGE_LABELS: Record<string, string> = {
-  en: "English",
-  tr: "Türkçe",
-};
+import { StyleSheet } from "react-native-unistyles";
 
 export default function SettingsPage() {
   const { t } = useI18n("settings");
@@ -37,8 +22,6 @@ export default function SettingsPage() {
   const { t: tCurrency } = useI18n("currency");
   const { t: tUnits } = useI18n("units");
   const { t: tTheme } = useI18n("theme");
-
-  const { theme: uTheme } = useUnistyles();
 
   const {
     theme,
@@ -220,6 +203,11 @@ export default function SettingsPage() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.header}>
+        <Image
+          source={require("@/assets/images/icon.png")}
+          contentFit="cover"
+          style={styles.image}
+        />
         <AppText style={styles.title}>{t("title")}</AppText>
         <AppText style={styles.subtitle}>{t("subtitle")}</AppText>
       </View>
@@ -285,6 +273,7 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingVertical: theme.spacing.sm,
   },
   content: {
     paddingBottom: theme.spacing.xl,
@@ -293,6 +282,13 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.md + theme.spacing.xs,
     paddingTop: theme.spacing.sm,
     paddingBottom: theme.spacing.md + 2,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: theme.radius.md,
+    alignSelf: "center",
+    marginBottom: theme.spacing.md,
   },
   title: {
     ...theme.typography.display,
