@@ -1,0 +1,17 @@
+{
+  "TRY": {
+    "symbol": "₺",
+    "longName": "Türk Lirası",
+    "shortName": "TRY"
+  },
+  "USD": {
+    "symbol": "$",
+    "longName": "US Doları",
+    "shortName": "USD"
+  },
+  "EUR": {
+    "symbol": "€",
+    "longName": "Euro",
+    "shortName": "EUR"
+  }
+}

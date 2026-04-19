@@ -7,7 +7,6 @@ import { StatusBar } from "react-native";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
-import "reflect-metadata";
 
 SplashScreen.preventAutoHideAsync();
 

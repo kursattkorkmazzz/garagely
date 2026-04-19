@@ -4,6 +4,7 @@ export const TranslationNamespaces = {
   LANGUAGES: "languages",
   SETTINGS: "settings",
   UNITS: "units",
+  CURRENCY: "currency",
 } as const;
 
 export type TranslationNamespace =

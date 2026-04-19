@@ -5,31 +5,46 @@ import { AppSegmented } from "@/components/ui/app-segmented";
 import { AppText } from "@/components/ui/app-text";
 import { AppToggle } from "@/components/ui/app-toggle";
 import { useI18n } from "@/i18n";
+import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import Constants from "expo-constants";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
-type ThemeValue = "light" | "dark" | "system";
-type DistanceUnit = "km" | "mi";
+const CURRENCY_LABELS: Record<string, string> = {
+  TRY: "₺ TRY",
+  USD: "$ USD",
+  EUR: "€ EUR",
+};
+
+const VOLUME_LABELS: Record<string, string> = {
+  L: "L / 100 km",
+  gal: "MPG",
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: "English",
+  tr: "Türkçe",
+};
 
 export default function SettingsPage() {
   const { t } = useI18n("settings");
+  const { t: tLang } = useI18n("languages");
+  const { t: tCurrency } = useI18n("currency");
 
-  const [themeMode, setThemeMode] = useState<ThemeValue>(
-    (UnistylesRuntime.themeName as ThemeValue) ?? "dark",
-  );
-  const [distance, setDistance] = useState<DistanceUnit>("km");
+  const {
+    theme,
+    language,
+    distanceUnit,
+    currency,
+    volumeUnit,
+    setTheme,
+    setDistanceUnit,
+  } = useUserPreferencesStore();
+
   const [autoBackup, setAutoBackup] = useState(true);
   const [syncDevices, setSyncDevices] = useState(true);
   const [analytics, setAnalytics] = useState(false);
-
-  const applyTheme = (next: ThemeValue) => {
-    setThemeMode(next);
-    if (next !== "system") {
-      UnistylesRuntime.setTheme(next);
-    }
-  };
 
   const version =
     (Constants.expoConfig?.version ?? "1.0.0") +
@@ -57,8 +72,8 @@ export default function SettingsPage() {
           label={t("theme")}
           trailing={
             <AppSegmented
-              value={themeMode}
-              onChange={applyTheme}
+              value={theme}
+              onChange={setTheme}
               options={[
                 { value: "system", label: t("themeSystem") },
                 { value: "light", label: t("themeLight") },
@@ -70,7 +85,7 @@ export default function SettingsPage() {
         <AppListItem
           icon="Languages"
           label={t("language")}
-          selectedValue="Türkçe"
+          selectedValue={tLang(`${language}.short`)}
           chevron
         />
         <AppListItem
@@ -78,8 +93,8 @@ export default function SettingsPage() {
           label={t("distanceUnit")}
           trailing={
             <AppSegmented
-              value={distance}
-              onChange={setDistance}
+              value={distanceUnit}
+              onChange={setDistanceUnit}
               options={[
                 { value: "km", label: "km" },
                 { value: "mi", label: "mi" },
@@ -90,13 +105,13 @@ export default function SettingsPage() {
         <AppListItem
           icon="Banknote"
           label={t("currency")}
-          selectedValue="₺ TRY"
+          selectedValue={CURRENCY_LABELS[currency]}
           chevron
         />
         <AppListItem
           icon="Fuel"
           label={t("volumeUnit")}
-          selectedValue="L / 100 km"
+          selectedValue={VOLUME_LABELS[volumeUnit]}
           chevron
         />
       </AppListGroup>
@@ -159,7 +174,7 @@ export default function SettingsPage() {
       </AppListGroup>
 
       <AppText style={styles.footer}>
-        {t("footerVersion", { build: "284" })}
+        {t("footerVersion", { build: version })}
       </AppText>
     </ScrollView>
   );
@@ -174,7 +189,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.xl,
   },
   header: {
-    paddingHorizontal: theme.spacing.md + theme.spacing.xs, // 20
+    paddingHorizontal: theme.spacing.md + theme.spacing.xs,
     paddingTop: theme.spacing.sm,
     paddingBottom: theme.spacing.md + 2,
   },

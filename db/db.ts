@@ -1,3 +1,4 @@
+import { UserPreferences } from "@/features/user-preferences/entity/user-preferences.entity";
 import { DataSource } from "typeorm";
 
 const SqliteDataSource = new DataSource({
@@ -6,20 +7,19 @@ const SqliteDataSource = new DataSource({
   database: "garagely.db",
   logging: false,
 
-  // Migration & Metadata Settings
-  migrations: ["./migrations/**/*{.js,.ts}"],
+  synchronize: true,
+
+  migrations: [],
   migrationsTableName: "garagely_migrations",
   migrationsRun: true,
   metadataTableName: "garagely_metadata",
-
-  // Null Handling
 
   invalidWhereValuesBehavior: {
     null: "sql-null",
     undefined: "ignore",
   },
 
-  entities: [],
+  entities: [UserPreferences],
 });
 
 export async function GetGaragelyDatabase() {
