@@ -34,7 +34,6 @@ export function AppListItem({
 }: AppListItemProps) {
   const { theme } = useUnistyles();
   const tintColor = iconColor ?? theme.colors.primary;
-
   return (
     <Pressable
       style={(state) => [

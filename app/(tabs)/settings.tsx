@@ -220,6 +220,7 @@ export default function SettingsPage() {
           selectedValue={tTheme(theme)}
           chevron
           onPress={openThemeSheet}
+          iconColor="#3b82f6"
         />
         <AppListItem
           icon="Languages"
@@ -227,6 +228,7 @@ export default function SettingsPage() {
           selectedValue={tLang(`${language}.long`)}
           chevron
           onPress={openLanguageSheet}
+          iconColor="#f59e0b"
         />
         <AppListItem
           icon="Banknote"
@@ -234,6 +236,7 @@ export default function SettingsPage() {
           selectedValue={tCurrency(`${currency}.longName`)}
           chevron
           onPress={openCurrencySheet}
+          iconColor="#ef4444"
         />
         <AppListItem
           icon="Ruler"
@@ -241,6 +244,7 @@ export default function SettingsPage() {
           selectedValue={tUnits(`distance.${distanceUnit}.long`)}
           chevron
           onPress={openDistanceSheet}
+          iconColor="#8b5cf6"
         />
         <AppListItem
           icon="Fuel"
@@ -248,6 +252,7 @@ export default function SettingsPage() {
           selectedValue={tUnits(`volume.${volumeUnit}.long`)}
           chevron
           onPress={openVolumeSheet}
+          iconColor="#06b6d4"
         />
       </AppListGroup>
 
@@ -257,9 +262,20 @@ export default function SettingsPage() {
           icon="MessageCircleCheck"
           label={t("supportAndSuggestions")}
           chevron
+          iconColor="#ec4899"
         />
-        <AppListItem icon="FileText" label={t("termsOfService")} chevron />
-        <AppListItem icon="ShieldCheck" label={t("privacyPolicy")} chevron />
+        <AppListItem
+          icon="FileText"
+          label={t("termsOfService")}
+          chevron
+          iconColor="#22c55e"
+        />
+        <AppListItem
+          icon="ShieldCheck"
+          label={t("privacyPolicy")}
+          chevron
+          iconColor="#14b8a6"
+        />
       </AppListGroup>
 
       <AppText style={styles.footer}>
