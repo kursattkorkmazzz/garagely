@@ -300,8 +300,8 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.md + 2,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 128,
+    height: 128,
     borderRadius: theme.radius.md,
     alignSelf: "center",
     marginBottom: theme.spacing.md,
