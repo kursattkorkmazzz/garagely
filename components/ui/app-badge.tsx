@@ -1,70 +1,82 @@
 import { AppText } from "@/components/ui/app-text";
 import { ReactNode } from "react";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
-type Tone = "primary" | "neutral" | "success" | "warning" | "danger";
-
-type AppBadgeProps = {
+export type AppBadgeProps = UnistylesVariants<typeof stylesheet> & {
   children: ReactNode;
-  tone?: Tone;
-  solid?: boolean;
 };
 
-export function AppBadge({
-  children,
-  tone = "neutral",
-  solid = false,
-}: AppBadgeProps) {
-  const { theme } = useUnistyles();
-
-  const palette = {
-    primary: {
-      fg: theme.colors.primary,
-      solidFg: theme.colors.primaryForeground,
-      bg: theme.colors.primary,
-    },
-    neutral: {
-      fg: theme.colors.mutedForeground,
-      solidFg: theme.colors.foreground,
-      bg: theme.colors.muted,
-    },
-    success: {
-      fg: theme.colors.color.green,
-      solidFg: theme.colors.color.greenForeground,
-      bg: theme.colors.color.green,
-    },
-    warning: {
-      fg: theme.colors.color.orange,
-      solidFg: theme.colors.color.orangeForeground,
-      bg: theme.colors.color.orange,
-    },
-    danger: {
-      fg: theme.colors.destructive,
-      solidFg: theme.colors.destructiveForeground,
-      bg: theme.colors.destructive,
-    },
-  }[tone];
-
-  const bg = solid ? palette.bg : theme.utils.withOpacity(palette.bg, 0.14);
-  const fg = solid ? palette.solidFg : palette.fg;
+export function AppBadge({ children, tone = "neutral", fill = "ghost" }: AppBadgeProps) {
+  stylesheet.useVariants({ tone, fill });
 
   return (
-    <View style={[styles.container, { backgroundColor: bg }]}>
-      <AppText style={[styles.label, { color: fg }]}>{children}</AppText>
+    <View style={stylesheet.container}>
+      <AppText style={stylesheet.label}>{children}</AppText>
     </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const stylesheet = StyleSheet.create((theme) => ({
   container: {
     paddingVertical: 3,
     paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.radius.full,
-    alignSelf: "flex-start",
+    alignSelf: "flex-start" as const,
+    variants: {
+      tone: {
+        primary: {},
+        neutral: {},
+        success: {},
+        warning: {},
+        danger: {},
+      },
+      fill: {
+        ghost: {},
+        solid: {},
+      },
+    },
+    compoundVariants: [
+      { tone: "primary", fill: "ghost", styles: { backgroundColor: theme.utils.withOpacity(theme.colors.primary, 0.14) } },
+      { tone: "neutral", fill: "ghost", styles: { backgroundColor: theme.utils.withOpacity(theme.colors.muted, 0.14) } },
+      { tone: "success", fill: "ghost", styles: { backgroundColor: theme.utils.withOpacity(theme.colors.color.green, 0.14) } },
+      { tone: "warning", fill: "ghost", styles: { backgroundColor: theme.utils.withOpacity(theme.colors.color.orange, 0.14) } },
+      { tone: "danger",  fill: "ghost", styles: { backgroundColor: theme.utils.withOpacity(theme.colors.destructive, 0.14) } },
+      { tone: "primary", fill: "solid", styles: { backgroundColor: theme.colors.primary } },
+      { tone: "neutral", fill: "solid", styles: { backgroundColor: theme.colors.muted } },
+      { tone: "success", fill: "solid", styles: { backgroundColor: theme.colors.color.green } },
+      { tone: "warning", fill: "solid", styles: { backgroundColor: theme.colors.color.orange } },
+      { tone: "danger",  fill: "solid", styles: { backgroundColor: theme.colors.destructive } },
+    ],
   },
+
   label: {
     ...theme.typography.overline,
     fontSize: 10,
+    variants: {
+      tone: {
+        primary: {},
+        neutral: {},
+        success: {},
+        warning: {},
+        danger: {},
+      },
+      fill: {
+        ghost: {},
+        solid: {},
+      },
+    },
+    compoundVariants: [
+      { tone: "primary", fill: "ghost", styles: { color: theme.colors.primary } },
+      { tone: "neutral", fill: "ghost", styles: { color: theme.colors.mutedForeground } },
+      { tone: "success", fill: "ghost", styles: { color: theme.colors.color.green } },
+      { tone: "warning", fill: "ghost", styles: { color: theme.colors.color.orange } },
+      { tone: "danger",  fill: "ghost", styles: { color: theme.colors.destructive } },
+      { tone: "primary", fill: "solid", styles: { color: theme.colors.primaryForeground } },
+      { tone: "neutral", fill: "solid", styles: { color: theme.colors.foreground } },
+      { tone: "success", fill: "solid", styles: { color: theme.colors.color.greenForeground } },
+      { tone: "warning", fill: "solid", styles: { color: theme.colors.color.orangeForeground } },
+      { tone: "danger",  fill: "solid", styles: { color: theme.colors.destructiveForeground } },
+    ],
   },
 }));
