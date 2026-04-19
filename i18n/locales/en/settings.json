@@ -8,31 +8,15 @@
 
   "preferences": "Appearance",
   "theme": "Theme",
-  "themeLight": "Light",
-  "themeDark": "Dark",
-  "themeSystem": "Auto",
   "language": "Language",
   "currency": "Currency",
   "distanceUnit": "Distance unit",
-  "volumeUnit": "Fuel consumption",
-
-  "dataGroup": "Backup & Sync",
-  "autoBackup": "Auto backup",
-  "autoBackupSub": "Last backup: 2 hours ago",
-  "exportData": "Export data",
-  "exportDataSub": "CSV · PDF · JSON",
-  "syncAcrossDevices": "Sync across devices",
-
-  "privacyGroup": "Privacy",
-  "analytics": "Anonymous analytics",
-  "analyticsSub": "Help us improve the app",
-  "location": "Location services",
-  "locationValue": "While using the app",
+  "volumeUnit": "Volume unit",
 
   "informations": "About",
-  "privacyPolicy": "Privacy policy",
-  "termsOfService": "Terms & conditions",
-  "supportAndSuggestions": "Help & support",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms & Conditions",
+  "supportAndSuggestions": "Help & Support",
 
   "footerVersion": "GARAGELY · Version {{build}}"
 }

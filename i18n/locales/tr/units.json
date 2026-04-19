@@ -14,7 +14,7 @@
       "short": "L",
       "long": "Litre"
     },
-    "GAL": {
+    "gal": {
       "short": "gal",
       "long": "Galon"
     }
