@@ -24,7 +24,7 @@ import { useVehicleStore } from "@/stores/vehicle.store";
 import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
 import { ChevronRight } from "lucide-react-native/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -34,7 +34,7 @@ import {
 } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { vehicleFormSchema } from "./vehicle-form.schema";
+import { createVehicleFormSchema } from "./vehicle-form.schema";
 import { VEHICLE_FORM_EMPTY, VehicleFormValues } from "./vehicle-form.types";
 
 type VehicleFormScreenProps = {
@@ -43,6 +43,8 @@ type VehicleFormScreenProps = {
 
 export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   const isNew = id === "new";
+  const { t } = useI18n("vehicle");
+  const validationSchema = useMemo(() => createVehicleFormSchema(t), [t]);
   const [initialValues, setInitialValues] =
     useState<VehicleFormValues>(VEHICLE_FORM_EMPTY);
   const [loadingVehicle, setLoadingVehicle] = useState(!isNew);
@@ -78,7 +80,7 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={vehicleFormSchema}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
       enableReinitialize
     >

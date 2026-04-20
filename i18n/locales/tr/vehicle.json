@@ -66,10 +66,13 @@
     "brand": "Marka zorunludur",
     "model": "Model zorunludur",
     "year": "Geçerli bir yıl girin",
+    "yearMin": "Yıl {{min}} sonrası olmalıdır",
+    "yearMax": "Yıl {{max}}'i geçemez",
     "plate": "Plaka zorunludur",
     "color": "Renk zorunludur",
     "transmissionType": "Vites tipi seçin",
     "bodyType": "Kasa tipi seçin",
-    "fuelType": "Yakıt tipi seçin"
+    "fuelType": "Yakıt tipi seçin",
+    "purchaseAmountInvalid": "Geçerli bir tutar girin"
   }
 }

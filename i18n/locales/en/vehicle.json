@@ -66,10 +66,13 @@
     "brand": "Brand is required",
     "model": "Model is required",
     "year": "Enter a valid year",
+    "yearMin": "Year must be after {{min}}",
+    "yearMax": "Year cannot exceed {{max}}",
     "plate": "Plate is required",
     "color": "Color is required",
     "transmissionType": "Select a transmission type",
     "bodyType": "Select a body type",
-    "fuelType": "Select a fuel type"
+    "fuelType": "Select a fuel type",
+    "purchaseAmountInvalid": "Enter a valid amount"
   }
 }
