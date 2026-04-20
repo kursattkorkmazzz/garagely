@@ -1,4 +1,5 @@
 import { UserPreferences } from "@/features/user-preferences/entity/user-preferences.entity";
+import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { DataSource } from "typeorm";
 
 const SqliteDataSource = new DataSource({
@@ -19,7 +20,7 @@ const SqliteDataSource = new DataSource({
     undefined: "ignore",
   },
 
-  entities: [UserPreferences],
+  entities: [UserPreferences, Vehicle],
 });
 
 export async function GetGaragelyDatabase() {

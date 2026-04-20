@@ -1,12 +1,12 @@
-import { AppText } from "@/components/ui/app-text";
 import { AppHeader } from "@/layouts/header/app-header";
-import { Stack } from "expo-router";
-import { useLocalSearchParams } from "expo-router/build/hooks";
-import { View } from "react-native";
+import { VehicleFormScreen } from "@/features/vehicle/screens/vehicle-form/VehicleFormScreen";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useI18n } from "@/i18n";
 
-export default function VehicleForm() {
-  const { id } = useLocalSearchParams();
-  const isAdding = id === "new";
+export default function VehicleFormRoute() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useI18n("vehicle");
+  const isNew = id === "new";
 
   return (
     <>
@@ -15,7 +15,7 @@ export default function VehicleForm() {
           headerShown: true,
           header: (props) => (
             <AppHeader
-              title={isAdding ? "Create Vehicle" : "Edit Vehicle"}
+              title={isNew ? t("addVehicle") : t("editVehicle")}
               icon="Car"
               goBack={true}
               {...props}
@@ -23,9 +23,7 @@ export default function VehicleForm() {
           ),
         }}
       />
-      <View>
-        <AppText>Vehicle Form</AppText>
-      </View>
+      <VehicleFormScreen id={id} />
     </>
   );
 }

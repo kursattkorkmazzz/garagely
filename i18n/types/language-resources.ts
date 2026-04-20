@@ -7,6 +7,7 @@ import en_languages from "@/i18n/locales/en/languages.json";
 import en_settings from "@/i18n/locales/en/settings.json";
 import en_theme from "@/i18n/locales/en/theme.json";
 import en_units from "@/i18n/locales/en/units.json";
+import en_vehicle from "@/i18n/locales/en/vehicle.json";
 
 import tr_currency from "@/i18n/locales/tr/currency.json";
 import tr_errors from "@/i18n/locales/tr/errors.json";
@@ -15,6 +16,7 @@ import tr_languages from "@/i18n/locales/tr/languages.json";
 import tr_settings from "@/i18n/locales/tr/settings.json";
 import tr_theme from "@/i18n/locales/tr/theme.json";
 import tr_units from "@/i18n/locales/tr/units.json";
+import tr_vehicle from "@/i18n/locales/tr/vehicle.json";
 
 export const LanguageResources = {
   [Languages.EN]: {
@@ -25,6 +27,7 @@ export const LanguageResources = {
     currency: en_currency,
     theme: en_theme,
     garage: en_garage,
+    vehicle: en_vehicle,
   },
   [Languages.TR]: {
     errors: tr_errors,
@@ -34,5 +37,6 @@ export const LanguageResources = {
     currency: tr_currency,
     theme: tr_theme,
     garage: tr_garage,
+    vehicle: tr_vehicle,
   },
 } as const;

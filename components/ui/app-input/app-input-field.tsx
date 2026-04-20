@@ -26,9 +26,9 @@ const stylesheet = StyleSheet.create((theme) => ({
   },
 }));
 
-export type AppInputFieldProps = Omit<TextInputProps, "editable">;
+export type AppInputFieldProps = TextInputProps;
 
-export function AppInputField({ onFocus, onBlur, style, ...rest }: AppInputFieldProps) {
+export function AppInputField({ onFocus, onBlur, style, editable, ...rest }: AppInputFieldProps) {
   const { size, setFocused, disabled } = useInputGroup();
   const { theme } = useUnistyles();
 
@@ -37,7 +37,7 @@ export function AppInputField({ onFocus, onBlur, style, ...rest }: AppInputField
   return (
     <TextInput
       style={[stylesheet.input, style]}
-      editable={!disabled}
+      editable={editable !== undefined ? editable : !disabled}
       placeholderTextColor={theme.colors.mutedForeground}
       onFocus={(e) => {
         setFocused(true);

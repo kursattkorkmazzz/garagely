@@ -1,0 +1,75 @@
+{
+  "addVehicle": "Araç Ekle",
+  "editVehicle": "Aracı Düzenle",
+  "noVehicles": "Henüz araç yok",
+  "noVehiclesSub": "Başlamak için ilk aracını ekle",
+
+  "fields": {
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "plate": "Plaka",
+    "color": "Renk",
+    "transmissionType": "Vites",
+    "bodyType": "Kasa Tipi",
+    "fuelType": "Yakıt Tipi",
+    "purchaseAmount": "Alış Fiyatı",
+    "purchaseCurrency": "Para Birimi",
+    "purchaseDate": "Alış Tarihi"
+  },
+
+  "placeholders": {
+    "brand": "örn. Toyota",
+    "model": "örn. Corolla",
+    "year": "örn. 2020",
+    "plate": "örn. 34 ABC 123",
+    "color": "örn. Beyaz",
+    "purchaseAmount": "0"
+  },
+
+  "sections": {
+    "basicInfo": "Temel Bilgiler",
+    "vehicleDetails": "Araç Detayları",
+    "purchaseInfo": "Alış Bilgileri (Opsiyonel)"
+  },
+
+  "fuelType": {
+    "gasoline": "Benzin",
+    "diesel": "Dizel",
+    "electric": "Elektrik",
+    "hybrid": "Hibrit",
+    "lpg": "LPG",
+    "cng": "CNG"
+  },
+
+  "transmissionType": {
+    "manual": "Manuel",
+    "automatic": "Otomatik",
+    "semi_automatic": "Yarı Otomatik",
+    "cvt": "CVT"
+  },
+
+  "bodyType": {
+    "sedan": "Sedan",
+    "hatchback": "Hatchback",
+    "suv": "SUV",
+    "crossover": "Crossover",
+    "coupe": "Coupe",
+    "convertible": "Cabrio",
+    "wagon": "Station Wagon",
+    "van": "Van",
+    "pickup": "Pickup",
+    "minivan": "Minivan"
+  },
+
+  "errors": {
+    "brand": "Marka zorunludur",
+    "model": "Model zorunludur",
+    "year": "Geçerli bir yıl girin",
+    "plate": "Plaka zorunludur",
+    "color": "Renk zorunludur",
+    "transmissionType": "Vites tipi seçin",
+    "bodyType": "Kasa tipi seçin",
+    "fuelType": "Yakıt tipi seçin"
+  }
+}

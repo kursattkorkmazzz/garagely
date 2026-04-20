@@ -8,6 +8,9 @@ import { Column, Entity } from "typeorm";
 
 @Entity("user_preferences")
 export class UserPreferences extends BaseEntity {
+  @Column({ type: "text", nullable: true })
+  activeVehicleId?: string;
+
   @Column({ type: "text", default: AppThemeTypes.SYSTEM })
   theme!: AppThemeType;
 

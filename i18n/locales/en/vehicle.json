@@ -1,0 +1,75 @@
+{
+  "addVehicle": "Add Vehicle",
+  "editVehicle": "Edit Vehicle",
+  "noVehicles": "No vehicles yet",
+  "noVehiclesSub": "Add your first vehicle to get started",
+
+  "fields": {
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "plate": "Plate",
+    "color": "Color",
+    "transmissionType": "Transmission",
+    "bodyType": "Body Type",
+    "fuelType": "Fuel Type",
+    "purchaseAmount": "Purchase Price",
+    "purchaseCurrency": "Currency",
+    "purchaseDate": "Purchase Date"
+  },
+
+  "placeholders": {
+    "brand": "e.g. Toyota",
+    "model": "e.g. Corolla",
+    "year": "e.g. 2020",
+    "plate": "e.g. 34 ABC 123",
+    "color": "e.g. White",
+    "purchaseAmount": "0"
+  },
+
+  "sections": {
+    "basicInfo": "Basic Info",
+    "vehicleDetails": "Vehicle Details",
+    "purchaseInfo": "Purchase Info (Optional)"
+  },
+
+  "fuelType": {
+    "gasoline": "Gasoline",
+    "diesel": "Diesel",
+    "electric": "Electric",
+    "hybrid": "Hybrid",
+    "lpg": "LPG",
+    "cng": "CNG"
+  },
+
+  "transmissionType": {
+    "manual": "Manual",
+    "automatic": "Automatic",
+    "semi_automatic": "Semi-Automatic",
+    "cvt": "CVT"
+  },
+
+  "bodyType": {
+    "sedan": "Sedan",
+    "hatchback": "Hatchback",
+    "suv": "SUV",
+    "crossover": "Crossover",
+    "coupe": "Coupe",
+    "convertible": "Convertible",
+    "wagon": "Wagon",
+    "van": "Van",
+    "pickup": "Pickup",
+    "minivan": "Minivan"
+  },
+
+  "errors": {
+    "brand": "Brand is required",
+    "model": "Model is required",
+    "year": "Enter a valid year",
+    "plate": "Plate is required",
+    "color": "Color is required",
+    "transmissionType": "Select a transmission type",
+    "bodyType": "Select a body type",
+    "fuelType": "Select a fuel type"
+  }
+}
