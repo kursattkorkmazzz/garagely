@@ -1,0 +1,13 @@
+{
+  "title": "Garage",
+  "subtitle": "Manage your vehicles and expenses",
+  "garageSection": "Garage",
+  "expenseSection": "Expenses",
+  "vehicles": "Vehicles",
+  "stationsAndRepairmen": "Stations & Repairmen",
+  "fuelExpense": "Fuel Expense",
+  "serviceExpense": "Service Expense",
+  "parkingExpense": "Parking Expense",
+  "carWashExpense": "Car Wash Expense",
+  "accessoryExpense": "Accessory Expense"
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Garaj",
+  "subtitle": "Araçlarını ve giderlerini yönet",
+  "garageSection": "Garaj",
+  "expenseSection": "Giderler",
+  "vehicles": "Araçlar",
+  "stationsAndRepairmen": "İstasyonlar & Tamirciler",
+  "fuelExpense": "Yakıt Gideri",
+  "serviceExpense": "Servis Gideri",
+  "parkingExpense": "Otopark Gideri",
+  "carWashExpense": "Oto Yıkama Gideri",
+  "accessoryExpense": "Aksesuar Gideri"
+}

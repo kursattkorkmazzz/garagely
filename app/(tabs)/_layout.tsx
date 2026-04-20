@@ -1,6 +1,7 @@
 import { TabOptions } from "@/layouts/tabs/tab-options";
 import { Tabs } from "expo-router";
 import { useUnistyles } from "react-native-unistyles";
+
 export default function TabLayout() {
   const { theme } = useUnistyles();
 
@@ -12,6 +13,14 @@ export default function TabLayout() {
         },
       }}
     >
+      <Tabs.Screen
+        name="garage"
+        options={TabOptions({
+          icon: "Warehouse",
+          title: "Garage",
+          theme,
+        })}
+      />
       <Tabs.Screen
         name="settings"
         options={TabOptions({

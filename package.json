@@ -3,7 +3,7 @@
   "main": "index.ts",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --clear",
     "build:android": "npx eas build --platform android --profile development --local",
     "lint": "expo lint",
     "migration:generate": "typeorm migration:generate -d ./src/database/db.ts ./src/database/migrations"

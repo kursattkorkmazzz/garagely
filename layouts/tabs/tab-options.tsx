@@ -1,5 +1,4 @@
-import { IconName } from "@/components/ui/icon";
-import { TabIcon } from "@/layouts/tabs/tab-icon";
+import Icon, { IconName } from "@/components/ui/icon";
 import { AppTheme } from "@/theme/theme";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 
@@ -16,7 +15,7 @@ export function TabOptions(props: TabOptionsProps): BottomTabNavigationOptions {
   return {
     headerShown: false,
     title,
-    tabBarIcon: TabIcon({ name: icon }),
+    tabBarIcon: ({ color }) => <Icon name={icon} size={24} color={color} />,
     tabBarStyle: {
       backgroundColor: theme.colors.background,
       borderTopWidth: 0,

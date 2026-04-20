@@ -1,5 +1,5 @@
-import * as SplashScreen from "expo-splash-screen";
 import { Redirect } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 export default function Index() {
@@ -7,5 +7,5 @@ export default function Index() {
     SplashScreen.hideAsync();
   }, []);
 
-  return <Redirect href="/(tabs)/settings" />;
+  return <Redirect href="/(tabs)/garage" />;
 }
