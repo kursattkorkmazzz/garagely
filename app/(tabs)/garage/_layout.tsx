@@ -15,6 +15,8 @@ export default function GarageLayout({
         contentStyle: {
           backgroundColor: theme.colors.background,
         },
+        animation: "slide_from_bottom",
+        animationDuration: 100,
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
