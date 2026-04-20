@@ -3,11 +3,21 @@
   "subtitle": "Manage your vehicles and expenses",
   "garageSection": "Garage",
   "expenseSection": "Expenses",
+  "utilsSection": "Utils",
   "vehicles": "Vehicles",
+  "vehiclesSub": "Track and manage your vehicles",
   "stationsAndRepairmen": "Stations & Repairmen",
+  "stationsAndRepairmenSub": "Saved fuel stations and mechanics",
   "fuelExpense": "Fuel Expense",
+  "fuelExpenseSub": "Log fuel fill-ups and costs",
   "serviceExpense": "Service Expense",
+  "serviceExpenseSub": "Maintenance and repair records",
   "parkingExpense": "Parking Expense",
+  "parkingExpenseSub": "Track your parking fees",
   "carWashExpense": "Car Wash Expense",
-  "accessoryExpense": "Accessory Expense"
+  "carWashExpenseSub": "Car wash history and costs",
+  "accessoryExpense": "Accessory Expense",
+  "accessoryExpenseSub": "Parts and accessory purchases",
+  "parkPlace": "Park Place",
+  "parkPlaceSub": "Save and navigate to your parking spots"
 }

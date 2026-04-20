@@ -3,11 +3,21 @@
   "subtitle": "Araçlarını ve giderlerini yönet",
   "garageSection": "Garaj",
   "expenseSection": "Giderler",
+  "utilsSection": "Yardımcı Özellikler",
   "vehicles": "Araçlar",
+  "vehiclesSub": "Araçlarını takip et ve yönet",
   "stationsAndRepairmen": "İstasyonlar & Tamirciler",
+  "stationsAndRepairmenSub": "Kayıtlı istasyonlar ve tamirciler",
   "fuelExpense": "Yakıt Gideri",
+  "fuelExpenseSub": "Yakıt dolumlarını ve maliyetlerini kaydet",
   "serviceExpense": "Servis Gideri",
+  "serviceExpenseSub": "Bakım ve onarım kayıtları",
   "parkingExpense": "Otopark Gideri",
+  "parkingExpenseSub": "Otopark ücretlerini takip et",
   "carWashExpense": "Oto Yıkama Gideri",
-  "accessoryExpense": "Aksesuar Gideri"
+  "carWashExpenseSub": "Araç yıkama geçmişi",
+  "accessoryExpense": "Aksesuar Gideri",
+  "accessoryExpenseSub": "Parça ve aksesuar alımları",
+  "parkPlace": "Park Yeri",
+  "parkPlaceSub": "Park yerlerini kaydet ve bul"
 }
