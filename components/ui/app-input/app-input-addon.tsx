@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 import { useInputGroup } from "./context";
 
@@ -7,7 +7,6 @@ const stylesheet = StyleSheet.create((theme) => ({
   container: {
     alignItems: "center" as const,
     justifyContent: "center" as const,
-    backgroundColor: theme.colors.secondary,
     variants: {
       position: {
         left: {
@@ -32,13 +31,16 @@ type AddonVariants = UnistylesVariants<typeof stylesheet>;
 
 export type AppInputAddonProps = {
   position?: AddonVariants["position"];
+  style?: ViewStyle;
   children: ReactNode;
 };
 
-export function AppInputAddon({ position = "left", children }: AppInputAddonProps) {
+export function AppInputAddon({
+  position = "left",
+  style,
+  children,
+}: AppInputAddonProps) {
   const { size } = useInputGroup();
-
   stylesheet.useVariants({ position, size });
-
-  return <View style={stylesheet.container}>{children}</View>;
+  return <View style={[stylesheet.container, style]}>{children}</View>;
 }
