@@ -1,38 +1,36 @@
 import { AppText } from "@/components/ui/app-text";
 import Icon, { IconName } from "@/components/ui/icon";
+import { type NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
 type AppHeaderProps = {
   title: string;
   icon?: IconName;
   iconColor?: string;
-  goBack?: {
-    canGoBack: boolean;
-    goBack: () => void;
-  };
+  goBack?: boolean;
   RightComponent?: ReactNode;
-};
+} & NativeStackHeaderProps;
 
 export function AppHeader({
   title,
   icon,
   iconColor,
-  goBack,
   RightComponent,
+  goBack,
+  ...props
 }: AppHeaderProps) {
   const { theme } = useUnistyles();
 
   const goBackHandler = () => {
-    if (goBack?.canGoBack) {
-      goBack.goBack();
+    if (props.navigation.canGoBack()) {
+      props.navigation.goBack();
     }
   };
 
   return (
     <View style={styles.container}>
-      {goBack?.canGoBack && (
+      {goBack && (
         <Pressable style={styles.goBackButton} onPress={goBackHandler}>
           <Icon name="ArrowLeft" size={24} color={theme.colors.primary} />
         </Pressable>

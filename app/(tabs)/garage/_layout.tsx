@@ -29,14 +29,12 @@ export default function GarageLayout({
               <AppHeader
                 title={"Vehicles"}
                 icon="Car"
-                goBack={{
-                  canGoBack: props.navigation.canGoBack(),
-                  goBack: props.navigation.goBack,
-                }}
+                goBack={true}
                 RightComponent={props.options.headerRight?.({
                   canGoBack: props.navigation.canGoBack(),
                   tintColor: props.options.headerTintColor,
                 })}
+                {...props}
               />
             );
           },
