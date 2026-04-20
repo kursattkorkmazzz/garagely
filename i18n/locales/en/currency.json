@@ -1,4 +1,5 @@
 {
+  "currency": "Currency",
   "TRY": {
     "symbol": "₺",
     "longName": "Turkish Lira",

@@ -1,3 +1,4 @@
+import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import {
@@ -9,6 +10,7 @@ import {
 import { AppText } from "@/components/ui/app-text";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
+import { useCurrencySheet } from "@/hooks/use-currency-sheet";
 import { useI18n } from "@/i18n";
 import { APP_HEADER_HEIGHT } from "@/layouts/header/app-header";
 import { CurrencyType, CurrencyTypes } from "@/shared/currency";
@@ -97,7 +99,15 @@ function VehicleFormFields() {
     isSubmitting,
   } = useFormikContext<VehicleFormValues>();
   const { t } = useI18n("vehicle");
+
+  const currency = useCurrencySheet({
+    onCurrencyChange: (currency) => setFieldValue("purchaseCurrency", currency),
+  });
   const { theme } = useUnistyles();
+
+  const showCurrencySheet = () => {
+    currency.openCurrencySheet();
+  };
 
   const showEnumSheet = <T extends string>(
     titleKey: string,
@@ -110,7 +120,7 @@ function VehicleFormFields() {
       payload: {
         sections: [
           {
-            title: "", //TODO: Başlık eklenecek.
+            title: "",
             data: (Object.values(options) as T[]).map((value) => ({
               key: value,
               label: t(`${titleKey}.${value}`),
@@ -161,15 +171,6 @@ function VehicleFormFields() {
       values.bodyType,
     );
 
-  const showCurrencySheet = () =>
-    showEnumSheet(
-      "currency",
-      CurrencyTypes,
-      "currency",
-      "purchaseCurrency",
-      values.purchaseCurrency,
-    );
-
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -186,7 +187,7 @@ function VehicleFormFields() {
           {t("sections.basicInfo")}
         </AppText>
         <View style={styles.fieldGroup}>
-          <FormField
+          <VehicleFormField
             label={t("fields.brand")}
             placeholder={t("placeholders.brand")}
             value={values.brand}
@@ -195,7 +196,7 @@ function VehicleFormFields() {
             error={touched.brand ? errors.brand : undefined}
             autoCapitalize="words"
           />
-          <FormField
+          <VehicleFormField
             label={t("fields.model")}
             placeholder={t("placeholders.model")}
             value={values.model}
@@ -204,7 +205,7 @@ function VehicleFormFields() {
             error={touched.model ? errors.model : undefined}
             autoCapitalize="words"
           />
-          <FormField
+          <VehicleFormField
             label={t("fields.year")}
             placeholder={t("placeholders.year")}
             value={values.year}
@@ -214,7 +215,7 @@ function VehicleFormFields() {
             keyboardType="number-pad"
             maxLength={4}
           />
-          <FormField
+          <VehicleFormField
             label={t("fields.plate")}
             placeholder={t("placeholders.plate")}
             value={values.plate}
@@ -223,7 +224,7 @@ function VehicleFormFields() {
             error={touched.plate ? errors.plate : undefined}
             autoCapitalize="characters"
           />
-          <FormField
+          <VehicleFormField
             label={t("fields.color")}
             placeholder={t("placeholders.color")}
             value={values.color}
@@ -330,7 +331,7 @@ function VehicleFormFields() {
   );
 }
 
-type FormFieldProps = {
+type VehicleFormFieldProps = {
   label: string;
   placeholder: string;
   value: string;
@@ -340,7 +341,7 @@ type FormFieldProps = {
   [key: string]: unknown;
 };
 
-function FormField({
+function VehicleFormField({
   label,
   placeholder,
   value,
@@ -348,7 +349,7 @@ function FormField({
   onBlur,
   error,
   ...rest
-}: FormFieldProps) {
+}: VehicleFormFieldProps) {
   return (
     <View style={styles.fieldWrapper}>
       <AppText style={styles.fieldLabel}>{label}</AppText>
@@ -361,51 +362,6 @@ function FormField({
           {...rest}
         />
       </AppInputGroup>
-      {error ? <AppText style={styles.errorText}>{error}</AppText> : null}
-    </View>
-  );
-}
-
-type EnumPickerRowProps = {
-  label: string;
-  value: string;
-  error?: string;
-  onPress: () => void;
-};
-
-function EnumPickerRow({ label, value, error, onPress }: EnumPickerRowProps) {
-  const { theme } = useUnistyles();
-
-  return (
-    <View style={styles.fieldWrapper}>
-      <AppText style={styles.fieldLabel}>{label}</AppText>
-      <Pressable
-        onPress={onPress}
-        style={(s) => [
-          styles.pickerRow,
-          {
-            borderColor: error
-              ? theme.colors.destructive
-              : s.pressed
-                ? theme.colors.ring
-                : theme.colors.border,
-          },
-        ]}
-      >
-        <AppText
-          style={[
-            styles.pickerValue,
-            {
-              color: value
-                ? theme.colors.foreground
-                : theme.colors.mutedForeground,
-            },
-          ]}
-        >
-          {value || "Select..."}
-        </AppText>
-        <ChevronRight size={16} color={theme.colors.muted} />
-      </Pressable>
       {error ? <AppText style={styles.errorText}>{error}</AppText> : null}
     </View>
   );
