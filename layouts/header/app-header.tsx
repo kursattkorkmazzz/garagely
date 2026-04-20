@@ -6,13 +6,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 type AppHeaderProps = {
   title: string;
   icon?: IconName;
+  iconColor?: string;
   goBack?: {
     canGoBack: boolean;
     goBack: () => void;
   };
 };
 
-export function AppHeader({ title, icon, goBack }: AppHeaderProps) {
+export function AppHeader({ title, icon, iconColor, goBack }: AppHeaderProps) {
   const { theme } = useUnistyles();
 
   const goBackHandler = () => {
@@ -28,7 +29,9 @@ export function AppHeader({ title, icon, goBack }: AppHeaderProps) {
           <Icon name="ArrowLeft" size={24} color={theme.colors.primary} />
         </Pressable>
       )}
-      {icon && <Icon name={icon} size={24} color={theme.colors.primary} />}
+      {icon && (
+        <Icon name={icon} size={24} color={iconColor || theme.colors.primary} />
+      )}
       <AppText style={styles.title}>{title}</AppText>
     </View>
   );
