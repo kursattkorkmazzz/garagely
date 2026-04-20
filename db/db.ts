@@ -1,5 +1,6 @@
 import { UserPreferences } from "@/features/user-preferences/entity/user-preferences.entity";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
+import * as SQLite from "expo-sqlite";
 import { DataSource } from "typeorm";
 
 const SqliteDataSource = new DataSource({
@@ -22,6 +23,8 @@ const SqliteDataSource = new DataSource({
 
   entities: [UserPreferences, Vehicle],
 });
+//TODO: Remove this at production, only for drizzle studio
+export const viewDB = SQLite.openDatabaseSync("garagely.db");
 
 export async function GetGaragelyDatabase() {
   if (!SqliteDataSource.isInitialized) {

@@ -1,4 +1,7 @@
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+
 import "@/components/sheets/sheets";
+import { viewDB } from "@/db/db";
 import { DatabaseProvider } from "@/db/hooks/database-provider";
 import { LocalizationProvider } from "@/i18n";
 import { AppThemeTypes } from "@/shared/theme";
@@ -14,6 +17,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { theme, rt } = useUnistyles();
+
+  useDrizzleStudio(viewDB);
 
   return (
     <SheetProvider>
