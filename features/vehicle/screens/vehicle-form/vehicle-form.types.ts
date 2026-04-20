@@ -1,7 +1,10 @@
-import { type BodyType } from "@/shared/enums/body-type";
-import { type FuelType } from "@/shared/enums/fuel-type";
-import { type TransmissionType } from "@/shared/enums/transmission-type";
 import { type CurrencyType } from "@/shared/currency";
+import { BodyTypes, type BodyType } from "@/shared/enums/body-type";
+import { FuelTypes, type FuelType } from "@/shared/enums/fuel-type";
+import {
+  TransmissionTypes,
+  type TransmissionType,
+} from "@/shared/enums/transmission-type";
 
 export type VehicleFormValues = {
   brand: string;
@@ -17,16 +20,17 @@ export type VehicleFormValues = {
   purchaseDate: number | null;
 };
 
+//TODO: Remove this at production, only for development and testing purposes
 export const VEHICLE_FORM_EMPTY: VehicleFormValues = {
-  brand: "",
-  model: "",
-  year: "",
-  plate: "",
-  color: "",
-  transmissionType: "",
-  bodyType: "",
-  fuelType: "",
-  purchaseAmount: "",
-  purchaseCurrency: "",
+  brand: "Mitsubishi",
+  model: "Carisma Avence",
+  year: "2003",
+  plate: "06 DJR 415",
+  color: "#FF0000",
+  transmissionType: TransmissionTypes.AUTOMATIC,
+  bodyType: BodyTypes.SEDAN,
+  fuelType: FuelTypes.LPG,
+  purchaseAmount: "165000",
+  purchaseCurrency: "TRY",
   purchaseDate: null,
 };
