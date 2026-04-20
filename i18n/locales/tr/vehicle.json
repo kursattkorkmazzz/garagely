@@ -73,6 +73,8 @@
     "transmissionType": "Vites tipi seçin",
     "bodyType": "Kasa tipi seçin",
     "fuelType": "Yakıt tipi seçin",
-    "purchaseAmountInvalid": "Geçerli bir tutar girin"
+    "purchaseAmountInvalid": "Geçerli bir tutar girin",
+    "purchaseAmountMin": "Tutar negatif olamaz",
+    "colorHex": "Geçerli bir hex renk kodu girin"
   }
 }

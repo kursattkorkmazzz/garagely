@@ -17,7 +17,9 @@ export const createVehicleFormSchema = (t: T) => {
       .min(1900, t("errors.yearMin", { min: 1900 }))
       .max(currentYear + 1, t("errors.yearMax", { max: currentYear + 1 })),
     plate: Yup.string().required(t("errors.plate")),
-    color: Yup.string().required(t("errors.color")),
+    color: Yup.string()
+      .required(t("errors.color"))
+      .matches(/^#([0-9A-F]{3}){1,2}$/i, t("errors.colorHex")),
     transmissionType: Yup.string()
       .oneOf(Object.values(TransmissionTypes), t("errors.transmissionType"))
       .required(t("errors.transmissionType")),
@@ -29,7 +31,7 @@ export const createVehicleFormSchema = (t: T) => {
       .required(t("errors.fuelType")),
     purchaseAmount: Yup.number()
       .typeError(t("errors.purchaseAmountInvalid"))
-      .min(0)
+      .min(0, t("errors.purchaseAmountMin"))
       .optional(),
     purchaseCurrency: Yup.string().optional(),
     purchaseDate: Yup.number().nullable().optional(),

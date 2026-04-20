@@ -22,7 +22,7 @@ export function VehicleListItem({ vehicle, onPress }: VehicleListItemProps) {
       onPress={() => onPress(vehicle.id)}
     >
       <View style={styles.left}>
-        <BackgroundedIcon icon="Car" iconColor={theme.colors.primary} />
+        <BackgroundedIcon icon="Car" iconColor={vehicle.color} size={42} />
         <View style={styles.labelStack}>
           <AppText style={styles.brand}>{vehicle.brand}</AppText>
           <AppText style={styles.sub}>
@@ -40,9 +40,10 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: theme.spacing.sm + 2,
-    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
     minHeight: 52,
+    borderRadius: theme.radius.md,
   },
   left: {
     flex: 1,

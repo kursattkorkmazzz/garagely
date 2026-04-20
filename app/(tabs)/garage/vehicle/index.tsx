@@ -39,7 +39,9 @@ export default function VehicleList() {
         <VehicleListItem vehicle={item} onPress={openVehicleForm} />
       )}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
-      contentContainerStyle={vehicles.length === 0 && styles.emptyContainer}
+      contentContainerStyle={
+        vehicles.length === 0 ? styles.emptyContainer : styles.container
+      }
       ListEmptyComponent={isLoading ? null : <EmptyState />}
       style={styles.list}
     />
@@ -84,6 +86,10 @@ const styles = StyleSheet.create((theme) => ({
     height: 1,
     backgroundColor: theme.colors.border,
     marginLeft: theme.spacing.md + 40 + theme.spacing.md,
+  },
+  container: {
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
   },
   emptyContainer: {
     flex: 1,

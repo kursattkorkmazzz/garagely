@@ -73,6 +73,8 @@
     "transmissionType": "Select a transmission type",
     "bodyType": "Select a body type",
     "fuelType": "Select a fuel type",
-    "purchaseAmountInvalid": "Enter a valid amount"
+    "purchaseAmountInvalid": "Enter a valid amount",
+    "purchaseAmountMin": "Amount cannot be negative",
+    "colorHex": "Enter a valid hex color code"
   }
 }
