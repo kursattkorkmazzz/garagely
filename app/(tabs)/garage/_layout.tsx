@@ -22,7 +22,18 @@ export default function GarageLayout({
         name="vehicle/index"
         options={{
           headerShown: true,
-          header: (props) => <AppHeader title={"Vehicles"} />,
+          header: (props) => {
+            return (
+              <AppHeader
+                title={"Vehicles"}
+                icon="Car"
+                goBack={{
+                  canGoBack: props.navigation.canGoBack(),
+                  goBack: props.navigation.goBack,
+                }}
+              />
+            );
+          },
         }}
       />
     </Stack>
