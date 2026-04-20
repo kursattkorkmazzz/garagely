@@ -33,6 +33,10 @@ export default function GarageLayout({
                   canGoBack: props.navigation.canGoBack(),
                   goBack: props.navigation.goBack,
                 }}
+                RightComponent={props.options.headerRight?.({
+                  canGoBack: props.navigation.canGoBack(),
+                  tintColor: props.options.headerTintColor,
+                })}
               />
             );
           },

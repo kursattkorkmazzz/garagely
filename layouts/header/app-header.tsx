@@ -1,5 +1,6 @@
 import { AppText } from "@/components/ui/app-text";
 import Icon, { IconName } from "@/components/ui/icon";
+import { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -11,9 +12,16 @@ type AppHeaderProps = {
     canGoBack: boolean;
     goBack: () => void;
   };
+  RightComponent?: ReactNode;
 };
 
-export function AppHeader({ title, icon, iconColor, goBack }: AppHeaderProps) {
+export function AppHeader({
+  title,
+  icon,
+  iconColor,
+  goBack,
+  RightComponent,
+}: AppHeaderProps) {
   const { theme } = useUnistyles();
 
   const goBackHandler = () => {
@@ -33,6 +41,10 @@ export function AppHeader({ title, icon, iconColor, goBack }: AppHeaderProps) {
         <Icon name={icon} size={24} color={iconColor || theme.colors.primary} />
       )}
       <AppText style={styles.title}>{title}</AppText>
+
+      {RightComponent && (
+        <View style={styles.rightComponent}>{RightComponent}</View>
+      )}
     </View>
   );
 }
@@ -54,5 +66,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   goBackButton: {
     padding: theme.spacing.sm,
+  },
+  rightComponent: {
+    flex: 1,
+    alignItems: "flex-end",
   },
 }));
