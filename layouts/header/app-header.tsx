@@ -12,6 +12,8 @@ type AppHeaderProps = {
   RightComponent?: ReactNode;
 } & NativeStackHeaderProps;
 
+export const APP_HEADER_HEIGHT = 56;
+
 export function AppHeader({
   title,
   icon,
@@ -49,7 +51,7 @@ export function AppHeader({
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    height: 56,
+    height: APP_HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.sm,

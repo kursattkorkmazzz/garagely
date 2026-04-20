@@ -10,6 +10,7 @@ import { AppText } from "@/components/ui/app-text";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
 import { useI18n } from "@/i18n";
+import { APP_HEADER_HEIGHT } from "@/layouts/header/app-header";
 import { CurrencyType, CurrencyTypes } from "@/shared/currency";
 import { BodyType, BodyTypes } from "@/shared/enums/body-type";
 import { FuelType, FuelTypes } from "@/shared/enums/fuel-type";
@@ -22,7 +23,13 @@ import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
 import { ChevronRight } from "lucide-react-native/icons";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { vehicleFormSchema } from "./vehicle-form.schema";
@@ -164,147 +171,162 @@ function VehicleFormFields() {
     );
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={APP_HEADER_HEIGHT}
     >
-      {/* Basic Info */}
-      <AppText style={styles.sectionHeader}>{t("sections.basicInfo")}</AppText>
-      <View style={styles.fieldGroup}>
-        <FormField
-          label={t("fields.brand")}
-          placeholder={t("placeholders.brand")}
-          value={values.brand}
-          onChangeText={handleChange("brand")}
-          onBlur={handleBlur("brand")}
-          error={touched.brand ? errors.brand : undefined}
-          autoCapitalize="words"
-        />
-        <FormField
-          label={t("fields.model")}
-          placeholder={t("placeholders.model")}
-          value={values.model}
-          onChangeText={handleChange("model")}
-          onBlur={handleBlur("model")}
-          error={touched.model ? errors.model : undefined}
-          autoCapitalize="words"
-        />
-        <FormField
-          label={t("fields.year")}
-          placeholder={t("placeholders.year")}
-          value={values.year}
-          onChangeText={handleChange("year")}
-          onBlur={handleBlur("year")}
-          error={touched.year ? errors.year : undefined}
-          keyboardType="number-pad"
-          maxLength={4}
-        />
-        <FormField
-          label={t("fields.plate")}
-          placeholder={t("placeholders.plate")}
-          value={values.plate}
-          onChangeText={handleChange("plate")}
-          onBlur={handleBlur("plate")}
-          error={touched.plate ? errors.plate : undefined}
-          autoCapitalize="characters"
-        />
-        <FormField
-          label={t("fields.color")}
-          placeholder={t("placeholders.color")}
-          value={values.color}
-          onChangeText={handleChange("color")}
-          onBlur={handleBlur("color")}
-          error={touched.color ? errors.color : undefined}
-          autoCapitalize="words"
-        />
-      </View>
-
-      {/* Vehicle Details */}
-      <AppText style={styles.sectionHeader}>
-        {t("sections.vehicleDetails")}
-      </AppText>
-      <View style={styles.fieldGroup}>
-        <EnumPickerRow
-          label={t("fields.fuelType")}
-          value={values.fuelType ? t(`fuelType.${values.fuelType}`) : ""}
-          error={touched.fuelType ? errors.fuelType : undefined}
-          onPress={showFuelTypeSheet}
-        />
-        <EnumPickerRow
-          label={t("fields.transmissionType")}
-          value={
-            values.transmissionType
-              ? t(`transmissionType.${values.transmissionType}`)
-              : ""
-          }
-          error={touched.transmissionType ? errors.transmissionType : undefined}
-          onPress={showTransmissionSheet}
-        />
-        <EnumPickerRow
-          label={t("fields.bodyType")}
-          value={values.bodyType ? t(`bodyType.${values.bodyType}`) : ""}
-          error={touched.bodyType ? errors.bodyType : undefined}
-          onPress={showBodyTypeSheet}
-        />
-      </View>
-
-      {/* Purchase Info */}
-      <AppText style={styles.sectionHeader}>
-        {t("sections.purchaseInfo")}
-      </AppText>
-      <View style={styles.fieldGroup}>
-        <View style={styles.fieldWrapper}>
-          <AppText style={styles.fieldLabel}>
-            {t("fields.purchaseAmount")}
-          </AppText>
-          <AppInputGroup
-            error={!!(touched.purchaseAmount && errors.purchaseAmount)}
-          >
-            <AppInputField
-              placeholder={t("placeholders.purchaseAmount")}
-              value={values.purchaseAmount}
-              onChangeText={handleChange("purchaseAmount")}
-              onBlur={handleBlur("purchaseAmount")}
-              keyboardType="numeric"
-            />
-            <AppInputAddon position="right">
-              <Pressable
-                onPress={showCurrencySheet}
-                style={styles.currencyAddon}
-              >
-                <AppInputText>
-                  {values.purchaseCurrency || CurrencyTypes.TRY}
-                </AppInputText>
-                <ChevronRight size={12} color={theme.colors.mutedForeground} />
-              </Pressable>
-            </AppInputAddon>
-          </AppInputGroup>
-          {touched.purchaseAmount && errors.purchaseAmount ? (
-            <AppText style={styles.errorText}>{errors.purchaseAmount}</AppText>
-          ) : null}
-        </View>
-
-        <View style={styles.fieldWrapper}>
-          <AppText style={styles.fieldLabel}>
-            {t("fields.purchaseDate")}
-          </AppText>
-          <AppInputGroup>
-            <AppInputField placeholder="— (coming soon)" editable={false} />
-          </AppInputGroup>
-        </View>
-      </View>
-
-      <AppButton
-        variant="primary"
-        size="lg"
-        loading={isSubmitting}
-        onPress={() => handleSubmit()}
-        style={styles.submitButton}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
       >
-        {t("addVehicle")}
-      </AppButton>
-    </ScrollView>
+        {/* Basic Info */}
+        <AppText style={styles.sectionHeader}>
+          {t("sections.basicInfo")}
+        </AppText>
+        <View style={styles.fieldGroup}>
+          <FormField
+            label={t("fields.brand")}
+            placeholder={t("placeholders.brand")}
+            value={values.brand}
+            onChangeText={handleChange("brand")}
+            onBlur={handleBlur("brand")}
+            error={touched.brand ? errors.brand : undefined}
+            autoCapitalize="words"
+          />
+          <FormField
+            label={t("fields.model")}
+            placeholder={t("placeholders.model")}
+            value={values.model}
+            onChangeText={handleChange("model")}
+            onBlur={handleBlur("model")}
+            error={touched.model ? errors.model : undefined}
+            autoCapitalize="words"
+          />
+          <FormField
+            label={t("fields.year")}
+            placeholder={t("placeholders.year")}
+            value={values.year}
+            onChangeText={handleChange("year")}
+            onBlur={handleBlur("year")}
+            error={touched.year ? errors.year : undefined}
+            keyboardType="number-pad"
+            maxLength={4}
+          />
+          <FormField
+            label={t("fields.plate")}
+            placeholder={t("placeholders.plate")}
+            value={values.plate}
+            onChangeText={handleChange("plate")}
+            onBlur={handleBlur("plate")}
+            error={touched.plate ? errors.plate : undefined}
+            autoCapitalize="characters"
+          />
+          <FormField
+            label={t("fields.color")}
+            placeholder={t("placeholders.color")}
+            value={values.color}
+            onChangeText={handleChange("color")}
+            onBlur={handleBlur("color")}
+            error={touched.color ? errors.color : undefined}
+            autoCapitalize="words"
+          />
+        </View>
+
+        {/* Vehicle Details */}
+        <AppText style={styles.sectionHeader}>
+          {t("sections.vehicleDetails")}
+        </AppText>
+        <View style={styles.fieldGroup}>
+          <EnumPickerRow
+            label={t("fields.fuelType")}
+            value={values.fuelType ? t(`fuelType.${values.fuelType}`) : ""}
+            error={touched.fuelType ? errors.fuelType : undefined}
+            onPress={showFuelTypeSheet}
+          />
+          <EnumPickerRow
+            label={t("fields.transmissionType")}
+            value={
+              values.transmissionType
+                ? t(`transmissionType.${values.transmissionType}`)
+                : ""
+            }
+            error={
+              touched.transmissionType ? errors.transmissionType : undefined
+            }
+            onPress={showTransmissionSheet}
+          />
+          <EnumPickerRow
+            label={t("fields.bodyType")}
+            value={values.bodyType ? t(`bodyType.${values.bodyType}`) : ""}
+            error={touched.bodyType ? errors.bodyType : undefined}
+            onPress={showBodyTypeSheet}
+          />
+        </View>
+
+        {/* Purchase Info */}
+        <AppText style={styles.sectionHeader}>
+          {t("sections.purchaseInfo")}
+        </AppText>
+        <View style={styles.fieldGroup}>
+          <View style={styles.fieldWrapper}>
+            <AppText style={styles.fieldLabel}>
+              {t("fields.purchaseAmount")}
+            </AppText>
+            <AppInputGroup
+              error={!!(touched.purchaseAmount && errors.purchaseAmount)}
+            >
+              <AppInputField
+                placeholder={t("placeholders.purchaseAmount")}
+                value={values.purchaseAmount}
+                onChangeText={handleChange("purchaseAmount")}
+                onBlur={handleBlur("purchaseAmount")}
+                keyboardType="numeric"
+              />
+              <AppInputAddon position="right">
+                <Pressable
+                  onPress={showCurrencySheet}
+                  style={styles.currencyAddon}
+                >
+                  <AppInputText>
+                    {values.purchaseCurrency || CurrencyTypes.TRY}
+                  </AppInputText>
+                  <ChevronRight
+                    size={12}
+                    color={theme.colors.mutedForeground}
+                  />
+                </Pressable>
+              </AppInputAddon>
+            </AppInputGroup>
+            {touched.purchaseAmount && errors.purchaseAmount ? (
+              <AppText style={styles.errorText}>
+                {errors.purchaseAmount}
+              </AppText>
+            ) : null}
+          </View>
+
+          <View style={styles.fieldWrapper}>
+            <AppText style={styles.fieldLabel}>
+              {t("fields.purchaseDate")}
+            </AppText>
+            <AppInputGroup>
+              <AppInputField placeholder="— (coming soon)" editable={false} />
+            </AppInputGroup>
+          </View>
+        </View>
+
+        <AppButton
+          variant="primary"
+          size="lg"
+          loading={isSubmitting}
+          onPress={() => handleSubmit()}
+          style={styles.submitButton}
+        >
+          {t("addVehicle")}
+        </AppButton>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -1,8 +1,8 @@
 import { BaseEntity } from "@/db/entity/base.entity";
-import { Money } from "@/shared/money";
 import { type BodyType } from "@/shared/enums/body-type";
 import { type FuelType } from "@/shared/enums/fuel-type";
 import { type TransmissionType } from "@/shared/enums/transmission-type";
+import { Money } from "@/shared/money";
 import { Column, Entity } from "typeorm";
 
 @Entity("vehicles")
