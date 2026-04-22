@@ -1,0 +1,121 @@
+import { GetGaragelyDatabase } from "@/db/db";
+import { AssetEntity } from "@/features/asset/entity/asset.entity";
+import { AssetErrors } from "@/features/asset/errors/asset.errors";
+import { StorageAsset } from "@/features/asset/model/storage-asset";
+import { ExpoFileSystemStorage } from "@/features/asset/storage/expo-fs-storage";
+import { AssetTypes } from "@/features/asset/types/asset-type.type";
+import { UploadAssetOptions } from "@/features/asset/types/asset.service.type";
+import {
+  ImageMimeTypes,
+  MimeType,
+} from "@/features/asset/types/mime-type.type";
+import { AppError } from "@/shared/errors/app-error";
+import { File } from "expo-file-system";
+export class AssetService {
+  static storageRepository = ExpoFileSystemStorage;
+
+  static readonly imageMimeTypes = Object.values(ImageMimeTypes);
+
+  private static async repo() {
+    const db = await GetGaragelyDatabase();
+    return db.getRepository(AssetEntity);
+  }
+
+  private static async uploadAsset(uri: string, options: UploadAssetOptions) {
+    const file = new File(uri);
+    if (typeof options?.maxSize === "number") {
+      this.checkMaxSize(file.size, options.maxSize);
+    }
+
+    let tempFile: StorageAsset | null = null;
+
+    const queryRunner = (await GetGaragelyDatabase()).createQueryRunner();
+
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+
+    try {
+      tempFile = await this.storageRepository.uploadFileToTemp(uri);
+
+      const newAsset = new AssetEntity();
+
+      newAsset.type = options.type;
+      newAsset.mimeType = tempFile.mimeType;
+      newAsset.baseName = tempFile.baseName;
+      newAsset.extension = tempFile.extension;
+      newAsset.fullName = tempFile.fullName;
+      newAsset.basePath = tempFile.basePath;
+      newAsset.fullPath = tempFile.fullPath;
+      newAsset.sizeBytes = tempFile.sizeBytes;
+
+      const assetRepo = queryRunner.manager.getRepository(AssetEntity);
+
+      const savedAssetEntity = await assetRepo.save(newAsset);
+
+      const finalAssetId = savedAssetEntity.id;
+
+      await this.storageRepository.commitFile(tempFile, finalAssetId);
+
+      await queryRunner.commitTransaction();
+
+      return savedAssetEntity;
+    } catch (error) {
+      if (tempFile) {
+        await this.storageRepository.deleteFile(tempFile);
+      }
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      queryRunner.release();
+    }
+  }
+
+  static async uploadImageAsset(
+    uri: string,
+    options?: Omit<UploadAssetOptions, "type">,
+  ) {
+    const originalFile = new File(uri);
+    if (!originalFile.exists) {
+      throw AppError.createAppError(
+        AssetErrors.FILE_NOT_FOUND_ERROR,
+        undefined,
+        {
+          uri,
+        },
+      );
+    }
+    const mimeType = originalFile.type;
+
+    this.isSupportedMimeType(mimeType as any, this.imageMimeTypes);
+
+    return this.uploadAsset(uri, {
+      maxSize: 5120, // Default max size for images is 5MB
+      ...options,
+      type: AssetTypes.IMAGE, // Force type to IMAGE for this method
+    });
+  }
+
+  private static checkMaxSize(fileSize: number, maxSize: number): void {
+    if (fileSize > maxSize) {
+      throw AppError.createAppError(
+        AssetErrors.MAX_FILE_SIZE_EXCEEDED,
+        undefined,
+        { size: fileSize, maxSize: maxSize },
+      );
+    }
+  }
+
+  private static isSupportedMimeType(
+    fileMimeType: number,
+    supportedMimeTypes: MimeType[],
+  ): void {
+    if (!supportedMimeTypes.includes(fileMimeType as any)) {
+      throw AppError.createAppError(
+        AssetErrors.NOT_SUPPORTED_MIME_TYPE,
+        undefined,
+        { mimeType: fileMimeType },
+      );
+    }
+  }
+}

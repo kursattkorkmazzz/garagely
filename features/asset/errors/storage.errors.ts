@@ -1,0 +1,11 @@
+export const StorageErrors = {
+  STORAGE_WRITE_ERROR: "STORAGE_WRITE_ERROR",
+  STORAGE_COMMIT_ERROR: "STORAGE_COMMIT_ERROR",
+  STORAGE_DELETE_ERROR: "STORAGE_DELETE_ERROR",
+
+  FILE_NOT_FOUND_ERROR: "FILE_NOT_FOUND_ERROR",
+
+  UNKNOWN_MIME_TYPE_ERROR: "UNKNOWN_MIME_TYPE_ERROR",
+} as const;
+
+export type StorageError = (typeof StorageErrors)[keyof typeof StorageErrors];

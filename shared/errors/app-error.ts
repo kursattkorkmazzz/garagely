@@ -1,13 +1,17 @@
+import { AssetError } from "@/features/asset/errors/asset.errors";
+import { StorageError } from "@/features/asset/errors/storage.errors";
 import { GlobalError } from "@/shared/errors/global.errors";
+
+export type AppErrorCode = GlobalError | StorageError | AssetError;
 
 export class AppError {
   message?: string;
-  errorCode: GlobalError | string;
+  errorCode: AppErrorCode;
   details?: Record<string, any>;
 
   constructor(
-    message: string,
-    errorCode: GlobalError | string,
+    errorCode: AppErrorCode,
+    message?: string,
     details?: Record<string, any>,
   ) {
     this.message = message;
@@ -16,10 +20,10 @@ export class AppError {
   }
 
   static createAppError(
-    message: string,
-    errorCode: GlobalError | string,
+    errorCode: AppErrorCode,
+    message?: string,
     details?: Record<string, any>,
   ): AppError {
-    return new AppError(message, errorCode, details);
+    return new AppError(errorCode, message, details);
   }
 }
