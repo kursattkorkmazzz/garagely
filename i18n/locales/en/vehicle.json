@@ -28,6 +28,7 @@
   },
 
   "sections": {
+    "coverPhoto": "Cover Photo",
     "basicInfo": "Basic Info",
     "vehicleDetails": "Vehicle Details",
     "purchaseInfo": "Purchase Info (Optional)"

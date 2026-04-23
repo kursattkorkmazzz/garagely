@@ -28,6 +28,7 @@
   },
 
   "sections": {
+    "coverPhoto": "Kapak Fotoğrafı",
     "basicInfo": "Temel Bilgiler",
     "vehicleDetails": "Araç Detayları",
     "purchaseInfo": "Alış Bilgileri (Opsiyonel)"

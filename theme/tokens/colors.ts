@@ -94,7 +94,7 @@ export const AppDarkColors = {
   destructive: "#FB7185",
   destructiveForeground: "#ffffff",
 
-  border: "#292524",
+  border: "#433d3b",
   input: "#292524",
   ring: "#F43F5E",
 

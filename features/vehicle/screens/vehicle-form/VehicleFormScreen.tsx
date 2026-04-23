@@ -1,4 +1,5 @@
 import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
+import { ImagePicker } from "@/components/image-picker/image-picker";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import {
@@ -184,6 +185,12 @@ function VehicleFormFields() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
+        <AppText style={styles.sectionHeader}>
+          {t("sections.coverPhoto")}
+        </AppText>
+        <View style={styles.imagePickerContainer}>
+          <ImagePicker allowsMultipleSelection={true} selectionLimit={5} />
+        </View>
         {/* Basic Info */}
         <AppText style={styles.sectionHeader}>
           {t("sections.basicInfo")}
@@ -439,6 +446,9 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.border,
     overflow: "hidden",
     gap: 0,
+  },
+  imagePickerContainer: {
+    paddingHorizontal: theme.spacing.md,
   },
   fieldWrapper: {
     paddingHorizontal: theme.spacing.md,

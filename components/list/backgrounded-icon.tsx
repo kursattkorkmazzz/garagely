@@ -5,12 +5,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 type BackgroundedIconProps = {
   icon: IconName;
   iconColor: string;
+  iconBackgroundOpacity?: number;
   size?: number;
 };
 
 export function BackgroundedIcon({
   icon,
   iconColor,
+  iconBackgroundOpacity = 0.14,
   size = 24,
 }: BackgroundedIconProps) {
   const { theme } = useUnistyles();
@@ -20,7 +22,10 @@ export function BackgroundedIcon({
       style={[
         styles.iconBackground,
         {
-          backgroundColor: theme.utils.withOpacity(iconColor, 0.14),
+          backgroundColor: theme.utils.withOpacity(
+            iconColor,
+            iconBackgroundOpacity,
+          ),
         },
       ]}
     >
