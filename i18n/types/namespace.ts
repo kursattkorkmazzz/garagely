@@ -8,6 +8,7 @@ export const TranslationNamespaces = {
   THEME: "theme",
   GARAGE: "garage",
   VEHICLE: "vehicle",
+  COMPONENTS: "components",
 } as const;
 
 export type TranslationNamespace =

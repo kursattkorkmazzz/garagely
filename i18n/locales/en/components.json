@@ -1,0 +1,8 @@
+{
+  "imagePicker": {
+    "noImagesSelected": "No images selected.",
+    "pickFromDeviceLibrary": "Select from library",
+    "takePhoto": "Take a photo",
+    "selectionLimitExceeded": "Selection limit exceeded."
+  }
+}

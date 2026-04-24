@@ -2,6 +2,8 @@ import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image
 import { ImagePickerPreview } from "@/components/image-picker/image-picker-viewer";
 import { PickedImageList } from "@/components/image-picker/picked-image-list";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
+import { useI18n } from "@/i18n";
+import { TranslationNamespaces } from "@/i18n/types/namespace";
 import {
   CameraType,
   CropShape,
@@ -29,6 +31,8 @@ type ImagePickerProps = {
 };
 
 export function ImagePicker(props: ImagePickerProps) {
+  const { t } = useI18n(TranslationNamespaces.COMPONENTS);
+
   const pickedImageState = usePickedImage({
     allowsMultipleSelection: props.allowsMultipleSelection,
     maxSelectionLimit: props.selectionLimit,
@@ -40,21 +44,21 @@ export function ImagePicker(props: ImagePickerProps) {
         data: [
           {
             key: "pick-from-device-library",
-            label: "Pick from Device Library",
+            label: t("imagePicker.pickFromDeviceLibrary"),
           },
           {
             key: "take-photo",
-            label: "Take a Photo",
+            label: t("imagePicker.takePhoto"),
           },
         ],
       },
     ],
-    [],
+    [t],
   );
 
   const pickImageHandler = () => {
     if (pickedImageState.remainingSelectionLimit <= 0) {
-      console.log("Selection limit exceeded.");
+      console.log(t("imagePicker.selectionLimitExceeded"));
       return;
     }
     SheetManager.show("select-sheet", {

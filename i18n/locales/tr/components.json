@@ -1,0 +1,8 @@
+{
+  "imagePicker": {
+    "noImagesSelected": "Resim seçilmedi.",
+    "pickFromDeviceLibrary": "Cihaz kitaplığından seç",
+    "takePhoto": "Fotoğraf çek",
+    "selectionLimitExceeded": "Seçim limiti aşıldı."
+  }
+}

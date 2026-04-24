@@ -1,5 +1,7 @@
 import { AppText } from "@/components/ui/app-text";
 import Icon from "@/components/ui/icon";
+import { useI18n } from "@/i18n";
+import { TranslationNamespaces } from "@/i18n/types/namespace";
 import { Image } from "expo-image";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -13,6 +15,7 @@ type PickedImageListProps = {
 };
 
 export function PickedImageList(props: PickedImageListProps) {
+  const { t } = useI18n(TranslationNamespaces.COMPONENTS);
   return (
     <View style={styles.container}>
       {typeof props.totalImageCount !== "undefined" &&
@@ -27,7 +30,9 @@ export function PickedImageList(props: PickedImageListProps) {
         contentContainerStyle={styles.scrollContainerContent}
       >
         {props.imageUriList.length === 0 && (
-          <AppText style={styles.noContentText}>No images selected.</AppText>
+          <AppText style={styles.noContentText}>
+            {t("imagePicker.noImagesSelected")}
+          </AppText>
         )}
         {props.imageUriList.map((imageUri) => (
           <PickedImageListItem
