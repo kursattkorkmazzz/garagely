@@ -19,5 +19,7 @@
   "accessoryExpense": "Accessory Expense",
   "accessoryExpenseSub": "Parts and accessory purchases",
   "parkPlace": "Park Place",
-  "parkPlaceSub": "Save and navigate to your parking spots"
+  "parkPlaceSub": "Save and navigate to your parking spots",
+  "gallery": "Gallery",
+  "gallerySub": "Manage all assets related to your vehicles"
 }

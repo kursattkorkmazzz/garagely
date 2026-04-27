@@ -98,6 +98,13 @@ export default function GaragePage() {
           sub={t("parkPlaceSub")}
           chevron
         />
+        <AppListItem
+          icon="FolderOpen"
+          iconColor="#44ef8b"
+          label={t("gallery")}
+          sub={t("gallerySub")}
+          chevron
+        />
       </AppListGroup>
     </ScrollView>
   );
