@@ -17,7 +17,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet } from "react-native-unistyles";
 
 type ImagePickerProps = {
-  allowEditing?: boolean;
+  allowsEditing?: boolean;
   allowsMultipleSelection?: boolean;
   aspect?: [number, number];
   cameraType?: CameraType;
@@ -70,13 +70,9 @@ export function ImagePicker(props: ImagePickerProps) {
             onPress={async () => {
               let result: string[] | null = null;
               if (item.key === "take-photo") {
-                result = await pickedImageState.pickImageFromCamera({
-                  ...props,
-                });
+                result = await pickedImageState.pickImageFromCamera(props);
               } else if (item.key === "pick-from-device-library") {
-                result = await pickedImageState.pickImageFromLibrary({
-                  ...props,
-                });
+                result = await pickedImageState.pickImageFromLibrary(props);
               }
 
               pickedImageState.addPickedImage(result || []);
@@ -87,8 +83,6 @@ export function ImagePicker(props: ImagePickerProps) {
       },
     });
   };
-
-  console.log(pickedImageState.selectedImageUriList);
 
   return (
     <View style={styles.container}>

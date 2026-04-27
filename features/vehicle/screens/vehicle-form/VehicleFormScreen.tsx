@@ -198,7 +198,14 @@ function VehicleFormFields() {
           {t("sections.coverPhoto")}
         </AppText>
         <View style={styles.imagePickerContainer}>
-          <ImagePicker allowsMultipleSelection={true} selectionLimit={5} />
+          <ImagePicker
+            allowsMultipleSelection={false}
+            selectionLimit={1}
+            allowsEditing={true}
+            aspect={[16, 9]}
+            shape="rectangle"
+            mediaTypes={["images"]}
+          />
         </View>
         {/* Basic Info */}
         <AppText style={styles.sectionHeader}>
