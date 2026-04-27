@@ -1,6 +1,7 @@
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 import "@/components/sheets/sheets";
+import { AppToast } from "@/components/ui/app-toast/app-toast";
 import { viewDB } from "@/db/db";
 import { DatabaseProvider } from "@/db/hooks/database-provider";
 import { LocalizationProvider } from "@/i18n";
@@ -39,6 +40,7 @@ export default function RootLayout() {
                     : "light-content"
                 }
               />
+              <AppToast />
             </>
           </SafeAreaView>
         </LocalizationProvider>

@@ -21,8 +21,8 @@ import {
   TransmissionType,
   TransmissionTypes,
 } from "@/shared/enums/transmission-type";
-import { AppError } from "@/shared/errors/app-error";
 import { useVehicleStore } from "@/stores/vehicle.store";
+import { handleUIError } from "@/utils/handle-ui-error";
 import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
 import { ChevronRight } from "lucide-react-native/icons";
@@ -65,17 +65,18 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   const handleSubmit = async (values: VehicleFormValues) => {
     const dto = formValuesToDto(values);
     if (isNew) {
-      await create(dto).catch((err) => {
-        if (err instanceof AppError) {
-          const localizedString = tErrors(err.errorCode as any);
-          console.log(localizedString);
-          alert(localizedString);
-        }
-      });
+      await create(dto)
+        .then(() => {
+          router.back();
+        })
+        .catch(handleUIError);
     } else {
-      await update(id, dto);
+      await update(id, dto)
+        .then(() => {
+          router.back();
+        })
+        .catch(handleUIError);
     }
-    router.back();
   };
 
   if (loadingVehicle) {
