@@ -1,8 +1,13 @@
 import { AssetError } from "@/features/asset/errors/asset.errors";
 import { StorageError } from "@/features/asset/errors/storage.errors";
+import { VehicleError } from "@/features/vehicle/errors/vehicle.errors";
 import { GlobalError } from "@/shared/errors/global.errors";
 
-export type AppErrorCode = GlobalError | StorageError | AssetError;
+export type AppErrorCode =
+  | GlobalError
+  | StorageError
+  | AssetError
+  | VehicleError;
 
 export class AppError {
   message?: string;

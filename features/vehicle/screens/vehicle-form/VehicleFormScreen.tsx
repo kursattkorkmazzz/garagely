@@ -21,6 +21,7 @@ import {
   TransmissionType,
   TransmissionTypes,
 } from "@/shared/enums/transmission-type";
+import { AppError } from "@/shared/errors/app-error";
 import { useVehicleStore } from "@/stores/vehicle.store";
 import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
@@ -45,6 +46,7 @@ type VehicleFormScreenProps = {
 export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   const isNew = id === "new";
   const { t } = useI18n("vehicle");
+  const { t: tErrors } = useI18n("errors");
   const validationSchema = useMemo(() => createVehicleFormSchema(t), [t]);
   const [initialValues, setInitialValues] =
     useState<VehicleFormValues>(VEHICLE_FORM_EMPTY);
@@ -63,7 +65,13 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   const handleSubmit = async (values: VehicleFormValues) => {
     const dto = formValuesToDto(values);
     if (isNew) {
-      await create(dto);
+      await create(dto).catch((err) => {
+        if (err instanceof AppError) {
+          const localizedString = tErrors(err.errorCode as any);
+          console.log(localizedString);
+          alert(localizedString);
+        }
+      });
     } else {
       await update(id, dto);
     }

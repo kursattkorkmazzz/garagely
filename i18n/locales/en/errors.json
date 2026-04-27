@@ -2,5 +2,7 @@
   "FORBIDDEN": "You don't have permission to access this resource.",
   "UNAUTHORIZED": "You need to log in to access this resource.",
   "NETWORK_ERROR": "A network error occurred. Please check your connection and try again.",
-  "UNKNOWN_ERROR": "An unknown error occurred. Please notify support and try again later."
+  "UNKNOWN_ERROR": "An unknown error occurred. Please notify support and try again later.",
+
+  "PLATE_NUMBER_EXISTS": "A vehicle with this plate number already exists. Please check the plate number and try again."
 }

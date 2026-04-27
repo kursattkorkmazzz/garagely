@@ -1,5 +1,7 @@
 import { GetGaragelyDatabase } from "@/db/db";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
+import { VehicleErrors } from "@/features/vehicle/errors/vehicle.errors";
+import { AppError } from "@/shared/errors/app-error";
 
 export type CreateVehicleDto = Omit<Vehicle, "id" | "createdAt" | "updateAt">;
 export type UpdateVehicleDto = Partial<CreateVehicleDto>;
@@ -22,6 +24,15 @@ export class VehicleService {
 
   static async create(dto: CreateVehicleDto): Promise<Vehicle> {
     const repo = await VehicleService.repo();
+
+    // Check the same plate number.
+    const existingVehicle = await repo.countBy({
+      plate: dto.plate,
+    });
+    if (existingVehicle > 0) {
+      throw new AppError(VehicleErrors.PLATE_NUMBER_EXISTS);
+    }
+
     const vehicle = repo.create(dto);
     return repo.save(vehicle);
   }
@@ -29,7 +40,7 @@ export class VehicleService {
   static async update(id: string, dto: UpdateVehicleDto): Promise<Vehicle> {
     const repo = await VehicleService.repo();
     await repo.update(id, dto);
-    return (await repo.findOneByOrFail({ id }));
+    return await repo.findOneByOrFail({ id });
   }
 
   static async delete(id: string): Promise<void> {

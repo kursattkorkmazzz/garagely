@@ -2,5 +2,7 @@
   "FORBIDDEN": "Bu kaynağa erişim izniniz yok.",
   "UNAUTHORIZED": "Bu kaynağı erişmek için giriş yapmanız gerekiyor.",
   "NETWORK_ERROR": "Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
-  "UNKNOWN_ERROR": "Bilinmeyen bir hata oluştu. Lütfen destek ekibine haber verin ve daha sonra tekrar deneyin."
+  "UNKNOWN_ERROR": "Bilinmeyen bir hata oluştu. Lütfen destek ekibine haber verin ve daha sonra tekrar deneyin.",
+
+  "PLATE_NUMBER_EXISTS": "Bu plaka numarasına sahip bir araç zaten var. Lütfen plaka numarasını kontrol edin ve tekrar deneyin."
 }

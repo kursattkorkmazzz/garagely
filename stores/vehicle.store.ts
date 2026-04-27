@@ -74,5 +74,5 @@ export const useVehicleStore = create<VehicleState & VehicleActions>()(
       const { vehicles, activeVehicleId } = get();
       return vehicles.find((v) => v.id === activeVehicleId) ?? null;
     },
-  })
+  }),
 );
