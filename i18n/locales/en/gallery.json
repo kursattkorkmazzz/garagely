@@ -1,0 +1,28 @@
+{
+  "title": "Gallery",
+  "subtitle": "Your media and documents",
+  "upload": "Upload",
+  "uploadPhoto": "Upload Photo",
+  "filters": {
+    "all": "All",
+    "media": "Media",
+    "documents": "Documents"
+  },
+  "sections": {
+    "recent": "Recent",
+    "media": "Media",
+    "documents": "Documents"
+  },
+  "category": {
+    "all": "All"
+  },
+  "empty": {
+    "title": "No assets yet",
+    "subtitle": "Upload your first photo or document",
+    "cta": "Upload"
+  },
+  "errors": {
+    "uploadFailed": "Upload failed. Please try again.",
+    "deleteFailed": "Could not delete the asset."
+  }
+}

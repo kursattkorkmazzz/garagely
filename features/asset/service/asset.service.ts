@@ -71,6 +71,52 @@ export class AssetService {
     }
   }
 
+  static async getAll(limit: number, offset: number): Promise<AssetEntity[]> {
+    const repo = await AssetService.repo();
+    return repo.find({
+      order: { createdAt: "DESC" },
+      take: limit,
+      skip: offset,
+      relations: ["categories"],
+    });
+  }
+
+  static async getRecent(limit = 10): Promise<AssetEntity[]> {
+    const repo = await AssetService.repo();
+    return repo.find({
+      order: { createdAt: "DESC" },
+      take: limit,
+    });
+  }
+
+  static async getById(id: string): Promise<AssetEntity | null> {
+    const repo = await AssetService.repo();
+    return repo.findOne({
+      where: { id },
+      relations: ["categories"],
+    });
+  }
+
+  static async deleteById(id: string): Promise<void> {
+    const repo = await AssetService.repo();
+    const asset = await repo.findOneBy({ id });
+    if (!asset) {
+      throw AppError.createAppError(AssetErrors.FILE_NOT_FOUND_ERROR);
+    }
+    const storageAsset: StorageAsset = {
+      baseName: asset.baseName,
+      extension: asset.extension,
+      fullPath: asset.fullPath,
+      fullName: asset.fullName,
+      basePath: asset.basePath,
+      mimeType: asset.mimeType,
+      sizeBytes: asset.sizeBytes,
+      isTemp: false,
+    };
+    await ExpoFileSystemStorage.deleteFile(storageAsset);
+    await repo.delete(id);
+  }
+
   static async uploadImageAsset(
     uri: string,
     options?: Omit<UploadAssetOptions, "type">,

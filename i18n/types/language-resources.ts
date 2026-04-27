@@ -4,6 +4,7 @@ import en_common from "@/i18n/locales/en/common.json";
 import en_components from "@/i18n/locales/en/components.json";
 import en_currency from "@/i18n/locales/en/currency.json";
 import en_errors from "@/i18n/locales/en/errors.json";
+import en_gallery from "@/i18n/locales/en/gallery.json";
 import en_garage from "@/i18n/locales/en/garage.json";
 import en_languages from "@/i18n/locales/en/languages.json";
 import en_settings from "@/i18n/locales/en/settings.json";
@@ -15,6 +16,7 @@ import tr_common from "@/i18n/locales/tr/common.json";
 import tr_components from "@/i18n/locales/tr/components.json";
 import tr_currency from "@/i18n/locales/tr/currency.json";
 import tr_errors from "@/i18n/locales/tr/errors.json";
+import tr_gallery from "@/i18n/locales/tr/gallery.json";
 import tr_garage from "@/i18n/locales/tr/garage.json";
 import tr_languages from "@/i18n/locales/tr/languages.json";
 import tr_settings from "@/i18n/locales/tr/settings.json";
@@ -34,6 +36,7 @@ export const LanguageResources = {
     garage: en_garage,
     vehicle: en_vehicle,
     components: en_components,
+    gallery: en_gallery,
   },
   [Languages.TR]: {
     common: tr_common,
@@ -46,5 +49,6 @@ export const LanguageResources = {
     garage: tr_garage,
     vehicle: tr_vehicle,
     components: tr_components,
+    gallery: tr_gallery,
   },
 } as const;

@@ -15,6 +15,9 @@ export default function GaragePage() {
       case "vehicles":
         router.push("/garage/vehicle");
         break;
+      case "gallery":
+        router.push("/(tabs)/gallery");
+        break;
       default:
         break;
     }
@@ -104,6 +107,7 @@ export default function GaragePage() {
           label={t("gallery")}
           sub={t("gallerySub")}
           chevron
+          onPress={() => onAppItemClickHandler("gallery")}
         />
       </AppListGroup>
     </ScrollView>

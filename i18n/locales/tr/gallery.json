@@ -1,0 +1,28 @@
+{
+  "title": "Galeri",
+  "subtitle": "Medya ve belgeleriniz",
+  "upload": "Yükle",
+  "uploadPhoto": "Fotoğraf Yükle",
+  "filters": {
+    "all": "Tümü",
+    "media": "Medya",
+    "documents": "Belgeler"
+  },
+  "sections": {
+    "recent": "Son Eklenenler",
+    "media": "Medya",
+    "documents": "Belgeler"
+  },
+  "category": {
+    "all": "Tümü"
+  },
+  "empty": {
+    "title": "Henüz dosya yok",
+    "subtitle": "İlk fotoğraf veya belgenizi yükleyin",
+    "cta": "Yükle"
+  },
+  "errors": {
+    "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+    "deleteFailed": "Dosya silinemedi."
+  }
+}

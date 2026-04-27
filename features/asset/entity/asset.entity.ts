@@ -1,7 +1,8 @@
 import { BaseEntity } from "@/db/entity/base.entity";
-import { ImageMetadataEntity } from "@/features/asset/entity/metadata/image-metadata.entity";
+import type { AssetCategoryEntity } from "@/features/asset/entity/asset-category.entity";
+import type { ImageMetadataEntity } from "@/features/asset/entity/metadata/image-metadata.entity";
 import { MimeType } from "@/features/asset/types/mime-type.type";
-import { Column, Entity, Index, OneToOne } from "typeorm";
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToOne } from "typeorm";
 
 @Entity("assets")
 @Index(["createdAt"]) // Galeri listesi için
@@ -61,11 +62,21 @@ export class AssetEntity extends BaseEntity {
   @Column({ type: "integer", default: 0 })
   sizeBytes!: number;
 
-  @OneToOne(() => ImageMetadataEntity, (m) => m.asset, {
+  @OneToOne("ImageMetadataEntity", (m: ImageMetadataEntity) => m.asset, {
     lazy: true,
     nullable: true,
-    cascade: ["insert", "update", "remove"], // asset silinince metadata da silinir
+    cascade: ["insert", "update", "remove"],
     onDelete: "CASCADE",
   })
   imageMetadata?: Promise<ImageMetadataEntity | null>;
+
+  @ManyToMany("AssetCategoryEntity", (cat: AssetCategoryEntity) => cat.assets, {
+    nullable: true,
+  })
+  @JoinTable({
+    name: "asset_category_map",
+    joinColumn: { name: "assetId", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "categoryId", referencedColumnName: "id" },
+  })
+  categories?: AssetCategoryEntity[];
 }
