@@ -101,7 +101,7 @@ export function GalleryScreen() {
       />
 
       {/* Son Eklenenler */}
-      {recentAssets.length > 0 && (
+      {store.activeTypeFilter === "all" && recentAssets.length > 0 && (
         <>
           <AppListSectionHeader title={t("sections.recent")} />
           <GalleryRecentStrip assets={recentAssets} onPressAsset={() => {}} />

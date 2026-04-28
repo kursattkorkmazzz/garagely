@@ -1,5 +1,6 @@
 import { GetGaragelyDatabase } from "@/db/db";
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
+import { ImageMetadataEntity } from "@/features/asset/entity/metadata/image-metadata.entity";
 import { AssetErrors } from "@/features/asset/errors/asset.errors";
 import { StorageAsset } from "@/features/asset/model/storage-asset";
 import { ExpoFileSystemStorage } from "@/features/asset/storage/expo-fs-storage";
@@ -11,6 +12,7 @@ import {
 } from "@/features/asset/types/mime-type.type";
 import { AppError } from "@/shared/errors/app-error";
 import { File } from "expo-file-system";
+import { Image } from "react-native";
 export class AssetService {
   static storageRepository = ExpoFileSystemStorage;
 
@@ -19,6 +21,18 @@ export class AssetService {
   private static async repo() {
     const db = await GetGaragelyDatabase();
     return db.getRepository(AssetEntity);
+  }
+
+  private static getImageDimensions(
+    uri: string,
+  ): Promise<{ width: number; height: number }> {
+    return new Promise((resolve) => {
+      Image.getSize(
+        uri,
+        (width, height) => resolve({ width, height }),
+        () => resolve({ width: 0, height: 0 }),
+      );
+    });
   }
 
   private static async uploadAsset(uri: string, options: UploadAssetOptions) {
@@ -70,6 +84,20 @@ export class AssetService {
         fullName: committedFile.fullName,
       });
 
+      // Resim metadata'sını (genişlik × yükseklik) kaydet.
+      if (options.type === AssetTypes.IMAGE) {
+        const { width, height } = await this.getImageDimensions(
+          committedFile.fullPath,
+        );
+        const metadata = new ImageMetadataEntity();
+        metadata.assetId = finalAssetId;
+        metadata.width = width > 0 ? width : null;
+        metadata.height = height > 0 ? height : null;
+        await queryRunner.manager
+          .getRepository(ImageMetadataEntity)
+          .save(metadata);
+      }
+
       await queryRunner.commitTransaction();
 
       // Transaction commit olduktan sonra güncel entity'yi döndür.
@@ -116,11 +144,19 @@ export class AssetService {
   }
 
   static async deleteById(id: string): Promise<void> {
-    const repo = await AssetService.repo();
+    const db = await GetGaragelyDatabase();
+    const repo = db.getRepository(AssetEntity);
     const asset = await repo.findOneBy({ id });
     if (!asset) {
       throw AppError.createAppError(AssetErrors.FILE_NOT_FOUND_ERROR);
     }
+
+    // ImageMetadata varsa önce sil (repo.delete FK cascade tetiklemez)
+    await db
+      .getRepository(ImageMetadataEntity)
+      .delete({ assetId: id });
+
+    // Dosyayı dosya sisteminden sil
     const storageAsset: StorageAsset = {
       baseName: asset.baseName,
       extension: asset.extension,
@@ -132,6 +168,8 @@ export class AssetService {
       isTemp: false,
     };
     await ExpoFileSystemStorage.deleteFile(storageAsset);
+
+    // Asset kaydını sil
     await repo.delete(id);
   }
 

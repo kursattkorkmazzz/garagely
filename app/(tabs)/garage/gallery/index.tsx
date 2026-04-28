@@ -9,7 +9,12 @@ export default function GalleryPage() {
         options={{
           headerShown: true,
           header: (props) => (
-            <AppHeader title={"Gallery"} icon="Car" goBack={true} {...props} />
+            <AppHeader
+              title={"Gallery"}
+              icon="FolderOpen"
+              goBack={true}
+              {...props}
+            />
           ),
         }}
       />
