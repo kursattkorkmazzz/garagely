@@ -1,6 +1,7 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
+import { AppButton } from "@/components/ui/app-button";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { GalleryCategoryChips } from "@/features/gallery/components/GalleryCategoryChips";
 import { GalleryDocumentList } from "@/features/gallery/components/GalleryDocumentList";
@@ -8,12 +9,17 @@ import { GalleryEmpty } from "@/features/gallery/components/GalleryEmpty";
 import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterChips";
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
 import { GalleryRecentStrip } from "@/features/gallery/components/GalleryRecentStrip";
+import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
+import { AppHeader } from "@/layouts/header/app-header";
 import { useI18n } from "@/i18n";
 import { useGalleryStore } from "@/stores/gallery.store";
 import { handleUIError } from "@/utils/handle-ui-error";
+import { Stack } from "expo-router";
+import { Upload } from "lucide-react-native/icons";
 import { useEffect } from "react";
 import {
   ActivityIndicator,
+  Alert,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -34,6 +40,7 @@ export function GalleryScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ─── Scroll / Pagination ──────────────────────────────────────────
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
     const nearEnd =
@@ -41,6 +48,7 @@ export function GalleryScreen() {
     if (nearEnd) store.loadMore();
   };
 
+  // ─── Upload ───────────────────────────────────────────────────────
   const handleUpload = () => {
     SheetManager.show("select-sheet", {
       payload: {
@@ -71,6 +79,26 @@ export function GalleryScreen() {
     });
   };
 
+  // ─── Seçim modu handler'ları ──────────────────────────────────────
+  const handleLongPress = (id: string) => store.enterSelectionMode(id);
+  const handleSelect = (id: string) => store.toggleSelection(id);
+
+  const handleDeleteSelected = () => {
+    Alert.alert(
+      t("selection.deleteConfirmTitle", { count: store.selectedIds.size }),
+      t("selection.deleteConfirmMessage"),
+      [
+        { text: t("selection.cancel"), style: "cancel" },
+        {
+          text: t("selection.delete"),
+          style: "destructive",
+          onPress: () => store.deleteSelected().catch(handleUIError),
+        },
+      ],
+    );
+  };
+
+  // ─── Veriler ──────────────────────────────────────────────────────
   const filtered = store.getFilteredAssets();
   const recentAssets = store.getRecentAssets();
   const mediaAssets = filtered.filter(
@@ -78,70 +106,125 @@ export function GalleryScreen() {
   );
   const docAssets = filtered.filter((a) => a.type === AssetTypes.DOCUMENT);
 
+  const stackScreen = (
+    <Stack.Screen
+      options={{
+        headerShown: true,
+        header: (props) => (
+          <AppHeader
+            title="Gallery"
+            icon="FolderOpen"
+            goBack={true}
+            RightComponent={
+              <AppButton variant="ghost" size="icon" onPress={handleUpload}>
+                <Upload size={20} color={theme.colors.primary} />
+              </AppButton>
+            }
+            {...props}
+          />
+        ),
+      }}
+    />
+  );
+
   if (store.isLoading) {
     return (
       <View style={styles.loadingContainer}>
+        {stackScreen}
         <ActivityIndicator color={theme.colors.mutedForeground} />
       </View>
     );
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Type filter chips */}
-      <GalleryFilterChips
-        active={store.activeTypeFilter}
-        onChange={store.setTypeFilter}
+    <View style={styles.root}>
+      {stackScreen}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
+          // Seçim modu aktifken SelectionBar yüksekliği kadar yer bırak
+          store.isSelecting && styles.contentWithBar,
+        ]}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Type filter chips */}
+        <GalleryFilterChips
+          active={store.activeTypeFilter}
+          onChange={store.setTypeFilter}
+        />
+
+        {/* Son Eklenenler */}
+        {store.activeTypeFilter === "all" && recentAssets.length > 0 && (
+          <>
+            <AppListSectionHeader title={t("sections.recent")} />
+            <GalleryRecentStrip
+              assets={recentAssets}
+              isSelecting={store.isSelecting}
+              onPressAsset={() => {}}
+            />
+          </>
+        )}
+
+        {/* Category chips */}
+        <GalleryCategoryChips
+          categories={store.categories}
+          activeId={store.activeCategoryId}
+          onSelect={store.setActiveCategory}
+        />
+
+        {/* Medya grid */}
+        {mediaAssets.length > 0 && (
+          <>
+            <AppListSectionHeader title={t("sections.media")} />
+            <GalleryMediaGrid
+              assets={mediaAssets}
+              isLoadingMore={store.isLoadingMore}
+              isSelecting={store.isSelecting}
+              selectedIds={store.selectedIds}
+              onPressAsset={() => {}}
+              onLongPressAsset={handleLongPress}
+              onSelectAsset={handleSelect}
+            />
+          </>
+        )}
+
+        {/* Belgeler list */}
+        {docAssets.length > 0 && (
+          <>
+            <AppListSectionHeader title={t("sections.documents")} />
+            <GalleryDocumentList
+              assets={docAssets}
+              isSelecting={store.isSelecting}
+              selectedIds={store.selectedIds}
+              onPressAsset={() => {}}
+              onLongPressAsset={handleLongPress}
+              onSelectAsset={handleSelect}
+            />
+          </>
+        )}
+
+        {/* Empty state */}
+        {filtered.length === 0 && <GalleryEmpty onUpload={handleUpload} />}
+      </ScrollView>
+
+      {/* Seçim action bar — ScrollView dışında, sabit pozisyonlu */}
+      <GallerySelectionBar
+        selectedCount={store.selectedIds.size}
+        onDelete={handleDeleteSelected}
+        onCancel={store.exitSelectionMode}
       />
-
-      {/* Son Eklenenler */}
-      {store.activeTypeFilter === "all" && recentAssets.length > 0 && (
-        <>
-          <AppListSectionHeader title={t("sections.recent")} />
-          <GalleryRecentStrip assets={recentAssets} onPressAsset={() => {}} />
-        </>
-      )}
-
-      {/* Category chips */}
-      <GalleryCategoryChips
-        categories={store.categories}
-        activeId={store.activeCategoryId}
-        onSelect={store.setActiveCategory}
-      />
-
-      {/* Medya grid */}
-      {mediaAssets.length > 0 && (
-        <>
-          <AppListSectionHeader title={t("sections.media")} />
-          <GalleryMediaGrid
-            assets={mediaAssets}
-            isLoadingMore={store.isLoadingMore}
-            onPressAsset={() => {}}
-          />
-        </>
-      )}
-
-      {/* Belgeler list */}
-      {docAssets.length > 0 && (
-        <>
-          <AppListSectionHeader title={t("sections.documents")} />
-          <GalleryDocumentList assets={docAssets} onPressAsset={() => {}} />
-        </>
-      )}
-
-      {/* Empty state */}
-      {filtered.length === 0 && <GalleryEmpty onUpload={handleUpload} />}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  root: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
   loadingContainer: {
     flex: 1,
     alignItems: "center",
@@ -150,29 +233,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   content: {
     paddingBottom: theme.spacing.xxl,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingHorizontal: theme.spacing.md + theme.spacing.xs,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.md,
-  },
-  headerText: {
-    flex: 1,
-  },
-  title: {
-    ...theme.typography.display,
-    color: theme.colors.foreground,
-  },
-  subtitle: {
-    ...theme.typography.bodyMedium,
-    color: theme.colors.mutedForeground,
-    marginTop: 2,
+  contentWithBar: {
+    // SelectionBar (~72px) + safe area için ekstra boşluk
+    paddingBottom: theme.spacing.xxl + 80,
   },
 }));

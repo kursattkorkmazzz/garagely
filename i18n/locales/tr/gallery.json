@@ -24,5 +24,12 @@
   "errors": {
     "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
     "deleteFailed": "Dosya silinemedi."
+  },
+  "selection": {
+    "itemsSelected": "{{count}} öğe seçildi",
+    "deleteConfirmTitle": "{{count}} öğe silinsin mi?",
+    "deleteConfirmMessage": "Bu işlem geri alınamaz.",
+    "cancel": "İptal",
+    "delete": "Sil"
   }
 }

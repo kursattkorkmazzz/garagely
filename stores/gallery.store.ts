@@ -21,6 +21,9 @@ interface GalleryState {
   categories: AssetCategoryEntity[];
   activeCategoryId: string | null;
   activeTypeFilter: TypeFilter;
+  // Seçim modu
+  isSelecting: boolean;
+  selectedIds: Set<string>;
 }
 
 interface GalleryActions {
@@ -29,6 +32,7 @@ interface GalleryActions {
   loadCategories: () => Promise<void>;
   uploadImage: (uri: string) => Promise<AssetEntity>;
   deleteAsset: (id: string) => Promise<void>;
+  deleteSelected: () => Promise<void>;
   addAssetToCategory: (assetId: string, categoryId: string) => Promise<void>;
   removeAssetFromCategory: (
     assetId: string,
@@ -36,6 +40,9 @@ interface GalleryActions {
   ) => Promise<void>;
   setActiveCategory: (id: string | null) => void;
   setTypeFilter: (filter: TypeFilter) => void;
+  enterSelectionMode: (id: string) => void;
+  toggleSelection: (id: string) => void;
+  exitSelectionMode: () => void;
   getOrderedAssets: () => AssetEntity[];
   getRecentAssets: () => AssetEntity[];
   getFilteredAssets: () => AssetEntity[];
@@ -53,6 +60,8 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
     categories: [],
     activeCategoryId: null,
     activeTypeFilter: "all",
+    isSelecting: false,
+    selectedIds: new Set<string>(),
 
     loadInitial: async () => {
       set({ isLoading: true });
@@ -119,6 +128,45 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           recentIds: s.recentIds.filter((oid) => oid !== id),
         };
       });
+    },
+
+    deleteSelected: async () => {
+      const ids = Array.from(get().selectedIds);
+      await Promise.all(ids.map((id) => AssetService.deleteById(id)));
+      set((s) => {
+        const idSet = new Set(ids);
+        const assetsById = { ...s.assetsById };
+        ids.forEach((id) => delete assetsById[id]);
+        return {
+          assetsById,
+          orderedIds: s.orderedIds.filter((id) => !idSet.has(id)),
+          recentIds: s.recentIds.filter((id) => !idSet.has(id)),
+          isSelecting: false,
+          selectedIds: new Set<string>(),
+        };
+      });
+    },
+
+    enterSelectionMode: (id) => {
+      set({ isSelecting: true, selectedIds: new Set([id]) });
+    },
+
+    toggleSelection: (id) => {
+      const next = new Set(get().selectedIds);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      if (next.size === 0) {
+        set({ isSelecting: false, selectedIds: next });
+      } else {
+        set({ selectedIds: next });
+      }
+    },
+
+    exitSelectionMode: () => {
+      set({ isSelecting: false, selectedIds: new Set<string>() });
     },
 
     addAssetToCategory: async (assetId, categoryId) => {
