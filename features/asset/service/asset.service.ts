@@ -67,6 +67,7 @@ export class AssetService {
         fullPath: committedFile.fullPath,
         basePath: committedFile.basePath,
         baseName: committedFile.baseName,
+        fullName: committedFile.fullName,
       });
 
       await queryRunner.commitTransaction();
