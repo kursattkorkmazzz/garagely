@@ -16,7 +16,7 @@ export default function GaragePage() {
         router.push("/garage/vehicle");
         break;
       case "gallery":
-        router.push("/(tabs)/gallery");
+        router.push("/(tabs)/garage/gallery");
         break;
       default:
         break;

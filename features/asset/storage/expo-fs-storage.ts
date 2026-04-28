@@ -7,24 +7,80 @@ import {
 } from "@/features/asset/types/mime-type.type";
 import { AppError } from "@/shared/errors/app-error";
 import * as ExpoCrypto from "expo-crypto";
-import { File, Paths } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
+
 export class ExpoFileSystemStorage {
-  static readonly BASE_FINAL_STORAGE_PATH: string = Paths.document + "storage";
-  static readonly BASE_TEMPORARY_STORAGE_PATH: string = Paths.cache + "storage";
+  // ─── Storage Directories ──────────────────────────────────────────
 
-  // ─── Path Builders ────────────────────────────────────────────────
-
-  static buildTempPath(name: string, ext: string): string {
-    return `${this.BASE_TEMPORARY_STORAGE_PATH}/${name}.${ext}`;
+  /**
+   * Kalıcı depolama klasörü — uygulama silinene kadar korunur.
+   * Paths.document bir Directory instance'ı döner; ikinci arg alt klasör adı.
+   */
+  private static get finalStorageDir(): Directory {
+    return new Directory(Paths.document, "storage");
   }
 
-  static buildFinalPath(name: string, ext: string): string {
-    // storage/{assetId}.{ext}
-    return `${this.BASE_FINAL_STORAGE_PATH}/${name}.${ext}`;
+  /**
+   * Geçici depolama klasörü — sistem tarafından temizlenebilir.
+   */
+  private static get tempStorageDir(): Directory {
+    return new Directory(Paths.cache, "storage");
   }
 
-  // -- CRUD Operations on File -----
+  // ─── Helpers ──────────────────────────────────────────────────────
 
+  /**
+   * Klasör yoksa oluşturur. Her dosya işleminden önce çağrılmalı.
+   */
+  private static ensureDir(dir: Directory): void {
+    if (!dir.exists) {
+      dir.create({ intermediates: true });
+    }
+  }
+
+  /**
+   * Geçici depolamada bir File referansı döner (dosya henüz oluşmamış olabilir).
+   */
+  private static buildTempFile(name: string, ext: string): File {
+    return new File(this.tempStorageDir, `${name}.${ext}`);
+  }
+
+  /**
+   * Kalıcı depolamada bir File referansı döner.
+   */
+  private static buildFinalFile(name: string, ext: string): File {
+    return new File(this.finalStorageDir, `${name}.${ext}`);
+  }
+
+  /**
+   * Var olan bir File instance'ından StorageAsset model oluşturur.
+   * file.extension → ".png" formatında gelir; başındaki nokta temizlenir.
+   */
+  private static toStorageAsset(file: File, isTemp: boolean): StorageAsset {
+    const ext = file.extension.replace(/^\./, "");
+    const fullName = file.name;
+    // Çok noktalı dosya isimlerini (örn. "photo.backup.jpg") doğru ayrıştır
+    const baseName = ext ? fullName.slice(0, -(ext.length + 1)) : fullName;
+    return {
+      fullPath: file.uri,
+      basePath: isTemp
+        ? this.tempStorageDir.uri
+        : this.finalStorageDir.uri,
+      baseName,
+      extension: ext,
+      fullName,
+      mimeType: file.type as MimeType,
+      sizeBytes: file.size,
+      isTemp,
+    };
+  }
+
+  // ─── Public API ───────────────────────────────────────────────────
+
+  /**
+   * Kaynak URI'daki dosyayı geçici depolamaya kopyalar.
+   * Dönen StorageAsset.fullPath, işlemin geri kalanında doğrudan kullanılır.
+   */
   static async uploadFileToTemp(uri: string): Promise<StorageAsset> {
     try {
       const originalFile = new File(uri);
@@ -36,10 +92,8 @@ export class ExpoFileSystemStorage {
         );
       }
 
-      const tempId = ExpoCrypto.randomUUID();
       const mimeType = originalFile.type;
       const extension = getExtensionFromMimeType(mimeType);
-
       if (extension === UNKNOWN_MIME_TYPE) {
         throw AppError.createAppError(
           StorageErrors.UNKNOWN_MIME_TYPE_ERROR,
@@ -48,21 +102,15 @@ export class ExpoFileSystemStorage {
         );
       }
 
-      const tempPath = this.buildTempPath(tempId, extension);
-      const destionationFile = new File(tempPath);
-      originalFile.copy(destionationFile);
-      return {
-        fullPath: destionationFile.uri,
-        basePath: this.BASE_TEMPORARY_STORAGE_PATH,
-        baseName: destionationFile.name.split(".")[0],
-        extension: destionationFile.name.split(".")[1],
-        fullName: destionationFile.name,
-        mimeType: destionationFile.type as MimeType,
-        sizeBytes: destionationFile.size,
-        isTemp: true,
-      };
+      this.ensureDir(this.tempStorageDir);
+
+      const tempId = ExpoCrypto.randomUUID();
+      const destinationFile = this.buildTempFile(tempId, extension);
+      originalFile.copy(destinationFile);
+
+      return this.toStorageAsset(destinationFile, true);
     } catch (err) {
-      console.error("Error uploading file:", err);
+      console.error("[ExpoFileSystemStorage] uploadFileToTemp error:", err);
       throw AppError.createAppError(
         StorageErrors.STORAGE_WRITE_ERROR,
         undefined,
@@ -71,42 +119,34 @@ export class ExpoFileSystemStorage {
     }
   }
 
+  /**
+   * Geçici dosyayı kalıcı depolamaya taşır; geçici dosyayı siler.
+   * Hedef dosya adı olarak finalAssetId (uuid) kullanılır.
+   */
   static async commitFile(
     tempAsset: StorageAsset,
     finalAssetId: string,
   ): Promise<StorageAsset> {
     try {
-      const tempPath = this.buildTempPath(
-        tempAsset.baseName,
-        tempAsset.extension,
-      );
-
-      const tempFile = new File(tempPath);
+      // Doğrudan kayıtlı URI üzerinden erişim — path yeniden inşa etmeye gerek yok
+      const tempFile = new File(tempAsset.fullPath);
       if (!tempFile.exists) {
         throw AppError.createAppError(
           StorageErrors.FILE_NOT_FOUND_ERROR,
           undefined,
-          { tempPath },
+          { uri: tempAsset.fullPath },
         );
       }
 
-      const finalPath = this.buildFinalPath(finalAssetId, tempAsset.extension);
-      const finalFile = new File(finalPath);
+      this.ensureDir(this.finalStorageDir);
+
+      const finalFile = this.buildFinalFile(finalAssetId, tempAsset.extension);
       tempFile.copy(finalFile);
       tempFile.delete();
 
-      return {
-        isTemp: false,
-        baseName: finalFile.name.split(".")[0],
-        extension: finalFile.name.split(".")[1],
-        fullName: finalFile.name,
-        fullPath: finalFile.uri,
-        basePath: this.BASE_FINAL_STORAGE_PATH,
-        mimeType: finalFile.type as MimeType,
-        sizeBytes: finalFile.size,
-      };
+      return this.toStorageAsset(finalFile, false);
     } catch (err) {
-      console.error("Error committing file:", err);
+      console.error("[ExpoFileSystemStorage] commitFile error:", err);
       throw AppError.createAppError(
         StorageErrors.STORAGE_COMMIT_ERROR,
         undefined,
@@ -115,12 +155,17 @@ export class ExpoFileSystemStorage {
     }
   }
 
+  /**
+   * Geçici dosyayı geri alır (transaction rollback sırasında kullanılır).
+   */
   static async rollbackTempFile(tempAsset: StorageAsset): Promise<void> {
     try {
-      const tempFile = await this.getFile(tempAsset);
-      this.deleteFile(tempFile);
+      const tempFile = new File(tempAsset.fullPath);
+      if (tempFile.exists) {
+        tempFile.delete();
+      }
     } catch (err) {
-      console.error("Error rolling back temp file:", err);
+      console.error("[ExpoFileSystemStorage] rollbackTempFile error:", err);
       throw AppError.createAppError(
         StorageErrors.STORAGE_DELETE_ERROR,
         undefined,
@@ -129,29 +174,18 @@ export class ExpoFileSystemStorage {
     }
   }
 
+  /**
+   * StorageAsset'in işaret ettiği dosyayı (geçici veya kalıcı) siler.
+   * Dosya zaten yoksa sessizce geçer.
+   */
   static async deleteFile(storageAsset: StorageAsset): Promise<void> {
     try {
-      let path = "";
-
-      if (storageAsset.isTemp) {
-        path = this.buildTempPath(
-          storageAsset.baseName,
-          storageAsset.extension,
-        );
-      } else {
-        path = this.buildFinalPath(
-          storageAsset.baseName,
-          storageAsset.extension,
-        );
-      }
-
-      const finalFile = new File(path);
-
-      if (finalFile.exists) {
-        finalFile.delete();
+      const file = new File(storageAsset.fullPath);
+      if (file.exists) {
+        file.delete();
       }
     } catch (err) {
-      console.error("Error deleting file:", err);
+      console.error("[ExpoFileSystemStorage] deleteFile error:", err);
       throw AppError.createAppError(
         StorageErrors.STORAGE_DELETE_ERROR,
         undefined,
@@ -160,41 +194,27 @@ export class ExpoFileSystemStorage {
     }
   }
 
+  /**
+   * StorageAsset'i güncel metadata ile döner.
+   * Dosya yoksa FILE_NOT_FOUND_ERROR fırlatır.
+   */
   static async getFile(storageAsset: StorageAsset): Promise<StorageAsset> {
-    let path: string = "";
-    if (storageAsset.isTemp) {
-      path = this.buildTempPath(storageAsset.baseName, storageAsset.extension);
-    } else {
-      path = this.buildFinalPath(storageAsset.baseName, storageAsset.extension);
-    }
-    const file = new File(path);
+    const file = new File(storageAsset.fullPath);
     if (!file.exists) {
       throw AppError.createAppError(
         StorageErrors.FILE_NOT_FOUND_ERROR,
         undefined,
-        { path },
+        { uri: storageAsset.fullPath },
       );
     }
-    return {
-      fullPath: file.uri,
-      basePath: storageAsset.isTemp
-        ? this.BASE_TEMPORARY_STORAGE_PATH
-        : this.BASE_FINAL_STORAGE_PATH,
-      baseName: file.name.split(".")[0],
-      extension: file.name.split(".")[1],
-      fullName: file.name,
-      mimeType: file.type as MimeType,
-      sizeBytes: file.size,
-      isTemp: storageAsset.isTemp,
-    };
+    return this.toStorageAsset(file, storageAsset.isTemp);
   }
 
+  /**
+   * Dosyanın var olup olmadığını kontrol eder.
+   * fullPath üzerinden erişir — isTemp değerine bakılmaksızın çalışır.
+   */
   static async isFileExists(storageAsset: StorageAsset): Promise<boolean> {
-    const finalPath = this.buildFinalPath(
-      storageAsset.baseName,
-      storageAsset.extension,
-    );
-    const finalFile = new File(finalPath);
-    return finalFile.exists;
+    return new File(storageAsset.fullPath).exists;
   }
 }

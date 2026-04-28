@@ -55,11 +55,28 @@ export class AssetService {
 
       const finalAssetId = savedAssetEntity.id;
 
-      await this.storageRepository.commitFile(tempFile, finalAssetId);
+      // commitFile geçici dosyayı kalıcı konuma taşır ve final path'i döner.
+      const committedFile = await this.storageRepository.commitFile(
+        tempFile,
+        finalAssetId,
+      );
+
+      // assetRepo.save() aynı transaction içinde change detection yapmaz;
+      // açık SQL UPDATE için queryRunner.manager.update() kullanıyoruz.
+      await queryRunner.manager.update(AssetEntity, finalAssetId, {
+        fullPath: committedFile.fullPath,
+        basePath: committedFile.basePath,
+        baseName: committedFile.baseName,
+      });
 
       await queryRunner.commitTransaction();
 
-      return savedAssetEntity;
+      // Transaction commit olduktan sonra güncel entity'yi döndür.
+      const finalAssetEntity = await assetRepo.findOneByOrFail({
+        id: finalAssetId,
+      });
+
+      return finalAssetEntity;
     } catch (error) {
       if (tempFile) {
         await this.storageRepository.deleteFile(tempFile);
@@ -136,7 +153,6 @@ export class AssetService {
     this.isSupportedMimeType(mimeType as any, this.imageMimeTypes);
 
     return this.uploadAsset(uri, {
-      maxSize: 5120, // Default max size for images is 5MB
       ...options,
       type: AssetTypes.IMAGE, // Force type to IMAGE for this method
     });
