@@ -1,6 +1,5 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
-import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { GalleryCategoryChips } from "@/features/gallery/components/GalleryCategoryChips";
@@ -10,8 +9,8 @@ import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterC
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
 import { GalleryRecentStrip } from "@/features/gallery/components/GalleryRecentStrip";
 import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
-import { AppHeader } from "@/layouts/header/app-header";
 import { useI18n } from "@/i18n";
+import { AppHeader } from "@/layouts/header/app-header";
 import { useGalleryStore } from "@/stores/gallery.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { Stack } from "expo-router";
@@ -25,7 +24,6 @@ import {
   ScrollView,
   View,
 } from "react-native";
-import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export function GalleryScreen() {
@@ -33,7 +31,10 @@ export function GalleryScreen() {
   const { t } = useI18n("gallery");
   const { theme } = useUnistyles();
 
-  const pickedImageState = usePickedImage({ allowsMultipleSelection: false });
+  const pickedImageState = usePickedImage({
+    allowsMultipleSelection: true,
+    maxSelectionLimit: 30,
+  });
 
   useEffect(() => {
     store.loadInitial();
@@ -49,34 +50,18 @@ export function GalleryScreen() {
   };
 
   // ─── Upload ───────────────────────────────────────────────────────
-  const handleUpload = () => {
-    SheetManager.show("select-sheet", {
-      payload: {
-        sections: [
-          {
-            title: "",
-            data: [{ key: "library", label: t("uploadPhoto") }],
-          },
-        ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        renderItem: ({ item }: any) => (
-          <SelectItem
-            label={item.label as string}
-            onPress={async () => {
-              SheetManager.hide("select-sheet");
-              const uris = await pickedImageState.pickImageFromLibrary({
-                allowsEditing: false,
-                mediaTypes: ["images"],
-                quality: 0.85,
-              });
-              if (uris?.[0]) {
-                await store.uploadImage(uris[0]).catch(handleUIError);
-              }
-            }}
-          />
-        ),
-      },
+  const handleUpload = async () => {
+    const uris = await pickedImageState.pickImageFromLibrary({
+      allowsEditing: false,
+      mediaTypes: ["images"],
+      quality: 0.85,
     });
+    if (!uris || uris.length === 0) return;
+
+    // Sıralı upload — SQLite paralel yazma çakışmasını önler
+    for (const uri of uris) {
+      await store.uploadImage(uri).catch(handleUIError);
+    }
   };
 
   // ─── Seçim modu handler'ları ──────────────────────────────────────

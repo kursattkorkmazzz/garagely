@@ -77,7 +77,7 @@ export function usePickedImage(opts?: {
     if (currentPermissionStatus.granted) return true;
 
     const permissionRequestResult =
-      await ImagePicker.getMediaLibraryPermissionsAsync();
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     return permissionRequestResult.granted;
   };
 
