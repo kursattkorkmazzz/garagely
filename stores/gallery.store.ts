@@ -31,6 +31,8 @@ interface GalleryActions {
   loadMore: () => Promise<void>;
   loadCategories: () => Promise<void>;
   uploadImage: (uri: string) => Promise<AssetEntity>;
+  uploadVideo: (uri: string) => Promise<AssetEntity>;
+  uploadDocument: (uri: string) => Promise<AssetEntity>;
   deleteAsset: (id: string) => Promise<void>;
   deleteSelected: () => Promise<void>;
   addAssetToCategory: (assetId: string, categoryId: string) => Promise<void>;
@@ -113,6 +115,25 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
         assetsById: { [asset.id]: asset, ...s.assetsById },
         orderedIds: [asset.id, ...s.orderedIds],
         recentIds: [asset.id, ...s.recentIds].slice(0, RECENT_LIMIT),
+      }));
+      return asset;
+    },
+
+    uploadVideo: async (uri) => {
+      const asset = await AssetService.uploadVideoAsset(uri);
+      set((s) => ({
+        assetsById: { [asset.id]: asset, ...s.assetsById },
+        orderedIds: [asset.id, ...s.orderedIds],
+        recentIds: [asset.id, ...s.recentIds].slice(0, RECENT_LIMIT),
+      }));
+      return asset;
+    },
+
+    uploadDocument: async (uri) => {
+      const asset = await AssetService.uploadDocumentAsset(uri);
+      set((s) => ({
+        assetsById: { [asset.id]: asset, ...s.assetsById },
+        orderedIds: [asset.id, ...s.orderedIds],
       }));
       return asset;
     },

@@ -25,6 +25,12 @@
     "uploadFailed": "Upload failed. Please try again.",
     "deleteFailed": "Could not delete the asset."
   },
+  "uploadSheet": {
+    "title": "Upload",
+    "image": "Image & Screenshots",
+    "video": "Video",
+    "document": "Document (PDF)"
+  },
   "selection": {
     "itemsSelected": "{{count}} selected",
     "deleteConfirmTitle": "Delete {{count}} item(s)?",

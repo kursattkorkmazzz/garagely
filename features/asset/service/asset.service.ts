@@ -7,8 +7,10 @@ import { ExpoFileSystemStorage } from "@/features/asset/storage/expo-fs-storage"
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { UploadAssetOptions } from "@/features/asset/types/asset.service.type";
 import {
+  DocumentMimeTypes,
   ImageMimeTypes,
   MimeType,
+  VideoMimeTypes,
 } from "@/features/asset/types/mime-type.type";
 import { AppError } from "@/shared/errors/app-error";
 import { File } from "expo-file-system";
@@ -17,6 +19,8 @@ export class AssetService {
   static storageRepository = ExpoFileSystemStorage;
 
   static readonly imageMimeTypes = Object.values(ImageMimeTypes);
+  static readonly videoMimeTypes = Object.values(VideoMimeTypes);
+  static readonly documentMimeTypes = Object.values(DocumentMimeTypes);
 
   private static async repo() {
     const db = await GetGaragelyDatabase();
@@ -195,6 +199,30 @@ export class AssetService {
       ...options,
       type: AssetTypes.IMAGE, // Force type to IMAGE for this method
     });
+  }
+
+  static async uploadVideoAsset(
+    uri: string,
+    options?: Omit<UploadAssetOptions, "type">,
+  ) {
+    const originalFile = new File(uri);
+    if (!originalFile.exists) {
+      throw AppError.createAppError(AssetErrors.FILE_NOT_FOUND_ERROR, undefined, { uri });
+    }
+    this.isSupportedMimeType(originalFile.type as any, this.videoMimeTypes);
+    return this.uploadAsset(uri, { ...options, type: AssetTypes.VIDEO });
+  }
+
+  static async uploadDocumentAsset(
+    uri: string,
+    options?: Omit<UploadAssetOptions, "type">,
+  ) {
+    const originalFile = new File(uri);
+    if (!originalFile.exists) {
+      throw AppError.createAppError(AssetErrors.FILE_NOT_FOUND_ERROR, undefined, { uri });
+    }
+    this.isSupportedMimeType(originalFile.type as any, this.documentMimeTypes);
+    return this.uploadAsset(uri, { ...options, type: AssetTypes.DOCUMENT });
   }
 
   private static checkMaxSize(fileSize: number, maxSize: number): void {

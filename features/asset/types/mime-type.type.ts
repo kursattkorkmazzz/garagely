@@ -6,15 +6,28 @@ export enum ImageMimeTypes {
   PNG = "image/png",
 }
 
-export type ImageMimeType =
-  (typeof ImageMimeTypes)[keyof typeof ImageMimeTypes];
+export enum VideoMimeTypes {
+  MP4 = "video/mp4",
+  MOV = "video/quicktime",
+}
 
-export type MimeType = ImageMimeType; // Şimdilik sadece image, ileride video, document vs. eklenebilir
+export enum DocumentMimeTypes {
+  PDF = "application/pdf",
+}
+
+export type ImageMimeType = (typeof ImageMimeTypes)[keyof typeof ImageMimeTypes];
+export type VideoMimeType = (typeof VideoMimeTypes)[keyof typeof VideoMimeTypes];
+export type DocumentMimeType = (typeof DocumentMimeTypes)[keyof typeof DocumentMimeTypes];
+
+export type MimeType = ImageMimeType | VideoMimeType | DocumentMimeType;
 
 export const MimeTypeExtentionMap: Record<MimeType, string> = {
   "image/jpeg": "jpeg",
   "image/jpg": "jpg",
   "image/png": "png",
+  "video/mp4": "mp4",
+  "video/quicktime": "mov",
+  "application/pdf": "pdf",
 };
 
 export const getExtensionFromMimeType = (mimeType: string): string =>

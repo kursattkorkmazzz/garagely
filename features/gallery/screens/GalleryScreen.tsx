@@ -1,5 +1,6 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
+import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { GalleryCategoryChips } from "@/features/gallery/components/GalleryCategoryChips";
@@ -8,10 +9,11 @@ import { GalleryEmpty } from "@/features/gallery/components/GalleryEmpty";
 import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterChips";
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
 import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
-import { useI18n } from "@/i18n";
 import { AppHeader } from "@/layouts/header/app-header";
+import { useI18n } from "@/i18n";
 import { useGalleryStore } from "@/stores/gallery.store";
 import { handleUIError } from "@/utils/handle-ui-error";
+import * as DocumentPicker from "expo-document-picker";
 import { Stack } from "expo-router";
 import { Upload } from "lucide-react-native/icons";
 import { useEffect } from "react";
@@ -23,6 +25,7 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export function GalleryScreen() {
@@ -48,8 +51,9 @@ export function GalleryScreen() {
     if (nearEnd) store.loadMore();
   };
 
-  // ─── Upload ───────────────────────────────────────────────────────
-  const handleUpload = async () => {
+  // ─── Upload handlers ──────────────────────────────────────────────
+  const handleUploadImage = async () => {
+    SheetManager.hide("select-sheet");
     const uris = await pickedImageState.pickImageFromLibrary({
       allowsEditing: false,
       allowsMultipleSelection: true,
@@ -57,11 +61,61 @@ export function GalleryScreen() {
       quality: 0.85,
     });
     if (!uris || uris.length === 0) return;
-
-    // Sıralı upload — SQLite paralel yazma çakışmasını önler
     for (const uri of uris) {
       await store.uploadImage(uri).catch(handleUIError);
     }
+  };
+
+  const handleUploadVideo = async () => {
+    SheetManager.hide("select-sheet");
+    const uris = await pickedImageState.pickImageFromLibrary({
+      allowsEditing: false,
+      allowsMultipleSelection: false,
+      mediaTypes: ["videos"],
+    });
+    if (!uris || uris.length === 0) return;
+    await store.uploadVideo(uris[0]).catch(handleUIError);
+  };
+
+  const handleUploadDocument = async () => {
+    SheetManager.hide("select-sheet");
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "application/pdf",
+      multiple: false,
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled || result.assets.length === 0) return;
+    await store.uploadDocument(result.assets[0].uri).catch(handleUIError);
+  };
+
+  const handleUpload = () => {
+    SheetManager.show("select-sheet", {
+      payload: {
+        sections: [
+          {
+            title: t("uploadSheet.title"),
+            data: [
+              { key: "image", label: t("uploadSheet.image"), icon: "Image" },
+              { key: "video", label: t("uploadSheet.video"), icon: "Video" },
+              { key: "document", label: t("uploadSheet.document"), icon: "FileText" },
+            ],
+          },
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        renderItem: ({ item }: any) => (
+          <SelectItem
+            label={item.label as string}
+            onPress={
+              item.key === "image"
+                ? handleUploadImage
+                : item.key === "video"
+                  ? handleUploadVideo
+                  : handleUploadDocument
+            }
+          />
+        ),
+      },
+    });
   };
 
   // ─── Seçim modu handler'ları ──────────────────────────────────────
@@ -127,7 +181,6 @@ export function GalleryScreen() {
         style={styles.container}
         contentContainerStyle={[
           styles.content,
-          // Seçim modu aktifken SelectionBar yüksekliği kadar yer bırak
           store.isSelecting && styles.contentWithBar,
         ]}
         onScroll={handleScroll}
@@ -182,7 +235,7 @@ export function GalleryScreen() {
         {filtered.length === 0 && <GalleryEmpty onUpload={handleUpload} />}
       </ScrollView>
 
-      {/* Seçim action bar — ScrollView dışında, sabit pozisyonlu */}
+      {/* Seçim action bar */}
       <GallerySelectionBar
         selectedCount={store.selectedIds.size}
         onDelete={handleDeleteSelected}
@@ -210,7 +263,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.xxl,
   },
   contentWithBar: {
-    // SelectionBar (~72px) + safe area için ekstra boşluk
     paddingBottom: theme.spacing.xxl + 80,
   },
 }));

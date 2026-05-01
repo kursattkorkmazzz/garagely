@@ -25,6 +25,12 @@
     "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
     "deleteFailed": "Dosya silinemedi."
   },
+  "uploadSheet": {
+    "title": "Yükle",
+    "image": "Fotoğraf ve Ekran Görüntüsü",
+    "video": "Video",
+    "document": "Belge (PDF)"
+  },
   "selection": {
     "itemsSelected": "{{count}} öğe seçildi",
     "deleteConfirmTitle": "{{count}} öğe silinsin mi?",
