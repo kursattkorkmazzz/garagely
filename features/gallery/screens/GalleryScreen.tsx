@@ -7,7 +7,6 @@ import { GalleryDocumentList } from "@/features/gallery/components/GalleryDocume
 import { GalleryEmpty } from "@/features/gallery/components/GalleryEmpty";
 import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterChips";
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
-import { GalleryRecentStrip } from "@/features/gallery/components/GalleryRecentStrip";
 import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
 import { useI18n } from "@/i18n";
 import { AppHeader } from "@/layouts/header/app-header";
@@ -53,6 +52,7 @@ export function GalleryScreen() {
   const handleUpload = async () => {
     const uris = await pickedImageState.pickImageFromLibrary({
       allowsEditing: false,
+      allowsMultipleSelection: true,
       mediaTypes: ["images"],
       quality: 0.85,
     });
@@ -85,7 +85,6 @@ export function GalleryScreen() {
 
   // ─── Veriler ──────────────────────────────────────────────────────
   const filtered = store.getFilteredAssets();
-  const recentAssets = store.getRecentAssets();
   const mediaAssets = filtered.filter(
     (a) => a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO,
   );
@@ -140,18 +139,6 @@ export function GalleryScreen() {
           active={store.activeTypeFilter}
           onChange={store.setTypeFilter}
         />
-
-        {/* Son Eklenenler */}
-        {store.activeTypeFilter === "all" && recentAssets.length > 0 && (
-          <>
-            <AppListSectionHeader title={t("sections.recent")} />
-            <GalleryRecentStrip
-              assets={recentAssets}
-              isSelecting={store.isSelecting}
-              onPressAsset={() => {}}
-            />
-          </>
-        )}
 
         {/* Category chips */}
         <GalleryCategoryChips
