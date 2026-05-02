@@ -37,5 +37,21 @@
     "deleteConfirmMessage": "This action cannot be undone.",
     "cancel": "Cancel",
     "delete": "Delete"
+  },
+  "itemActions": {
+    "select": "Select",
+    "rename": "Rename",
+    "delete": "Delete"
+  },
+  "rename": {
+    "title": "Rename",
+    "save": "Save",
+    "cancel": "Cancel",
+    "errors": {
+      "empty": "File name cannot be empty.",
+      "tooLong": "File name is too long (max 200 characters).",
+      "invalidChars": "File name contains invalid characters.",
+      "alreadyExists": "A file with this name already exists."
+    }
   }
 }

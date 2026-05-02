@@ -37,5 +37,21 @@
     "deleteConfirmMessage": "Bu işlem geri alınamaz.",
     "cancel": "İptal",
     "delete": "Sil"
+  },
+  "itemActions": {
+    "select": "Seç",
+    "rename": "Yeniden Adlandır",
+    "delete": "Sil"
+  },
+  "rename": {
+    "title": "Yeniden Adlandır",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "errors": {
+      "empty": "Dosya adı boş olamaz.",
+      "tooLong": "Dosya adı çok uzun (maksimum 200 karakter).",
+      "invalidChars": "Dosya adında geçersiz karakter var.",
+      "alreadyExists": "Bu isimde bir dosya zaten mevcut."
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { AppListItem } from "@/components/list/list-item";
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
 import { formatBytes } from "@/features/gallery/utils/format-bytes";
+import { truncateFileName } from "@/features/gallery/utils/truncate-file-name";
 import { FlatList } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -43,7 +44,7 @@ export function GalleryDocumentList({
                   : theme.colors.mutedForeground
                 : "#6366f1"
             }
-            label={item.fullName}
+            label={truncateFileName(item.baseName, item.extension)}
             sub={formatBytes(item.sizeBytes)}
             chevron={!isSelecting}
             onPress={() =>

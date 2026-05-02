@@ -3,10 +3,10 @@ import { AppText } from "@/components/ui/app-text";
 import { IconName } from "@/components/ui/icon";
 import { ChevronRight } from "lucide-react-native/icons";
 import { ReactNode } from "react";
-import { Pressable, PressableProps, View } from "react-native";
+import { Pressable, PressableProps, PressableStateCallbackType, StyleProp, ViewStyle, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-type AppListItemProps = PressableProps & {
+type AppListItemProps = Omit<PressableProps, "style"> & {
   label: string;
   icon?: IconName;
   iconColor?: string;
@@ -17,6 +17,7 @@ type AppListItemProps = PressableProps & {
   destructive?: boolean;
   first?: boolean; // grup içinde ilk satır
   last?: boolean; // grup içinde son satır
+  style?: StyleProp<ViewStyle>;
 };
 
 export function AppListItem({
@@ -30,17 +31,19 @@ export function AppListItem({
   destructive,
   first,
   last,
+  style,
   ...props
 }: AppListItemProps) {
   const { theme } = useUnistyles();
   const tintColor = iconColor ?? theme.colors.primary;
   return (
     <Pressable
+      {...props}
       style={(state) => [
         styles.container,
         state.pressed && { backgroundColor: theme.colors.secondary },
+        style,
       ]}
-      {...props}
     >
       <View style={styles.leftContentContainer}>
         {icon ? (
@@ -51,6 +54,7 @@ export function AppListItem({
         ) : null}
         <View style={styles.labelStack}>
           <AppText
+            numberOfLines={1}
             style={[
               styles.label,
               {

@@ -1,3 +1,4 @@
+import { AssetErrors } from "@/features/asset/errors/asset.errors";
 import { StorageErrors } from "@/features/asset/errors/storage.errors";
 import { StorageAsset } from "@/features/asset/model/storage-asset";
 import {
@@ -216,5 +217,55 @@ export class ExpoFileSystemStorage {
    */
   static async isFileExists(storageAsset: StorageAsset): Promise<boolean> {
     return new File(storageAsset.fullPath).exists;
+  }
+
+  /**
+   * Kalıcı depolamadaki bir dosyayı yeni bir baseName ile yeniden adlandırır.
+   * Uzantı değişmez; sadece baseName güncellenir.
+   * Hedef dosya zaten varsa NAME_ALREADY_EXISTS hatası fırlatır.
+   * Eski dosya kopyalanır, ardından silinir (atomic move).
+   */
+  static async renameFile(
+    asset: StorageAsset,
+    newBaseName: string,
+  ): Promise<StorageAsset> {
+    try {
+      const newFullName = `${newBaseName}.${asset.extension}`;
+      const newFullPath = `${asset.basePath}${newFullName}`;
+
+      // Hedef dosya çakışma kontrolü
+      const targetFile = new File(newFullPath);
+      if (targetFile.exists) {
+        throw AppError.createAppError(AssetErrors.NAME_ALREADY_EXISTS, undefined, {
+          newFullPath,
+        });
+      }
+
+      const sourceFile = new File(asset.fullPath);
+      if (!sourceFile.exists) {
+        throw AppError.createAppError(StorageErrors.FILE_NOT_FOUND_ERROR, undefined, {
+          uri: asset.fullPath,
+        });
+      }
+
+      // Kopyala → eski dosyayı sil (move semantics)
+      sourceFile.copy(targetFile);
+      sourceFile.delete();
+
+      return {
+        ...asset,
+        baseName: newBaseName,
+        fullName: newFullName,
+        fullPath: newFullPath,
+      };
+    } catch (err) {
+      // AppError'ları olduğu gibi ilet
+      if (err instanceof AppError) throw err;
+      console.error("[ExpoFileSystemStorage] renameFile error:", err);
+      throw AppError.createAppError(StorageErrors.STORAGE_WRITE_ERROR, undefined, {
+        asset,
+        newBaseName,
+      });
+    }
   }
 }

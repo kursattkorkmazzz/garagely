@@ -5,6 +5,11 @@ export const AssetErrors = {
   NOT_SUPPORTED_MIME_TYPE: "NOT_SUPPORTED_MIME_TYPE",
 
   MAX_FILE_SIZE_EXCEEDED: "MAX_FILE_SIZE_EXCEEDED",
+
+  // Rename errors
+  INVALID_NAME: "INVALID_NAME",
+  NAME_TOO_LONG: "NAME_TOO_LONG",
+  NAME_ALREADY_EXISTS: "NAME_ALREADY_EXISTS",
 } as const;
 
 export type AssetError = (typeof AssetErrors)[keyof typeof AssetErrors];

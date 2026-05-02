@@ -225,6 +225,58 @@ export class AssetService {
     return this.uploadAsset(uri, { ...options, type: AssetTypes.DOCUMENT });
   }
 
+  /**
+   * Asset'in baseName'ini değiştirir — fiziksel dosyayı ve DB kaydını günceller.
+   * Sıra: dosya taşı → DB güncelle. DB başarısız olursa dosya geri taşınır.
+   */
+  static async rename(id: string, newBaseName: string): Promise<AssetEntity> {
+    const trimmed = newBaseName.trim();
+
+    // Validasyon
+    if (!trimmed) {
+      throw AppError.createAppError(AssetErrors.INVALID_NAME);
+    }
+    if (trimmed.length > 200) {
+      throw AppError.createAppError(AssetErrors.NAME_TOO_LONG);
+    }
+    // Dosya sisteminde geçersiz karakterler
+    if (/[/\\:*?"<>|]/.test(trimmed)) {
+      throw AppError.createAppError(AssetErrors.INVALID_NAME);
+    }
+
+    const repo = await this.repo();
+    const asset = await repo.findOneByOrFail({ id });
+
+    const storageAsset: StorageAsset = {
+      baseName: asset.baseName,
+      fullName: asset.fullName,
+      fullPath: asset.fullPath,
+      basePath: asset.basePath,
+      extension: asset.extension,
+      mimeType: asset.mimeType,
+      sizeBytes: asset.sizeBytes,
+      isTemp: false,
+    };
+
+    // 1. Fiziksel dosyayı yeniden adlandır
+    const renamed = await ExpoFileSystemStorage.renameFile(storageAsset, trimmed);
+
+    // 2. DB güncelle — başarısız olursa dosyayı eski yerine geri al
+    try {
+      await repo.update(id, {
+        baseName: renamed.baseName,
+        fullName: renamed.fullName,
+        fullPath: renamed.fullPath,
+      });
+    } catch (err) {
+      // Rollback: yeni dosyayı eski adıyla geri taşı
+      await ExpoFileSystemStorage.renameFile(renamed, asset.baseName);
+      throw err;
+    }
+
+    return repo.findOneByOrFail({ id });
+  }
+
   private static checkMaxSize(fileSize: number, maxSize: number): void {
     if (fileSize > maxSize) {
       throw AppError.createAppError(

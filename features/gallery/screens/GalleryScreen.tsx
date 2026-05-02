@@ -1,13 +1,17 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
+import { AppImageViewer, ImageViewerItem } from "@/components/ui/app-image-viewer";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
+import { formatBytes } from "@/features/gallery/utils/format-bytes";
+import { truncateFileName } from "@/features/gallery/utils/truncate-file-name";
 import { GalleryCategoryChips } from "@/features/gallery/components/GalleryCategoryChips";
 import { GalleryDocumentList } from "@/features/gallery/components/GalleryDocumentList";
 import { GalleryEmpty } from "@/features/gallery/components/GalleryEmpty";
 import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterChips";
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
+import { GalleryRenameModal } from "@/features/gallery/components/GalleryRenameModal";
 import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
 import { AppHeader } from "@/layouts/header/app-header";
 import { useI18n } from "@/i18n";
@@ -16,7 +20,7 @@ import { handleUIError } from "@/utils/handle-ui-error";
 import * as DocumentPicker from "expo-document-picker";
 import { Stack } from "expo-router";
 import { Upload } from "lucide-react-native/icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -118,8 +122,72 @@ export function GalleryScreen() {
     });
   };
 
+  // ─── Image preview ────────────────────────────────────────────────
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
+  // ─── Rename ───────────────────────────────────────────────────────
+  type RenameTarget = { id: string; baseName: string; extension: string };
+  const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
+
+  const handlePressMedia = (id: string) => {
+    const index = imageAssets.findIndex((a) => a.id === id);
+    if (index !== -1) setPreviewIndex(index);
+  };
+
   // ─── Seçim modu handler'ları ──────────────────────────────────────
-  const handleLongPress = (id: string) => store.enterSelectionMode(id);
+  const handleLongPress = (id: string) => {
+    const asset = store.assetsById[id];
+    if (!asset) return;
+
+    SheetManager.show("select-sheet", {
+      payload: {
+        sections: [
+          {
+            data: [
+              { key: "select", label: t("itemActions.select"), icon: "CheckSquare" },
+              { key: "rename", label: t("itemActions.rename"), icon: "Pencil" },
+              { key: "delete", label: t("itemActions.delete"), icon: "Trash2" },
+            ],
+          },
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        renderItem: ({ item }: any) => (
+          <SelectItem
+            label={item.label as string}
+            onPress={() => {
+              SheetManager.hide("select-sheet");
+              if (item.key === "select") {
+                store.enterSelectionMode(id);
+              } else if (item.key === "rename") {
+                setRenameTarget({
+                  id,
+                  baseName: asset.baseName,
+                  extension: asset.extension,
+                });
+              } else if (item.key === "delete") {
+                Alert.alert(
+                  t("selection.deleteConfirmTitle", { count: 1 }),
+                  t("selection.deleteConfirmMessage"),
+                  [
+                    { text: t("selection.cancel"), style: "cancel" },
+                    {
+                      text: t("selection.delete"),
+                      style: "destructive",
+                      onPress: () => {
+                        store.enterSelectionMode(id);
+                        store.deleteSelected().catch(handleUIError);
+                      },
+                    },
+                  ],
+                );
+              }
+            }}
+          />
+        ),
+      },
+    });
+  };
+
   const handleSelect = (id: string) => store.toggleSelection(id);
 
   const handleDeleteSelected = () => {
@@ -143,6 +211,14 @@ export function GalleryScreen() {
     (a) => a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO,
   );
   const docAssets = filtered.filter((a) => a.type === AssetTypes.DOCUMENT);
+
+  // Only IMAGE assets go into the viewer (VIDEO not supported by GalleryPreview)
+  const imageAssets = mediaAssets.filter((a) => a.type === AssetTypes.IMAGE);
+  const viewerImages: ImageViewerItem[] = imageAssets.map((a) => ({
+    uri: a.fullPath,
+    label: truncateFileName(a.baseName, a.extension),
+    sub: formatBytes(a.sizeBytes),
+  }));
 
   const stackScreen = (
     <Stack.Screen
@@ -209,7 +285,7 @@ export function GalleryScreen() {
               isLoadingMore={store.isLoadingMore}
               isSelecting={store.isSelecting}
               selectedIds={store.selectedIds}
-              onPressAsset={() => {}}
+              onPressAsset={handlePressMedia}
               onLongPressAsset={handleLongPress}
               onSelectAsset={handleSelect}
             />
@@ -240,6 +316,25 @@ export function GalleryScreen() {
         selectedCount={store.selectedIds.size}
         onDelete={handleDeleteSelected}
         onCancel={store.exitSelectionMode}
+      />
+
+      {/* Image preview */}
+      <AppImageViewer
+        isVisible={previewIndex !== null}
+        images={viewerImages}
+        initialIndex={previewIndex ?? 0}
+        onClose={() => setPreviewIndex(null)}
+      />
+
+      {/* Rename modal */}
+      <GalleryRenameModal
+        visible={renameTarget !== null}
+        currentBaseName={renameTarget?.baseName ?? ""}
+        extension={renameTarget?.extension ?? ""}
+        onSave={(newBaseName) =>
+          store.renameAsset(renameTarget!.id, newBaseName)
+        }
+        onClose={() => setRenameTarget(null)}
       />
     </View>
   );

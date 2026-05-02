@@ -35,6 +35,7 @@ interface GalleryActions {
   uploadDocument: (uri: string) => Promise<AssetEntity>;
   deleteAsset: (id: string) => Promise<void>;
   deleteSelected: () => Promise<void>;
+  renameAsset: (id: string, newBaseName: string) => Promise<void>;
   addAssetToCategory: (assetId: string, categoryId: string) => Promise<void>;
   removeAssetFromCategory: (
     assetId: string,
@@ -166,6 +167,13 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
           selectedIds: new Set<string>(),
         };
       });
+    },
+
+    renameAsset: async (id, newBaseName) => {
+      const updated = await AssetService.rename(id, newBaseName);
+      set((s) => ({
+        assetsById: { ...s.assetsById, [id]: updated },
+      }));
     },
 
     enterSelectionMode: (id) => {

@@ -11,6 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "react-native";
 import { SheetProvider } from "react-native-actions-sheet";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -22,6 +23,7 @@ export default function RootLayout() {
   useDrizzleStudio(viewDB);
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SheetProvider>
       <DatabaseProvider>
         <LocalizationProvider>
@@ -46,5 +48,6 @@ export default function RootLayout() {
         </LocalizationProvider>
       </DatabaseProvider>
     </SheetProvider>
+    </GestureHandlerRootView>
   );
 }
