@@ -1,5 +1,6 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
 import { AppImageViewer, ImageViewerItem } from "@/components/ui/app-image-viewer";
+import { AppPdfViewer } from "@/components/ui/app-pdf-viewer";
 import { AppListSectionHeader } from "@/components/list/list-section-header";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
@@ -124,6 +125,20 @@ export function GalleryScreen() {
 
   // ─── Image preview ────────────────────────────────────────────────
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
+  // ─── PDF preview ─────────────────────────────────────────────────
+  type PdfPreview = { uri: string; label: string; sub: string };
+  const [pdfPreview, setPdfPreview] = useState<PdfPreview | null>(null);
+
+  const handlePressDocument = (id: string) => {
+    const asset = store.assetsById[id];
+    if (!asset) return;
+    setPdfPreview({
+      uri: asset.fullPath,
+      label: truncateFileName(asset.baseName, asset.extension),
+      sub: formatBytes(asset.sizeBytes),
+    });
+  };
 
   // ─── Rename ───────────────────────────────────────────────────────
   type RenameTarget = { id: string; baseName: string; extension: string };
@@ -300,7 +315,7 @@ export function GalleryScreen() {
               assets={docAssets}
               isSelecting={store.isSelecting}
               selectedIds={store.selectedIds}
-              onPressAsset={() => {}}
+              onPressAsset={handlePressDocument}
               onLongPressAsset={handleLongPress}
               onSelectAsset={handleSelect}
             />
@@ -324,6 +339,15 @@ export function GalleryScreen() {
         images={viewerImages}
         initialIndex={previewIndex ?? 0}
         onClose={() => setPreviewIndex(null)}
+      />
+
+      {/* PDF preview */}
+      <AppPdfViewer
+        visible={pdfPreview !== null}
+        uri={pdfPreview?.uri ?? ""}
+        label={pdfPreview?.label}
+        sub={pdfPreview?.sub}
+        onClose={() => setPdfPreview(null)}
       />
 
       {/* Rename modal */}
