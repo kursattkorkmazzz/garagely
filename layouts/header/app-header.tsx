@@ -9,6 +9,7 @@ type AppHeaderProps = {
   icon?: IconName;
   iconColor?: string;
   goBack?: boolean;
+  onGoBack?: () => void;
   RightComponent?: ReactNode;
 } & NativeStackHeaderProps;
 
@@ -20,11 +21,16 @@ export function AppHeader({
   iconColor,
   RightComponent,
   goBack,
+  onGoBack,
   ...props
 }: AppHeaderProps) {
   const { theme } = useUnistyles();
 
   const goBackHandler = () => {
+    if (onGoBack) {
+      onGoBack();
+      return;
+    }
     if (props.navigation.canGoBack()) {
       props.navigation.goBack();
     }

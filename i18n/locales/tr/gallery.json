@@ -41,7 +41,28 @@
   "itemActions": {
     "select": "Seç",
     "rename": "Yeniden Adlandır",
+    "move": "Taşı",
     "delete": "Sil"
+  },
+  "folders": {
+    "title": "Klasörler",
+    "allFiles": "Tüm Dosyalar",
+    "newFolder": "Yeni Klasör",
+    "renameFolder": "Klasörü Yeniden Adlandır",
+    "moveFolder": "Klasörü Taşı",
+    "moveAsset": "Dosyayı Taşı",
+    "moveHere": "Buraya Taşı",
+    "noSubfolders": "Alt klasör yok",
+    "deleteConfirmTitle": "Klasör Silinsin mi?",
+    "deleteConfirmMessage": "{{folderCount}} alt klasör ve {{assetCount}} dosya kalıcı olarak silinecek.",
+    "deleteConfirmMessageNoChildren": "Bu klasör ve içindeki tüm dosyalar kalıcı olarak silinecek.",
+    "errors": {
+      "notFound": "Klasör bulunamadı.",
+      "circularReference": "Klasör kendi alt klasörüne taşınamaz.",
+      "nameAlreadyExists": "Bu isimde bir klasör zaten mevcut.",
+      "invalidName": "Klasör adı geçersiz karakter içeriyor.",
+      "nameTooLong": "Klasör adı çok uzun."
+    }
   },
   "rename": {
     "title": "Yeniden Adlandır",

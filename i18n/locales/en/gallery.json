@@ -41,7 +41,28 @@
   "itemActions": {
     "select": "Select",
     "rename": "Rename",
+    "move": "Move",
     "delete": "Delete"
+  },
+  "folders": {
+    "title": "Folders",
+    "allFiles": "All Files",
+    "newFolder": "New Folder",
+    "renameFolder": "Rename Folder",
+    "moveFolder": "Move Folder",
+    "moveAsset": "Move File",
+    "moveHere": "Move Here",
+    "noSubfolders": "No subfolders",
+    "deleteConfirmTitle": "Delete Folder?",
+    "deleteConfirmMessage": "{{folderCount}} subfolder(s) and {{assetCount}} file(s) will be permanently deleted.",
+    "deleteConfirmMessageNoChildren": "This folder and all its files will be permanently deleted.",
+    "errors": {
+      "notFound": "Folder not found.",
+      "circularReference": "Cannot move a folder into its own subfolder.",
+      "nameAlreadyExists": "A folder with this name already exists.",
+      "invalidName": "Folder name contains invalid characters.",
+      "nameTooLong": "Folder name is too long."
+    }
   },
   "rename": {
     "title": "Rename",

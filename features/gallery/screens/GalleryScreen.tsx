@@ -5,22 +5,27 @@ import { AppListSectionHeader } from "@/components/list/list-section-header";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
+import { MediaFolderErrors } from "@/features/asset/errors/media-folder.errors";
 import { formatBytes } from "@/features/gallery/utils/format-bytes";
 import { truncateFileName } from "@/features/gallery/utils/truncate-file-name";
-import { GalleryCategoryChips } from "@/features/gallery/components/GalleryCategoryChips";
+import { GalleryBreadcrumb } from "@/features/gallery/components/GalleryBreadcrumb";
 import { GalleryDocumentList } from "@/features/gallery/components/GalleryDocumentList";
 import { GalleryEmpty } from "@/features/gallery/components/GalleryEmpty";
 import { GalleryFilterChips } from "@/features/gallery/components/GalleryFilterChips";
+import { GalleryFolderGrid } from "@/features/gallery/components/GalleryFolderGrid";
+import { GalleryFolderNameModal } from "@/features/gallery/components/GalleryFolderNameModal";
+import { GalleryFolderPickerModal } from "@/features/gallery/components/GalleryFolderPickerModal";
 import { GalleryMediaGrid } from "@/features/gallery/components/GalleryMediaGrid";
 import { GalleryRenameModal } from "@/features/gallery/components/GalleryRenameModal";
 import { GallerySelectionBar } from "@/features/gallery/components/GallerySelectionBar";
 import { AppHeader } from "@/layouts/header/app-header";
 import { useI18n } from "@/i18n";
+import { AppError } from "@/shared/errors/app-error";
 import { useGalleryStore } from "@/stores/gallery.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import * as DocumentPicker from "expo-document-picker";
 import { Stack } from "expo-router";
-import { Upload } from "lucide-react-native/icons";
+import { FolderPlus, Upload } from "lucide-react-native/icons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -123,6 +128,78 @@ export function GalleryScreen() {
     });
   };
 
+  // ─── Klasör state'leri ────────────────────────────────────────────
+  const [createFolderVisible, setCreateFolderVisible] = useState(false);
+
+  type RenameFolderTarget = { id: string; name: string };
+  const [renameFolderTarget, setRenameFolderTarget] =
+    useState<RenameFolderTarget | null>(null);
+
+  // folderId taşınacak klasör; null = modal kapalı
+  const [moveFolderTarget, setMoveFolderTarget] = useState<string | null>(null);
+  // assetId taşınacak asset; null = modal kapalı
+  const [moveAssetTarget, setMoveAssetTarget] = useState<string | null>(null);
+
+  // ─── Klasör handlers ─────────────────────────────────────────────
+  const handleLongPressFolder = (id: string) => {
+    const folder = store.subFolders.find((f) => f.id === id);
+    if (!folder) return;
+
+    SheetManager.show("select-sheet", {
+      payload: {
+        sections: [
+          {
+            data: [
+              { key: "rename", label: t("itemActions.rename"), icon: "Pencil" },
+              { key: "move",   label: t("folders.moveFolder"), icon: "FolderInput" },
+              { key: "delete", label: t("itemActions.delete"), icon: "Trash2" },
+            ],
+          },
+        ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        renderItem: ({ item }: any) => (
+          <SelectItem
+            label={item.label as string}
+            onPress={() => {
+              SheetManager.hide("select-sheet");
+              if (item.key === "rename") {
+                setRenameFolderTarget({ id, name: folder.name });
+              } else if (item.key === "move") {
+                setMoveFolderTarget(id);
+              } else if (item.key === "delete") {
+                handleDeleteFolder(id);
+              }
+            }}
+          />
+        ),
+      },
+    });
+  };
+
+  const handleDeleteFolder = async (id: string) => {
+    try {
+      const stats = await store.deleteFolderWithWarning(id);
+      const msg =
+        stats.folderCount > 0 || stats.assetCount > 0
+          ? t("folders.deleteConfirmMessage", {
+              folderCount: stats.folderCount,
+              assetCount: stats.assetCount,
+            })
+          : t("folders.deleteConfirmMessageNoChildren");
+
+      Alert.alert(t("folders.deleteConfirmTitle"), msg, [
+        { text: t("selection.cancel"), style: "cancel" },
+        {
+          text: t("selection.delete"),
+          style: "destructive",
+          onPress: () => store.deleteFolder(id).catch(handleUIError),
+        },
+      ]);
+    } catch (err) {
+      handleUIError(err);
+    }
+  };
+
   // ─── Image preview ────────────────────────────────────────────────
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
@@ -140,7 +217,7 @@ export function GalleryScreen() {
     });
   };
 
-  // ─── Rename ───────────────────────────────────────────────────────
+  // ─── Asset rename ─────────────────────────────────────────────────
   type RenameTarget = { id: string; baseName: string; extension: string };
   const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
 
@@ -149,7 +226,7 @@ export function GalleryScreen() {
     if (index !== -1) setPreviewIndex(index);
   };
 
-  // ─── Seçim modu handler'ları ──────────────────────────────────────
+  // ─── Asset seçim modu ─────────────────────────────────────────────
   const handleLongPress = (id: string) => {
     const asset = store.assetsById[id];
     if (!asset) return;
@@ -159,9 +236,10 @@ export function GalleryScreen() {
         sections: [
           {
             data: [
-              { key: "select", label: t("itemActions.select"), icon: "CheckSquare" },
-              { key: "rename", label: t("itemActions.rename"), icon: "Pencil" },
-              { key: "delete", label: t("itemActions.delete"), icon: "Trash2" },
+              { key: "select", label: t("itemActions.select"),  icon: "CheckSquare" },
+              { key: "rename", label: t("itemActions.rename"),  icon: "Pencil" },
+              { key: "move",   label: t("itemActions.move"),    icon: "FolderInput" },
+              { key: "delete", label: t("itemActions.delete"),  icon: "Trash2" },
             ],
           },
         ],
@@ -179,6 +257,8 @@ export function GalleryScreen() {
                   baseName: asset.baseName,
                   extension: asset.extension,
                 });
+              } else if (item.key === "move") {
+                setMoveAssetTarget(id);
               } else if (item.key === "delete") {
                 Alert.alert(
                   t("selection.deleteConfirmTitle", { count: 1 }),
@@ -220,14 +300,47 @@ export function GalleryScreen() {
     );
   };
 
+  // ─── Move asset handler ───────────────────────────────────────────
+  const handleMoveAssetSelect = async (targetFolderId: string | null) => {
+    if (!moveAssetTarget) return;
+    try {
+      await store.moveAsset(moveAssetTarget, targetFolderId);
+    } catch (err) {
+      handleUIError(err);
+    }
+    setMoveAssetTarget(null);
+  };
+
+  // ─── Move folder handler ──────────────────────────────────────────
+  const handleMoveFolderSelect = async (targetParentId: string | null) => {
+    if (!moveFolderTarget) return;
+    try {
+      await store.moveFolder(moveFolderTarget, targetParentId);
+    } catch (err) {
+      if (
+        err instanceof AppError &&
+        err.errorCode === MediaFolderErrors.CIRCULAR_REFERENCE
+      ) {
+        Alert.alert("", t("folders.errors.circularReference"));
+      } else {
+        handleUIError(err);
+      }
+    }
+    setMoveFolderTarget(null);
+  };
+
+  // ─── Header geri butonu ───────────────────────────────────────────
+  const isInsideFolder = store.folderPath.length > 0;
+  const headerTitle = isInsideFolder
+    ? store.folderPath[store.folderPath.length - 1].name
+    : "Gallery";
+
   // ─── Veriler ──────────────────────────────────────────────────────
   const filtered = store.getFilteredAssets();
   const mediaAssets = filtered.filter(
     (a) => a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO,
   );
   const docAssets = filtered.filter((a) => a.type === AssetTypes.DOCUMENT);
-
-  // Only IMAGE assets go into the viewer (VIDEO not supported by GalleryPreview)
   const imageAssets = mediaAssets.filter((a) => a.type === AssetTypes.IMAGE);
   const viewerImages: ImageViewerItem[] = imageAssets.map((a) => ({
     uri: a.fullPath,
@@ -241,13 +354,25 @@ export function GalleryScreen() {
         headerShown: true,
         header: (props) => (
           <AppHeader
-            title="Gallery"
-            icon="FolderOpen"
+            title={headerTitle}
+            icon={isInsideFolder ? undefined : "FolderOpen"}
             goBack={true}
+            onGoBack={
+              isInsideFolder ? store.navigateBack : undefined
+            }
             RightComponent={
-              <AppButton variant="ghost" size="icon" onPress={handleUpload}>
-                <Upload size={20} color={theme.colors.primary} />
-              </AppButton>
+              <View style={styles.headerButtons}>
+                <AppButton
+                  variant="ghost"
+                  size="icon"
+                  onPress={() => setCreateFolderVisible(true)}
+                >
+                  <FolderPlus size={20} color={theme.colors.primary} />
+                </AppButton>
+                <AppButton variant="ghost" size="icon" onPress={handleUpload}>
+                  <Upload size={20} color={theme.colors.primary} />
+                </AppButton>
+              </View>
             }
             {...props}
           />
@@ -278,11 +403,29 @@ export function GalleryScreen() {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >
+        {/* Breadcrumb navigasyon */}
+        <GalleryBreadcrumb
+          path={store.folderPath}
+          onNavigate={store.navigateToFolder}
+        />
+
         {/* Type filter chips */}
         <GalleryFilterChips
           active={store.activeTypeFilter}
           onChange={store.setTypeFilter}
         />
+
+        {/* Alt klasörler */}
+        {store.subFolders.length > 0 && (
+          <>
+            <AppListSectionHeader title={t("folders.title")} />
+            <GalleryFolderGrid
+              folders={store.subFolders}
+              onPressFolder={(id) => store.navigateToFolder(id)}
+              onLongPressFolder={handleLongPressFolder}
+            />
+          </>
+        )}
 
         {/* Medya grid */}
         {mediaAssets.length > 0 && (
@@ -300,7 +443,7 @@ export function GalleryScreen() {
           </>
         )}
 
-        {/* Belgeler list */}
+        {/* Belgeler listesi */}
         {docAssets.length > 0 && (
           <>
             <AppListSectionHeader title={t("sections.documents")} />
@@ -316,7 +459,9 @@ export function GalleryScreen() {
         )}
 
         {/* Empty state */}
-        {filtered.length === 0 && <GalleryEmpty onUpload={handleUpload} />}
+        {store.subFolders.length === 0 && filtered.length === 0 && (
+          <GalleryEmpty onUpload={handleUpload} />
+        )}
       </ScrollView>
 
       {/* Seçim action bar */}
@@ -343,7 +488,7 @@ export function GalleryScreen() {
         onClose={() => setPdfPreview(null)}
       />
 
-      {/* Rename modal */}
+      {/* Asset rename modal */}
       <GalleryRenameModal
         visible={renameTarget !== null}
         currentBaseName={renameTarget?.baseName ?? ""}
@@ -352,6 +497,46 @@ export function GalleryScreen() {
           store.renameAsset(renameTarget!.id, newBaseName)
         }
         onClose={() => setRenameTarget(null)}
+      />
+
+      {/* Klasör oluşturma modal */}
+      <GalleryFolderNameModal
+        visible={createFolderVisible}
+        title={t("folders.newFolder")}
+        onSave={async (name) => {
+          await store.createFolder(name);
+          setCreateFolderVisible(false);
+        }}
+        onClose={() => setCreateFolderVisible(false)}
+      />
+
+      {/* Klasör yeniden adlandırma modal */}
+      <GalleryFolderNameModal
+        visible={renameFolderTarget !== null}
+        title={t("folders.renameFolder")}
+        initialValue={renameFolderTarget?.name ?? ""}
+        onSave={async (name) => {
+          await store.renameFolder(renameFolderTarget!.id, name);
+          setRenameFolderTarget(null);
+        }}
+        onClose={() => setRenameFolderTarget(null)}
+      />
+
+      {/* Klasör taşıma picker */}
+      <GalleryFolderPickerModal
+        visible={moveFolderTarget !== null}
+        title={t("folders.moveFolder")}
+        excludeFolderId={moveFolderTarget}
+        onSelect={handleMoveFolderSelect}
+        onClose={() => setMoveFolderTarget(null)}
+      />
+
+      {/* Asset taşıma picker */}
+      <GalleryFolderPickerModal
+        visible={moveAssetTarget !== null}
+        title={t("folders.moveAsset")}
+        onSelect={handleMoveAssetSelect}
+        onClose={() => setMoveAssetTarget(null)}
       />
     </View>
   );
@@ -376,5 +561,10 @@ const styles = StyleSheet.create((theme) => ({
   },
   contentWithBar: {
     paddingBottom: theme.spacing.xxl + 80,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
   },
 }));
