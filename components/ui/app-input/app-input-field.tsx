@@ -28,7 +28,13 @@ const stylesheet = StyleSheet.create((theme) => ({
 
 export type AppInputFieldProps = TextInputProps;
 
-export function AppInputField({ onFocus, onBlur, style, editable, ...rest }: AppInputFieldProps) {
+export function AppInputField({
+  onFocus,
+  onBlur,
+  style,
+  editable,
+  ...rest
+}: AppInputFieldProps) {
   const { size, setFocused, disabled } = useInputGroup();
   const { theme } = useUnistyles();
 

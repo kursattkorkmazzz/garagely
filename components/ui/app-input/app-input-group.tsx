@@ -31,7 +31,9 @@ export function AppInputGroup({
   });
 
   return (
-    <InputGroupContext.Provider value={{ size, focused, setFocused, disabled, error }}>
+    <InputGroupContext.Provider
+      value={{ size, focused, setFocused, disabled, error }}
+    >
       <View style={[groupStylesheet.container, style]}>{children}</View>
     </InputGroupContext.Provider>
   );

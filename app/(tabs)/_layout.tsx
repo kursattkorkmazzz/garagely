@@ -14,6 +14,14 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="showcase/index"
+        options={TabOptions({
+          icon: "Sparkle",
+          title: "Showcase",
+          theme,
+        })}
+      />
+      <Tabs.Screen
         name="garage"
         options={TabOptions({
           icon: "Warehouse",
