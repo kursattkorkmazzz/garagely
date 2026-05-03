@@ -68,6 +68,10 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
     loadInitial: async () => {
       set({ isLoading: true });
+
+      // Fiziksel dosyası olmayan (backup/restore sonrası oluşan) kayıtları temizle
+      await AssetService.pruneOrphanedAssets();
+
       const [assets, recent, categories] = await Promise.all([
         AssetService.getAll(PAGE_SIZE, 0),
         AssetService.getRecent(RECENT_LIMIT),

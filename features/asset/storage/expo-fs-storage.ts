@@ -21,6 +21,11 @@ export class ExpoFileSystemStorage {
     return new Directory(Paths.document, "storage");
   }
 
+  /** Disk'teki kalıcı storage dizinini döner (dışarıdan erişim için). */
+  static getFinalStorageDir(): Directory {
+    return new Directory(Paths.document, "storage");
+  }
+
   /**
    * Geçici depolama klasörü — sistem tarafından temizlenebilir.
    */

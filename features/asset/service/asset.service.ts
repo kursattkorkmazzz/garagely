@@ -121,6 +121,68 @@ export class AssetService {
     }
   }
 
+  /**
+   * İki yönlü temizlik — uygulama başlangıcında çağrılır:
+   *  1. DB kaydı var, dosya yok → DB kaydını sil
+   *  2. Dosya var, DB kaydı yok → dosyayı sil
+   * Backup/restore veya reinstall sonrası tutarsızlığı giderir.
+   */
+  static async pruneOrphanedAssets(): Promise<void> {
+    const repo = await this.repo();
+    const db = await GetGaragelyDatabase();
+
+    // ── 1. DB kaydı var, dosyası yok → DB'den sil ────────────────────
+    const allRecords = await repo.find({ select: { id: true, fullPath: true } });
+
+    const orphanedIds: string[] = [];
+    for (const asset of allRecords) {
+      if (!new File(asset.fullPath).exists) {
+        orphanedIds.push(asset.id);
+      }
+    }
+
+    if (orphanedIds.length > 0) {
+      await db
+        .getRepository(ImageMetadataEntity)
+        .createQueryBuilder()
+        .delete()
+        .where("assetId IN (:...ids)", { ids: orphanedIds })
+        .execute();
+
+      await repo
+        .createQueryBuilder()
+        .delete()
+        .where("id IN (:...ids)", { ids: orphanedIds })
+        .execute();
+
+      console.log(`[AssetService] Removed ${orphanedIds.length} orphaned DB record(s).`);
+    }
+
+    // ── 2. Dosya var, DB kaydı yok → dosyayı sil ─────────────────────
+    const finalDir = ExpoFileSystemStorage.getFinalStorageDir();
+    if (!finalDir.exists) return;
+
+    const knownPaths = new Set(
+      allRecords
+        .filter((a) => !orphanedIds.includes(a.id))
+        .map((a) => a.fullPath),
+    );
+
+    const diskFiles = finalDir.list();
+    let deletedFiles = 0;
+
+    for (const item of diskFiles) {
+      if (item instanceof File && !knownPaths.has(item.uri)) {
+        item.delete();
+        deletedFiles++;
+      }
+    }
+
+    if (deletedFiles > 0) {
+      console.log(`[AssetService] Deleted ${deletedFiles} orphaned file(s) from disk.`);
+    }
+  }
+
   static async getAll(limit: number, offset: number): Promise<AssetEntity[]> {
     const repo = await AssetService.repo();
     return repo.find({
