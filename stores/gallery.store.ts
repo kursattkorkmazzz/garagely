@@ -237,8 +237,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
     },
 
     getFilteredAssets: () => {
-      const { assetsById, orderedIds, activeCategoryId, activeTypeFilter } =
-        get();
+      const { assetsById, orderedIds, activeTypeFilter } = get();
       let assets = orderedIds.map((id) => assetsById[id]).filter(Boolean);
 
       if (activeTypeFilter === "media") {
@@ -248,12 +247,6 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
         );
       } else if (activeTypeFilter === "documents") {
         assets = assets.filter((a) => a.type === AssetTypes.DOCUMENT);
-      }
-
-      if (activeCategoryId !== null) {
-        assets = assets.filter((a) =>
-          a.categories?.some((c) => c.id === activeCategoryId),
-        );
       }
 
       return assets;

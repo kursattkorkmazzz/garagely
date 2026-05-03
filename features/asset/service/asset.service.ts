@@ -44,6 +44,7 @@ export class AssetService {
     if (typeof options?.maxSize === "number") {
       this.checkMaxSize(file.size, options.maxSize);
     }
+    const folderId = options.folderId ?? null;
 
     let tempFile: StorageAsset | null = null;
 
@@ -66,6 +67,7 @@ export class AssetService {
       newAsset.basePath = tempFile.basePath;
       newAsset.fullPath = tempFile.fullPath;
       newAsset.sizeBytes = tempFile.sizeBytes;
+      newAsset.folderId = folderId;
 
       const assetRepo = queryRunner.manager.getRepository(AssetEntity);
 
@@ -189,7 +191,27 @@ export class AssetService {
       order: { createdAt: "DESC" },
       take: limit,
       skip: offset,
-      relations: ["categories"],
+      relations: ["folder"],
+    });
+  }
+
+  /**
+   * Belirli bir klasördeki asset'leri döner.
+   * folderId null → klasörsüz (root'taki) asset'ler.
+   */
+  static async getByFolder(
+    folderId: string | null,
+    limit: number,
+    offset: number,
+  ): Promise<AssetEntity[]> {
+    const repo = await AssetService.repo();
+    const { IsNull } = await import("typeorm");
+    return repo.find({
+      where: { folderId: folderId ?? IsNull() },
+      order: { createdAt: "DESC" },
+      take: limit,
+      skip: offset,
+      relations: ["folder"],
     });
   }
 
@@ -205,8 +227,18 @@ export class AssetService {
     const repo = await AssetService.repo();
     return repo.findOne({
       where: { id },
-      relations: ["categories"],
+      relations: ["folder"],
     });
+  }
+
+  /** Asset'i bir klasöre taşı (folderId null → klasörsüz / root) */
+  static async moveAsset(
+    assetId: string,
+    targetFolderId: string | null,
+  ): Promise<AssetEntity> {
+    const repo = await AssetService.repo();
+    await repo.update(assetId, { folderId: targetFolderId });
+    return repo.findOneByOrFail({ id: assetId });
   }
 
   static async deleteById(id: string): Promise<void> {
@@ -241,7 +273,7 @@ export class AssetService {
 
   static async uploadImageAsset(
     uri: string,
-    options?: Omit<UploadAssetOptions, "type">,
+    options?: Omit<UploadAssetOptions, "type"> & { folderId?: string | null },
   ) {
     const originalFile = new File(uri);
     if (!originalFile.exists) {
@@ -265,7 +297,7 @@ export class AssetService {
 
   static async uploadVideoAsset(
     uri: string,
-    options?: Omit<UploadAssetOptions, "type">,
+    options?: Omit<UploadAssetOptions, "type"> & { folderId?: string | null },
   ) {
     const originalFile = new File(uri);
     if (!originalFile.exists) {
@@ -277,7 +309,7 @@ export class AssetService {
 
   static async uploadDocumentAsset(
     uri: string,
-    options?: Omit<UploadAssetOptions, "type">,
+    options?: Omit<UploadAssetOptions, "type"> & { folderId?: string | null },
   ) {
     const originalFile = new File(uri);
     if (!originalFile.exists) {

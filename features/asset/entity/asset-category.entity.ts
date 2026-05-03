@@ -1,6 +1,9 @@
+/**
+ * @deprecated — MediaFolderEntity ile değiştirildi.
+ * Bu dosya Phase 4 (gallery store güncellemesi) sonrasında silinecek.
+ */
 import { BaseEntity } from "@/db/entity/base.entity";
-import type { AssetEntity } from "@/features/asset/entity/asset.entity";
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity } from "typeorm";
 
 @Entity("asset_categories")
 export class AssetCategoryEntity extends BaseEntity {
@@ -12,7 +15,4 @@ export class AssetCategoryEntity extends BaseEntity {
 
   @Column({ type: "integer", default: 0 })
   sortOrder!: number;
-
-  @ManyToMany("AssetEntity", (asset: AssetEntity) => asset.categories)
-  assets?: AssetEntity[];
 }
