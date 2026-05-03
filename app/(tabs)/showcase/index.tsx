@@ -14,7 +14,10 @@ import { StyleSheet } from "react-native-unistyles";
 export default function ShowcaseScreen() {
   return (
     <View style={styles.container}>
-      <AppFieldGroup>
+      <AppFieldGroup
+        label="Field Group Label"
+        description="This is a simple field group description."
+      >
         <AppField>
           <AppFieldLabel>Input with Addon</AppFieldLabel>
           <AppInputGroup size="md">
