@@ -46,17 +46,20 @@ const styles = StyleSheet.create((theme) => ({
   groupContainer: {
     display: "flex",
     width: "100%",
-    gap: theme.spacing.sm,
+    gap: theme.spacing.xs,
     flexDirection: "column",
     alignItems: "flex-start",
   },
   groupLabel: {
-    ...theme.typography.label,
+    ...theme.typography.overline,
     color: theme.colors.mutedForeground,
+    paddingHorizontal: theme.spacing.xs,
+    textTransform: "uppercase" as const,
   },
   groupDescription: {
     ...theme.typography.helperText,
     color: theme.colors.mutedForeground,
+    paddingHorizontal: theme.spacing.xs,
   },
   fieldContainer: {
     display: "flex",
