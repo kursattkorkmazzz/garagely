@@ -403,17 +403,21 @@ export function GalleryScreen() {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >
-        {/* Breadcrumb navigasyon */}
-        <GalleryBreadcrumb
-          path={store.folderPath}
-          onNavigate={store.navigateToFolder}
-        />
+        {/* Breadcrumb navigasyon — sadece klasör içindeyken gösterilir */}
+        {isInsideFolder && (
+          <GalleryBreadcrumb
+            path={store.folderPath}
+            onNavigate={store.navigateToFolder}
+          />
+        )}
 
-        {/* Type filter chips */}
-        <GalleryFilterChips
-          active={store.activeTypeFilter}
-          onChange={store.setTypeFilter}
-        />
+        {/* Type filter chips — sadece klasör içindeyken gösterilir */}
+        {isInsideFolder && (
+          <GalleryFilterChips
+            active={store.activeTypeFilter}
+            onChange={store.setTypeFilter}
+          />
+        )}
 
         {/* Alt klasörler */}
         {store.subFolders.length > 0 && (
@@ -427,8 +431,8 @@ export function GalleryScreen() {
           </>
         )}
 
-        {/* Medya grid */}
-        {mediaAssets.length > 0 && (
+        {/* Medya grid — sadece klasör içindeyken gösterilir */}
+        {isInsideFolder && mediaAssets.length > 0 && (
           <>
             <AppListSectionHeader title={t("sections.media")} />
             <GalleryMediaGrid
@@ -443,8 +447,8 @@ export function GalleryScreen() {
           </>
         )}
 
-        {/* Belgeler listesi */}
-        {docAssets.length > 0 && (
+        {/* Belgeler listesi — sadece klasör içindeyken gösterilir */}
+        {isInsideFolder && docAssets.length > 0 && (
           <>
             <AppListSectionHeader title={t("sections.documents")} />
             <GalleryDocumentList
@@ -458,8 +462,11 @@ export function GalleryScreen() {
           </>
         )}
 
-        {/* Empty state */}
-        {store.subFolders.length === 0 && filtered.length === 0 && (
+        {/* Empty state:
+            - Root: hiç klasör yoksa
+            - Klasör içinde: alt klasör ve dosya ikisi de yoksa */}
+        {store.subFolders.length === 0 &&
+          (!isInsideFolder || filtered.length === 0) && (
           <GalleryEmpty onUpload={handleUpload} />
         )}
       </ScrollView>
