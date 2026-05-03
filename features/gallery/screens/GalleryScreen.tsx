@@ -284,13 +284,6 @@ export function GalleryScreen() {
           onChange={store.setTypeFilter}
         />
 
-        {/* Category chips */}
-        <GalleryCategoryChips
-          categories={store.categories}
-          activeId={store.activeCategoryId}
-          onSelect={store.setActiveCategory}
-        />
-
         {/* Medya grid */}
         {mediaAssets.length > 0 && (
           <>
