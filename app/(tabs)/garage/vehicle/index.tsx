@@ -24,9 +24,9 @@ export default function VehicleList() {
     return () => appHeader.resetHeaderRight();
   }, []);
 
-  const openVehicleForm = (id: string) => {
+  const openVehicleDetail = (id: string) => {
     router.push({
-      pathname: "/garage/vehicle/[id]/vehicle-form",
+      pathname: "/garage/vehicle/[id]",
       params: { id },
     });
   };
@@ -36,7 +36,7 @@ export default function VehicleList() {
       data={vehicles}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <VehicleListItem vehicle={item} onPress={openVehicleForm} />
+        <VehicleListItem vehicle={item} onPress={openVehicleDetail} />
       )}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       contentContainerStyle={

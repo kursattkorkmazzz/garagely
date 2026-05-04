@@ -46,7 +46,7 @@ export function AppHeader({
       {icon && (
         <Icon name={icon} size={24} color={iconColor || theme.colors.primary} />
       )}
-      <AppText style={styles.title}>{title}</AppText>
+      <AppText style={styles.title} numberOfLines={1}>{title}</AppText>
 
       {RightComponent && (
         <View style={styles.rightComponent}>{RightComponent}</View>
@@ -69,12 +69,12 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     ...theme.typography.heading3,
     color: theme.colors.foreground,
+    flex: 1,
   },
   goBackButton: {
     padding: theme.spacing.sm,
   },
   rightComponent: {
-    flex: 1,
     alignItems: "flex-end",
   },
 }));

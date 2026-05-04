@@ -20,6 +20,7 @@ export default function GarageLayout({
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="vehicle/[id]/index" options={{ headerShown: false }} />
       <Stack.Screen
         name="vehicle/index"
         options={{

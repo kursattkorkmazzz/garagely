@@ -80,6 +80,17 @@
     "changePhoto": "Change Photo"
   },
 
+  "detail": {
+    "specs": "Specifications",
+    "purchase": "Purchase Info",
+    "activeVehicle": "Active Vehicle",
+    "setAsActive": "Set as Active",
+    "deleteConfirmTitle": "Delete Vehicle",
+    "deleteConfirmMessage": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel"
+  },
+
   "errors": {
     "brand": "Brand is required",
     "model": "Model is required",

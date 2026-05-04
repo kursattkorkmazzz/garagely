@@ -80,6 +80,17 @@
     "changePhoto": "Fotoğrafı Değiştir"
   },
 
+  "detail": {
+    "specs": "Özellikler",
+    "purchase": "Alış Bilgileri",
+    "activeVehicle": "Aktif Araç",
+    "setAsActive": "Aktif Araç Yap",
+    "deleteConfirmTitle": "Aracı Sil",
+    "deleteConfirmMessage": "{{name}} aracını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+    "deleteConfirm": "Sil",
+    "deleteCancel": "İptal"
+  },
+
   "errors": {
     "brand": "Marka zorunludur",
     "model": "Model zorunludur",
