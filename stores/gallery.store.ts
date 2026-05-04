@@ -47,6 +47,7 @@ interface GalleryActions {
   deleteFolder: (id: string) => Promise<void>;
   // Asset işlemleri
   uploadImage: (uri: string) => Promise<AssetEntity>;
+  uploadImageToRoot: (uri: string) => Promise<AssetEntity>;
   uploadVideo: (uri: string) => Promise<AssetEntity>;
   uploadDocument: (uri: string) => Promise<AssetEntity>;
   deleteAsset: (id: string) => Promise<void>;
@@ -247,6 +248,20 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       set((s) => ({
         assetsById: { [asset.id]: asset, ...s.assetsById },
         orderedIds: [asset.id, ...s.orderedIds],
+        recentIds: [asset.id, ...s.recentIds].slice(0, RECENT_LIMIT),
+      }));
+      return asset;
+    },
+
+    uploadImageToRoot: async (uri) => {
+      const asset = await AssetService.uploadImageAsset(uri, { folderId: null });
+      set((s) => ({
+        assetsById: { [asset.id]: asset, ...s.assetsById },
+        // Root görünümdeyken orderedIds'e ekle; klasör içindeyken ekleme
+        orderedIds:
+          s.currentFolderId === null
+            ? [asset.id, ...s.orderedIds]
+            : s.orderedIds,
         recentIds: [asset.id, ...s.recentIds].slice(0, RECENT_LIMIT),
       }));
       return asset;

@@ -1,9 +1,10 @@
 import { BaseEntity } from "@/db/entity/base.entity";
+import { AssetEntity } from "@/features/asset/entity/asset.entity";
 import { type BodyType } from "@/shared/enums/body-type";
 import { type FuelType } from "@/shared/enums/fuel-type";
 import { type TransmissionType } from "@/shared/enums/transmission-type";
 import { Money } from "@/shared/money";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity("vehicles")
 export class Vehicle extends BaseEntity {
@@ -36,4 +37,11 @@ export class Vehicle extends BaseEntity {
 
   @Column({ type: "integer", nullable: true })
   purchaseDate?: number;
+
+  @Column({ type: "text", nullable: true })
+  coverPhotoAssetId?: string | null;
+
+  @ManyToOne(() => AssetEntity, { nullable: true, onDelete: "SET NULL", eager: false })
+  @JoinColumn({ name: "coverPhotoAssetId" })
+  coverPhoto?: AssetEntity | null;
 }

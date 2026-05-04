@@ -63,6 +63,23 @@
     "minivan": "Minivan"
   },
 
+  "coverPhoto": {
+    "uploadWarningTitle": "Photo will be added to Gallery",
+    "uploadWarningMessage": "The photo you take or upload will also be added to the app's gallery.",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "keepOldTitle": "Previous Cover Photo",
+    "keepOldMessage": "Do you want to keep the previous cover photo in the gallery?",
+    "keepInGallery": "Keep in Gallery",
+    "removeFromGallery": "Remove from Gallery",
+    "pickFromLibrary": "Upload from Device",
+    "takePhoto": "Take Photo",
+    "selectFromGallery": "Select from App Gallery",
+    "pickerTitle": "Select Cover Photo",
+    "addPhoto": "Add Cover Photo",
+    "changePhoto": "Change Photo"
+  },
+
   "errors": {
     "brand": "Brand is required",
     "model": "Model is required",

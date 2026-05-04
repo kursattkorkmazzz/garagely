@@ -19,7 +19,7 @@ export class VehicleService {
 
   static async getById(id: string): Promise<Vehicle | null> {
     const repo = await VehicleService.repo();
-    return repo.findOneBy({ id });
+    return repo.findOne({ where: { id }, relations: ["coverPhoto"] });
   }
 
   static async create(dto: CreateVehicleDto): Promise<Vehicle> {

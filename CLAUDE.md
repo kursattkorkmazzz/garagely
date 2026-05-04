@@ -138,7 +138,8 @@ Actions (folder CRUD):
   deleteFolder(id)            → cascade deletes files + DB records
 
 Actions (asset):
-  uploadImage(uri)   → uploads to currentFolderId automatically
+  uploadImage(uri)         → uploads to currentFolderId automatically
+  uploadImageToRoot(uri)   → always uploads to root (folderId: null) — used by VehicleCoverPhotoField
   uploadVideo(uri)
   uploadDocument(uri)
   deleteAsset(id)
@@ -179,11 +180,31 @@ DDD-inspired structure. Each feature owns: entity, errors, service, types, (opti
 
 ### `features/vehicle`
 
-**Entity:** `Vehicle` — brand, model, year, plate (unique), color (hex), transmissionType, bodyType, fuelType, purchase (Money embedded), purchaseDate.
+**Entity:** `Vehicle` — brand, model, year, plate (unique), color (hex), transmissionType, bodyType, fuelType, purchase (Money embedded), purchaseDate, coverPhotoAssetId (nullable FK → assets).
 
-**Service:** `VehicleService` — `getAll`, `getById`, `create(dto)`, `update(id, dto)`, `delete(id)`.
+**Service:** `VehicleService` — `getAll`, `getById` (loads `coverPhoto` relation), `create(dto)`, `update(id, dto)`, `delete(id)`.
 
 **Screen:** `VehicleFormScreen` — Formik wizard with `createVehicleFormSchema(t)`. Each step uses `useFormikContext<VehicleFormState>()`.
+
+**Cover Photo:** `VehicleCoverPhotoField` (`features/vehicle/components/`) — 16:9 photo field with 3 upload sources:
+- **Cihazdan Yükle / Kamera ile Çek** → shows warning Alert ("galeriye eklenecek") → on confirm: `galleryStore.uploadImageToRoot(uri)` → asset root'a yüklenir
+- **Uygulama Galerisinden Seç** → `GalleryAssetPickerModal` (full-screen navigable picker, only IMAGE type)
+
+On update: if cover photo changed and previous one existed, Alert asks "Keep in gallery?" — if no, `galleryStore.deleteAsset(oldId)`.
+
+```tsx
+<VehicleCoverPhotoField
+  previewUri={values.coverPhotoPreviewUri}
+  onUploadComplete={(assetId, previewUri) => {
+    setFieldValue("coverPhotoAssetId", assetId);
+    setFieldValue("coverPhotoPreviewUri", previewUri);
+  }}
+/>
+```
+
+`VehicleFormValues` has two cover photo fields:
+- `coverPhotoAssetId: string | null` — saved to DB
+- `coverPhotoPreviewUri: string | null` — display only, not sent to service
 
 ### `features/asset`
 
@@ -295,7 +316,7 @@ All errors extend `AppError` via `AppError.createAppError(errorCode, message?, d
 | `GallerySelectionBar` | Fixed bottom bar in selection mode (count + delete + cancel) |
 | `GalleryFilterChips` | All / Media / Documents type filter (folder-only, hidden at root) |
 | `GalleryEmpty` | Empty state with upload CTA |
-| `GallerySelectionBar` | Fixed bottom bar: selected count, delete, cancel |
+| `GalleryAssetPickerModal` | Full-screen navigable asset picker (IMAGE only) — used by `VehicleCoverPhotoField` |
 
 **Image preview:** `AppImageViewer` wraps `react-native-gallery-preview`. Requires `GestureHandlerRootView` at app root (already in `app/_layout.tsx`).
 

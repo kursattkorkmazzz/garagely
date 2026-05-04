@@ -1,5 +1,4 @@
 import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
-import { ImagePicker } from "@/components/image-picker/image-picker";
 import { MoneyInputField } from "@/components/money-input-field/money-input-field";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
@@ -7,8 +6,10 @@ import { AppField } from "@/components/ui/app-field/app-field";
 import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
 import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
+import { AppFieldSeperator } from "@/components/ui/app-field/app-field-seperator";
 import { AppInputField, AppInputGroup } from "@/components/ui/app-input";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
+import { VehicleCoverPhotoField } from "@/features/vehicle/components/VehicleCoverPhotoField";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
 import { useI18n } from "@/i18n";
 import { APP_HEADER_HEIGHT } from "@/layouts/header/app-header";
@@ -19,13 +20,15 @@ import {
   TransmissionType,
   TransmissionTypes,
 } from "@/shared/enums/transmission-type";
+import { useGalleryStore } from "@/stores/gallery.store";
 import { useVehicleStore } from "@/stores/vehicle.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   ScrollView,
   View,
@@ -42,21 +45,25 @@ type VehicleFormScreenProps = {
 export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
   const isNew = id === "new";
   const { t } = useI18n("vehicle");
-  const { t: tErrors } = useI18n("errors");
   const validationSchema = useMemo(() => createVehicleFormSchema(t), [t]);
   const [initialValues, setInitialValues] =
     useState<VehicleFormValues>(VEHICLE_FORM_EMPTY);
   const [loadingVehicle, setLoadingVehicle] = useState(!isNew);
+  const previousCoverPhotoAssetIdRef = useRef<string | null>(null);
+
+  const { create, update } = useVehicleStore();
+  const galleryStore = useGalleryStore();
 
   useEffect(() => {
     if (isNew) return;
     VehicleService.getById(id).then((vehicle) => {
-      if (vehicle) setInitialValues(vehicleToFormValues(vehicle));
+      if (vehicle) {
+        setInitialValues(vehicleToFormValues(vehicle));
+        previousCoverPhotoAssetIdRef.current = vehicle.coverPhotoAssetId ?? null;
+      }
       setLoadingVehicle(false);
     });
   }, [id]);
-
-  const { create, update } = useVehicleStore();
 
   const handleSubmit = async (values: VehicleFormValues) => {
     const dto = formValuesToDto(values);
@@ -69,6 +76,25 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
     } else {
       await update(id, dto)
         .then(() => {
+          const oldId = previousCoverPhotoAssetIdRef.current;
+          if (oldId && oldId !== values.coverPhotoAssetId) {
+            Alert.alert(
+              t("coverPhoto.keepOldTitle"),
+              t("coverPhoto.keepOldMessage"),
+              [
+                {
+                  text: t("coverPhoto.keepInGallery"),
+                  style: "default",
+                },
+                {
+                  text: t("coverPhoto.removeFromGallery"),
+                  style: "destructive",
+                  onPress: () =>
+                    galleryStore.deleteAsset(oldId).catch(handleUIError),
+                },
+              ],
+            );
+          }
           router.back();
         })
         .catch(handleUIError);
@@ -181,14 +207,14 @@ function VehicleFormFields() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Cover Photo */}
         <AppFieldGroup label={t("sections.coverPhoto")}>
-          <ImagePicker
-            allowsMultipleSelection={false}
-            selectionLimit={1}
-            allowsEditing={true}
-            aspect={[16, 9]}
-            shape="rectangle"
-            mediaTypes={["images"]}
+          <VehicleCoverPhotoField
+            previewUri={values.coverPhotoPreviewUri}
+            onUploadComplete={(assetId, previewUri) => {
+              setFieldValue("coverPhotoAssetId", assetId);
+              setFieldValue("coverPhotoPreviewUri", previewUri);
+            }}
           />
         </AppFieldGroup>
 
@@ -203,7 +229,7 @@ function VehicleFormFields() {
             error={touched.brand ? errors.brand : undefined}
             autoCapitalize="words"
           />
-
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.model")}
             placeholder={t("placeholders.model")}
@@ -213,7 +239,7 @@ function VehicleFormFields() {
             error={touched.model ? errors.model : undefined}
             autoCapitalize="words"
           />
-
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.year")}
             placeholder={t("placeholders.year")}
@@ -224,7 +250,7 @@ function VehicleFormFields() {
             keyboardType="number-pad"
             maxLength={4}
           />
-
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.plate")}
             placeholder={t("placeholders.plate")}
@@ -234,7 +260,7 @@ function VehicleFormFields() {
             error={touched.plate ? errors.plate : undefined}
             autoCapitalize="characters"
           />
-
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.color")}
             placeholder={t("placeholders.color")}
@@ -290,13 +316,15 @@ function VehicleFormFields() {
             }
             error={errors.purchaseAmount}
           />
+          <AppFieldSeperator />
           <AppField>
-            <AppFieldLabel> {t("fields.purchaseDate")}</AppFieldLabel>
+            <AppFieldLabel>{t("fields.purchaseDate")}</AppFieldLabel>
             <AppInputGroup>
               <AppInputField placeholder="— (coming soon)" editable={false} />
             </AppInputGroup>
           </AppField>
         </AppFieldGroup>
+
         <AppButton
           variant="primary"
           size="lg"
@@ -360,6 +388,8 @@ function vehicleToFormValues(v: Vehicle): VehicleFormValues {
     purchaseAmount: v.purchase?.amount ? String(v.purchase.amount) : "",
     purchaseCurrency: v.purchase?.currency ?? "",
     purchaseDate: v.purchaseDate ?? null,
+    coverPhotoAssetId: v.coverPhotoAssetId ?? null,
+    coverPhotoPreviewUri: v.coverPhoto?.fullPath ?? null,
   };
 }
 
@@ -382,6 +412,7 @@ function formValuesToDto(values: VehicleFormValues) {
         }
       : undefined,
     purchaseDate: values.purchaseDate ?? undefined,
+    coverPhotoAssetId: values.coverPhotoAssetId ?? undefined,
   };
 }
 
@@ -401,19 +432,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.background,
-  },
-  sectionHeader: {
-    ...theme.typography.overline,
-    color: theme.colors.mutedForeground,
-    paddingHorizontal: theme.spacing.md + theme.spacing.xs,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.xs,
-    textTransform: "uppercase" as const,
-  },
-  currencyAddon: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: theme.spacing.xxs,
   },
   submitButton: {
     marginHorizontal: theme.spacing.md,

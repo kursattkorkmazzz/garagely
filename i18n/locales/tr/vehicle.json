@@ -63,6 +63,23 @@
     "minivan": "Minivan"
   },
 
+  "coverPhoto": {
+    "uploadWarningTitle": "Fotoğraf Galeriye Eklenecek",
+    "uploadWarningMessage": "Çektiğiniz veya yüklediğiniz fotoğraf uygulamanın galerisine de eklenecektir.",
+    "cancel": "İptal",
+    "continue": "Devam Et",
+    "keepOldTitle": "Önceki Kapak Fotoğrafı",
+    "keepOldMessage": "Önceki kapak fotoğrafını galeride tutmak ister misiniz?",
+    "keepInGallery": "Galeride Kalsın",
+    "removeFromGallery": "Galeriden Kaldır",
+    "pickFromLibrary": "Cihazdan Yükle",
+    "takePhoto": "Kamera ile Çek",
+    "selectFromGallery": "Uygulama Galerisinden Seç",
+    "pickerTitle": "Kapak Fotoğrafı Seç",
+    "addPhoto": "Kapak Fotoğrafı Ekle",
+    "changePhoto": "Fotoğrafı Değiştir"
+  },
+
   "errors": {
     "brand": "Marka zorunludur",
     "model": "Model zorunludur",

@@ -18,6 +18,9 @@ export type VehicleFormValues = {
   purchaseAmount: string;
   purchaseCurrency: CurrencyType | "";
   purchaseDate: number | null;
+  coverPhotoAssetId: string | null;
+  /** Sadece gösterim için. Servise gönderilmez. */
+  coverPhotoPreviewUri: string | null;
 };
 
 //TODO: Remove this at production, only for development and testing purposes
@@ -33,4 +36,6 @@ export const VEHICLE_FORM_EMPTY: VehicleFormValues = {
   purchaseAmount: "165000",
   purchaseCurrency: "TRY",
   purchaseDate: null,
+  coverPhotoAssetId: null,
+  coverPhotoPreviewUri: null,
 };
