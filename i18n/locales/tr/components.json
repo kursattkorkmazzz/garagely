@@ -4,5 +4,9 @@
     "pickFromDeviceLibrary": "Cihaz kitaplığından seç",
     "takePhoto": "Fotoğraf çek",
     "selectionLimitExceeded": "Seçim limiti aşıldı."
+  },
+  "colorPicker": {
+    "title": "Renk Seç",
+    "done": "Tamam"
   }
 }

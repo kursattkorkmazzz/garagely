@@ -4,5 +4,9 @@
     "pickFromDeviceLibrary": "Select from library",
     "takePhoto": "Take a photo",
     "selectionLimitExceeded": "Selection limit exceeded."
+  },
+  "colorPicker": {
+    "title": "Pick a Color",
+    "done": "Done"
   }
 }
