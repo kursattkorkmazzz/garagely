@@ -42,7 +42,7 @@ export default function SettingsPage() {
 
   const timezoneDisplayValue = useMemo(() => {
     const tz = ct.getTimezone(timezone);
-    return tz ? `${timezone} (UTC ${tz.utcOffsetStr})` : timezone;
+    return tz ? `UTC ${tz.utcOffsetStr}` : timezone;
   }, [timezone]);
 
   const version = Constants.expoConfig?.version ?? "1.0.0";
