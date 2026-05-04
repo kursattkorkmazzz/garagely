@@ -7,7 +7,6 @@ import { AppField } from "@/components/ui/app-field/app-field";
 import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
 import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
-import { AppFieldSeperator } from "@/components/ui/app-field/app-field-seperator";
 import { AppInputField, AppInputGroup } from "@/components/ui/app-input";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
@@ -32,7 +31,7 @@ import {
   View,
 } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { createVehicleFormSchema } from "./vehicle-form.schema";
 import { VEHICLE_FORM_EMPTY, VehicleFormValues } from "./vehicle-form.types";
 
@@ -108,8 +107,6 @@ function VehicleFormFields() {
     isSubmitting,
   } = useFormikContext<VehicleFormValues>();
   const { t } = useI18n("vehicle");
-
-  const { theme } = useUnistyles();
 
   const showEnumSheet = <T extends string>(
     titleKey: string,
@@ -206,7 +203,7 @@ function VehicleFormFields() {
             error={touched.brand ? errors.brand : undefined}
             autoCapitalize="words"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.model")}
             placeholder={t("placeholders.model")}
@@ -216,7 +213,7 @@ function VehicleFormFields() {
             error={touched.model ? errors.model : undefined}
             autoCapitalize="words"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.year")}
             placeholder={t("placeholders.year")}
@@ -227,7 +224,7 @@ function VehicleFormFields() {
             keyboardType="number-pad"
             maxLength={4}
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.plate")}
             placeholder={t("placeholders.plate")}
@@ -237,7 +234,7 @@ function VehicleFormFields() {
             error={touched.plate ? errors.plate : undefined}
             autoCapitalize="characters"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.color")}
             placeholder={t("placeholders.color")}

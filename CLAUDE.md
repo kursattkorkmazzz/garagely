@@ -355,15 +355,75 @@ Always compose inputs with the group system:
 
 ### Field System (`components/ui/app-field/`)
 
-For settings/form rows with label + description + error:
+Six composable sub-components for labeled form fields. Import each individually.
+
+| Component | Description |
+|---|---|
+| `AppField` | Vertical flex container (`gap: xs`). Wraps label + input + error. |
+| `AppFieldLabel` | `label` typography, `mutedForeground` color. |
+| `AppFieldDescription` | `caption` typography, `mutedForeground`. Helper text below the input. |
+| `AppFieldError` | `caption` typography, `destructive` color. Render only when error string is truthy. |
+| `AppFieldSeperator` | 1px horizontal rule (`border` color). Has `.noPadding = true` so `AppFieldGroup` renders it edge-to-edge. |
+| `AppFieldGroup` | Card container (rounded, bordered, `card` background). Accepts `label` and `description` string props for section header. Adds `paddingHorizontal` padding around each child automatically — unless the child has `.noPadding = true` (i.e. `AppFieldSeperator`). |
+
+#### Standalone field (inside a form, not grouped)
 
 ```tsx
-<AppFieldGroup>
-  <AppFieldLabel>Brand</AppFieldLabel>
-  <AppInputGroup><AppInputField .../></AppInputGroup>
-  <AppFieldError>{errors.brand}</AppFieldError>
+<AppField>
+  <AppFieldLabel>{t("fields.brand")}</AppFieldLabel>
+  <AppInputGroup>
+    <AppInputField value={value} onChangeText={onChange} onBlur={onBlur} />
+  </AppInputGroup>
+  {error ? <AppFieldError>{error}</AppFieldError> : null}
+</AppField>
+```
+
+#### Grouped fields (iOS Settings style)
+
+```tsx
+<AppFieldGroup label={t("sections.basicInfo")}>
+  {/* Each child gets horizontal padding automatically */}
+  <AppField>
+    <AppFieldLabel>{t("fields.brand")}</AppFieldLabel>
+    <AppInputGroup><AppInputField ... /></AppInputGroup>
+    {errors.brand ? <AppFieldError>{errors.brand}</AppFieldError> : null}
+  </AppField>
+  <AppFieldSeperator />   {/* edge-to-edge divider — no extra padding */}
+  <AppField>
+    <AppFieldLabel>{t("fields.model")}</AppFieldLabel>
+    <AppInputGroup><AppInputField ... /></AppInputGroup>
+  </AppField>
 </AppFieldGroup>
 ```
+
+#### With description
+
+```tsx
+<AppField>
+  <AppFieldLabel>API Key</AppFieldLabel>
+  <AppInputGroup><AppInputField .../></AppInputGroup>
+  <AppFieldDescription>Used for third-party integrations.</AppFieldDescription>
+</AppField>
+```
+
+### Money Input Field (`components/money-input-field/money-input-field.tsx`)
+
+Composite input for monetary values with inline currency picker.
+
+```tsx
+<MoneyInputField
+  label={t("fields.purchaseAmount")}
+  placeholder={t("placeholders.purchaseAmount")}
+  value={values.purchaseAmount}          // string
+  onMoneyChange={(money: number) => setFieldValue("purchaseAmount", money)}
+  onBlur={handleBlur("purchaseAmount")}
+  selectedCurrency={values.purchaseCurrency as CurrencyType}
+  onCurrencyChange={(currency) => setFieldValue("purchaseCurrency", currency)}
+  error={errors.purchaseAmount}          // optional
+/>
+```
+
+Internally uses `AppField + AppFieldLabel + AppInputGroup + AppInputField + AppInputAddon + AppFieldError`. The currency badge on the right opens a bottom sheet via `useCurrencySheet`.
 
 ### List Components (`components/list/`)
 
@@ -629,11 +689,6 @@ import Icon from "@/components/ui/icon";
 
 ---
 
-## Known Pre-existing Issues
-
-- `components/money-input/money-input.tsx` — incomplete WIP component, references undefined variables (`t`, `values`, `errors`, `styles` etc.). **Do not use** — kept for future implementation reference.
-
----
 
 ## Deprecated / Pending Cleanup
 
