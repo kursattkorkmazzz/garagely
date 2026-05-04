@@ -38,15 +38,17 @@ export function AppHeader({
 
   return (
     <View style={styles.container}>
-      {goBack && (
-        <Pressable style={styles.goBackButton} onPress={goBackHandler}>
-          <Icon name="ArrowLeft" size={24} color={theme.colors.primary} />
-        </Pressable>
-      )}
-      {icon && (
-        <Icon name={icon} size={24} color={iconColor || theme.colors.primary} />
-      )}
-      <AppText style={styles.title} numberOfLines={1}>{title}</AppText>
+      <View style={styles.left}>
+        {goBack && (
+          <Pressable style={styles.goBackButton} onPress={goBackHandler}>
+            <Icon name="ArrowLeft" size={24} color={theme.colors.primary} />
+          </Pressable>
+        )}
+        {icon && (
+          <Icon name={icon} size={24} color={iconColor || theme.colors.primary} />
+        )}
+        <AppText style={styles.title} numberOfLines={1}>{title}</AppText>
+      </View>
 
       {RightComponent && (
         <View style={styles.rightComponent}>{RightComponent}</View>
@@ -60,11 +62,17 @@ const styles = StyleSheet.create((theme) => ({
     height: APP_HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
     backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+  },
+  left: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    minWidth: 0,
   },
   title: {
     ...theme.typography.heading3,
@@ -76,5 +84,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   rightComponent: {
     alignItems: "flex-end",
+    flexShrink: 0,
   },
 }));

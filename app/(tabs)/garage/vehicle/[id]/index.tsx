@@ -87,6 +87,5 @@ export default function VehicleDetailRoute() {
 const styles = StyleSheet.create((theme) => ({
   headerActions: {
     flexDirection: "row",
-    gap: theme.spacing.xxs,
   },
 }));

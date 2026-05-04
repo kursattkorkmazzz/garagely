@@ -9,7 +9,8 @@ import { useI18n } from "@/i18n";
 import { useVehicleStore } from "@/stores/vehicle.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { Image } from "expo-image";
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -24,12 +25,15 @@ export function VehicleDetailScreen({ id }: VehicleDetailScreenProps) {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    VehicleService.getById(id).then((v) => {
-      setVehicle(v);
-      setLoading(false);
-    });
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      VehicleService.getById(id).then((v) => {
+        setVehicle(v);
+        setLoading(false);
+      });
+    }, [id]),
+  );
 
   const isActive = activeVehicleId === id;
 
