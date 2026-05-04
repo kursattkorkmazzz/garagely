@@ -12,6 +12,8 @@
   "currency": "Currency",
   "distanceUnit": "Distance unit",
   "volumeUnit": "Volume unit",
+  "timezone": "Timezone",
+  "timezoneSearch": "Search timezone...",
 
   "informations": "About",
   "privacyPolicy": "Privacy Policy",

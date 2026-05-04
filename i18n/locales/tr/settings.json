@@ -12,6 +12,8 @@
   "currency": "Para birimi",
   "distanceUnit": "Mesafe birimi",
   "volumeUnit": "Hacim birimi",
+  "timezone": "Saat Dilimi",
+  "timezoneSearch": "Saat dilimi ara...",
 
   "informations": "Hakkında",
   "privacyPolicy": "Gizlilik Politikası",

@@ -10,8 +10,10 @@ import { Languages, type Language } from "@/shared/languages";
 import { AppThemeType, AppThemeTypes } from "@/shared/theme";
 import { VolumeTypes, type VolumeType } from "@/shared/volume";
 import { useUserPreferencesStore } from "@/stores/user-preferences.store";
+import ct from "countries-and-timezones";
 import Constants from "expo-constants";
 import { Image } from "expo-image";
+import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet } from "react-native-unistyles";
@@ -29,12 +31,19 @@ export default function SettingsPage() {
     distanceUnit,
     currency,
     volumeUnit,
+    timezone,
     setTheme,
     setLanguage,
     setDistanceUnit,
     setCurrency,
     setVolumeUnit,
+    setTimezone,
   } = useUserPreferencesStore();
+
+  const timezoneDisplayValue = useMemo(() => {
+    const tz = ct.getTimezone(timezone);
+    return tz ? `${timezone} (UTC ${tz.utcOffsetStr})` : timezone;
+  }, [timezone]);
 
   const version = Constants.expoConfig?.version ?? "1.0.0";
 
@@ -163,6 +172,14 @@ export default function SettingsPage() {
       },
     });
 
+  const openTimezoneSheet = () =>
+    SheetManager.show("timezone-sheet", {
+      payload: {
+        currentTimezone: timezone,
+        onSelect: setTimezone,
+      },
+    });
+
   const openDistanceSheet = () =>
     SheetManager.show("select-sheet", {
       payload: {
@@ -253,6 +270,14 @@ export default function SettingsPage() {
           chevron
           onPress={openVolumeSheet}
           iconColor="#06b6d4"
+        />
+        <AppListItem
+          icon="Globe"
+          label={t("timezone")}
+          selectedValue={timezoneDisplayValue}
+          chevron
+          onPress={openTimezoneSheet}
+          iconColor="#10b981"
         />
       </AppListGroup>
 
