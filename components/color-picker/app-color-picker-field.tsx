@@ -10,6 +10,7 @@ import { AppButton } from "@/components/ui/app-button";
 import { AppText } from "@/components/ui/app-text";
 import { useI18n } from "@/i18n";
 import { useRef, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modal, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { AppColorPicker } from "./app-color-picker";
@@ -89,6 +90,7 @@ export function AppColorPickerField({
         animationType="fade"
         onRequestClose={closeModal}
       >
+        <GestureHandlerRootView style={styles.gestureRoot}>
         <Pressable style={styles.backdrop} onPress={closeModal}>
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <AppText style={styles.modalTitle}>{t("colorPicker.title")}</AppText>
@@ -111,6 +113,7 @@ export function AppColorPickerField({
             </AppButton>
           </Pressable>
         </Pressable>
+        </GestureHandlerRootView>
       </Modal>
     </AppField>
   );
@@ -123,6 +126,9 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     borderColor: theme.colors.border,
+  },
+  gestureRoot: {
+    flex: 1,
   },
   backdrop: {
     flex: 1,

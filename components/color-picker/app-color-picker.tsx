@@ -1,10 +1,10 @@
+import { StyleSheet } from "react-native-unistyles";
+import type { ColorPickerRef } from "reanimated-color-picker";
 import ColorPicker, {
   HueSlider,
   OpacitySlider,
   Panel1,
 } from "reanimated-color-picker";
-import type { ColorPickerRef } from "reanimated-color-picker";
-import { StyleSheet } from "react-native-unistyles";
 
 type AppColorPickerProps = {
   value: string;

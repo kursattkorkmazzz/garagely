@@ -19,7 +19,7 @@ export const createVehicleFormSchema = (t: T) => {
     plate: Yup.string().required(t("errors.plate")),
     color: Yup.string()
       .required(t("errors.color"))
-      .matches(/^#([0-9A-F]{3}){1,2}$/i, t("errors.colorHex")),
+      .matches(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, t("errors.colorHex")),
     transmissionType: Yup.string()
       .oneOf(Object.values(TransmissionTypes), t("errors.transmissionType"))
       .required(t("errors.transmissionType")),

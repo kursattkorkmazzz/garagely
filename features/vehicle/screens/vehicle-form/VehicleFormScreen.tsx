@@ -1,3 +1,4 @@
+import { AppColorPickerField } from "@/components/color-picker/app-color-picker-field";
 import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { MoneyInputField } from "@/components/money-input-field/money-input-field";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
@@ -129,6 +130,7 @@ function VehicleFormFields() {
     handleChange,
     handleBlur,
     setFieldValue,
+    setFieldTouched,
     handleSubmit,
     isSubmitting,
   } = useFormikContext<VehicleFormValues>();
@@ -261,14 +263,14 @@ function VehicleFormFields() {
             autoCapitalize="characters"
           />
 
-          <VehicleFormField
+          <AppColorPickerField
             label={t("fields.color")}
-            placeholder={t("placeholders.color")}
             value={values.color}
-            onChangeText={handleChange("color")}
-            onBlur={handleBlur("color")}
+            onChange={(hex) => {
+              setFieldValue("color", hex);
+              setFieldTouched("color", true, false);
+            }}
             error={touched.color ? errors.color : undefined}
-            autoCapitalize="words"
           />
         </AppFieldGroup>
 
