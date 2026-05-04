@@ -1,5 +1,6 @@
 import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { ImagePicker } from "@/components/image-picker/image-picker";
+import { MoneyInputField } from "@/components/money-input-field/money-input-field";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AppField } from "@/components/ui/app-field/app-field";
@@ -7,18 +8,12 @@ import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
 import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
 import { AppFieldSeperator } from "@/components/ui/app-field/app-field-seperator";
-import {
-  AppInputAddon,
-  AppInputField,
-  AppInputGroup,
-  AppInputText,
-} from "@/components/ui/app-input";
+import { AppInputField, AppInputGroup } from "@/components/ui/app-input";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
-import { useCurrencySheet } from "@/hooks/use-currency-sheet";
 import { useI18n } from "@/i18n";
 import { APP_HEADER_HEIGHT } from "@/layouts/header/app-header";
-import { CurrencyType, CurrencyTypes } from "@/shared/currency";
+import { CurrencyType } from "@/shared/currency";
 import { BodyType, BodyTypes } from "@/shared/enums/body-type";
 import { FuelType, FuelTypes } from "@/shared/enums/fuel-type";
 import {
@@ -29,12 +24,10 @@ import { useVehicleStore } from "@/stores/vehicle.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { router } from "expo-router";
 import { Formik, useFormikContext } from "formik";
-import { ChevronRight } from "lucide-react-native/icons";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Pressable,
   ScrollView,
   View,
 } from "react-native";
@@ -116,14 +109,7 @@ function VehicleFormFields() {
   } = useFormikContext<VehicleFormValues>();
   const { t } = useI18n("vehicle");
 
-  const currency = useCurrencySheet({
-    onCurrencyChange: (currency) => setFieldValue("purchaseCurrency", currency),
-  });
   const { theme } = useUnistyles();
-
-  const showCurrencySheet = () => {
-    currency.openCurrencySheet();
-  };
 
   const showEnumSheet = <T extends string>(
     titleKey: string,
@@ -293,37 +279,20 @@ function VehicleFormFields() {
 
         {/* Purchase Info */}
         <AppFieldGroup label={t("sections.purchaseInfo")}>
-          <AppField>
-            <AppFieldLabel>{t("fields.purchaseAmount")}</AppFieldLabel>
-            <AppInputGroup
-              error={!!(touched.purchaseAmount && errors.purchaseAmount)}
-            >
-              <AppInputField
-                placeholder={t("placeholders.purchaseAmount")}
-                value={values.purchaseAmount}
-                onChangeText={handleChange("purchaseAmount")}
-                onBlur={handleBlur("purchaseAmount")}
-                keyboardType="numeric"
-              />
-              <AppInputAddon position="right">
-                <Pressable
-                  onPress={showCurrencySheet}
-                  style={styles.currencyAddon}
-                >
-                  <AppInputText>
-                    {values.purchaseCurrency || CurrencyTypes.TRY}
-                  </AppInputText>
-                  <ChevronRight
-                    size={12}
-                    color={theme.colors.mutedForeground}
-                  />
-                </Pressable>
-              </AppInputAddon>
-            </AppInputGroup>
-            {errors.purchaseAmount && (
-              <AppFieldError>{errors.purchaseAmount}</AppFieldError>
-            )}
-          </AppField>
+          <MoneyInputField
+            label={t("fields.purchaseAmount")}
+            placeholder={t("placeholders.purchaseAmount")}
+            value={values.purchaseAmount}
+            onMoneyChange={(money) => {
+              setFieldValue("purchaseAmount", money);
+            }}
+            onBlur={handleBlur("purchaseAmount")}
+            selectedCurrency={values.purchaseCurrency as CurrencyType}
+            onCurrencyChange={(currency) =>
+              setFieldValue("purchaseCurrency", currency)
+            }
+            error={errors.purchaseAmount}
+          />
           <AppField>
             <AppFieldLabel> {t("fields.purchaseDate")}</AppFieldLabel>
             <AppInputGroup>
