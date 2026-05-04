@@ -51,6 +51,13 @@ export default function GaragePage() {
           sub={t("stationsAndRepairmenSub")}
           chevron
         />
+        <AppListItem
+          icon="Disc2"
+          iconColor="#0bf5d2"
+          label={"Tires"}
+          sub={"Manage your tires and their maintenance schedules."}
+          chevron
+        />
       </AppListGroup>
 
       <AppListSectionHeader title={t("expenseSection")} />

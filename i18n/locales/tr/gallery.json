@@ -36,7 +36,9 @@
     "deleteConfirmTitle": "{{count}} öğe silinsin mi?",
     "deleteConfirmMessage": "Bu işlem geri alınamaz.",
     "cancel": "İptal",
-    "delete": "Sil"
+    "delete": "Sil",
+    "move": "Taşı",
+    "moveTitle": "{{count}} öğeyi taşı"
   },
   "itemActions": {
     "select": "Seç",

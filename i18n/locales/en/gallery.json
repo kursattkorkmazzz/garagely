@@ -36,7 +36,9 @@
     "deleteConfirmTitle": "Delete {{count}} item(s)?",
     "deleteConfirmMessage": "This action cannot be undone.",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "move": "Move",
+    "moveTitle": "Move {{count}} item(s)"
   },
   "itemActions": {
     "select": "Select",

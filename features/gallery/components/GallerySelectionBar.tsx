@@ -1,19 +1,21 @@
 import { AppButton } from "@/components/ui/app-button";
 import { AppText } from "@/components/ui/app-text";
 import { useI18n } from "@/i18n";
-import { Trash2 } from "lucide-react-native/icons";
+import { FolderInput, Trash2 } from "lucide-react-native/icons";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 type GallerySelectionBarProps = {
   selectedCount: number;
+  onMove: () => void;
   onDelete: () => void;
   onCancel: () => void;
 };
 
 export function GallerySelectionBar({
   selectedCount,
+  onMove,
   onDelete,
   onCancel,
 }: GallerySelectionBarProps) {
@@ -37,11 +39,19 @@ export function GallerySelectionBar({
         <AppButton variant="ghost" size="sm" onPress={onCancel}>
           {t("selection.cancel")}
         </AppButton>
+        <AppButton variant="outline" size="sm" onPress={onMove}>
+          <View style={styles.actionButtonContent}>
+            <FolderInput size={15} color={theme.colors.foreground} />
+            <AppText style={[styles.actionLabel, { color: theme.colors.foreground }]}>
+              {t("selection.move")}
+            </AppText>
+          </View>
+        </AppButton>
         <AppButton variant="outline" size="sm" onPress={onDelete}>
-          <View style={styles.deleteButtonContent}>
+          <View style={styles.actionButtonContent}>
             <Trash2 size={15} color={theme.colors.destructive} />
             <AppText
-              style={[styles.deleteLabel, { color: theme.colors.destructive }]}
+              style={[styles.actionLabel, { color: theme.colors.destructive }]}
             >
               {t("selection.delete")}
             </AppText>
@@ -82,12 +92,12 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing.sm,
   },
-  deleteButtonContent: {
+  actionButtonContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.xs,
   },
-  deleteLabel: {
+  actionLabel: {
     ...theme.typography.buttonSmall,
   },
 }));

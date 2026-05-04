@@ -29,7 +29,8 @@ interface GalleryState {
   activeTypeFilter: TypeFilter;
   // Seçim modu
   isSelecting: boolean;
-  selectedIds: Set<string>;
+  selectedIds: Set<string>;        // asset ID'leri
+  selectedFolderIds: Set<string>;  // klasör ID'leri
 }
 
 interface GalleryActions {
@@ -52,12 +53,14 @@ interface GalleryActions {
   uploadDocument: (uri: string) => Promise<AssetEntity>;
   deleteAsset: (id: string) => Promise<void>;
   deleteSelected: () => Promise<void>;
+  moveSelected: (targetFolderId: string | null) => Promise<void>;
   renameAsset: (id: string, newBaseName: string) => Promise<void>;
   moveAsset: (assetId: string, targetFolderId: string | null) => Promise<void>;
   // Filtre & seçim
   setTypeFilter: (filter: TypeFilter) => void;
-  enterSelectionMode: (id: string) => void;
+  enterSelectionMode: (id: string, type?: "asset" | "folder") => void;
   toggleSelection: (id: string) => void;
+  toggleFolderSelection: (id: string) => void;
   exitSelectionMode: () => void;
   // Selector'lar
   getOrderedAssets: () => AssetEntity[];
@@ -81,6 +84,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
     activeTypeFilter: "all",
     isSelecting: false,
     selectedIds: new Set<string>(),
+    selectedFolderIds: new Set<string>(),
 
     // ─── Yükleme ─────────────────────────────────────────────────────
 
@@ -140,7 +144,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
     // ─── Klasör Navigasyon ────────────────────────────────────────────
 
     navigateToFolder: async (folderId) => {
-      set({ isLoading: true, isSelecting: false, selectedIds: new Set() });
+      set({ isLoading: true, isSelecting: false, selectedIds: new Set(), selectedFolderIds: new Set() });
 
       const [assets, subFolders, folderPath] = await Promise.all([
         AssetService.getByFolder(folderId, PAGE_SIZE, 0),
@@ -306,18 +310,56 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
     },
 
     deleteSelected: async () => {
-      const ids = Array.from(get().selectedIds);
-      await Promise.all(ids.map((id) => AssetService.deleteById(id)));
+      const assetIds = Array.from(get().selectedIds);
+      const folderIds = Array.from(get().selectedFolderIds);
+      await Promise.all([
+        ...assetIds.map((id) => AssetService.deleteById(id)),
+        ...folderIds.map((id) => MediaFolderService.deleteCascade(id)),
+      ]);
       set((s) => {
-        const idSet = new Set(ids);
+        const assetIdSet = new Set(assetIds);
+        const folderIdSet = new Set(folderIds);
         const assetsById = { ...s.assetsById };
-        ids.forEach((id) => delete assetsById[id]);
+        assetIds.forEach((id) => delete assetsById[id]);
+        // Silinen klasörlerin içindeki asset'leri de temizle
+        Object.keys(assetsById).forEach((id) => {
+          if (folderIdSet.has(assetsById[id]?.folderId ?? "")) {
+            delete assetsById[id];
+          }
+        });
+        const remainingAssetIds = new Set(Object.keys(assetsById));
         return {
           assetsById,
-          orderedIds: s.orderedIds.filter((id) => !idSet.has(id)),
-          recentIds: s.recentIds.filter((id) => !idSet.has(id)),
+          orderedIds: s.orderedIds.filter((id) => remainingAssetIds.has(id)),
+          recentIds: s.recentIds.filter((id) => remainingAssetIds.has(id)),
+          subFolders: s.subFolders.filter((f) => !folderIdSet.has(f.id)),
           isSelecting: false,
           selectedIds: new Set<string>(),
+          selectedFolderIds: new Set<string>(),
+        };
+      });
+    },
+
+    moveSelected: async (targetFolderId) => {
+      const assetIds = Array.from(get().selectedIds);
+      const folderIds = Array.from(get().selectedFolderIds);
+      await Promise.all([
+        ...assetIds.map((id) => AssetService.moveAsset(id, targetFolderId)),
+        ...folderIds.map((id) => MediaFolderService.moveFolder(id, targetFolderId)),
+      ]);
+      set((s) => {
+        const assetIdSet = new Set(assetIds);
+        const folderIdSet = new Set(folderIds);
+        const assetsById = { ...s.assetsById };
+        assetIds.forEach((id) => delete assetsById[id]);
+        return {
+          assetsById,
+          orderedIds: s.orderedIds.filter((id) => !assetIdSet.has(id)),
+          recentIds: s.recentIds.filter((id) => !assetIdSet.has(id)),
+          subFolders: s.subFolders.filter((f) => !folderIdSet.has(f.id)),
+          isSelecting: false,
+          selectedIds: new Set<string>(),
+          selectedFolderIds: new Set<string>(),
         };
       });
     },
@@ -350,8 +392,20 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
 
     setTypeFilter: (filter) => set({ activeTypeFilter: filter }),
 
-    enterSelectionMode: (id) => {
-      set({ isSelecting: true, selectedIds: new Set([id]) });
+    enterSelectionMode: (id, type = "asset") => {
+      if (type === "folder") {
+        set({
+          isSelecting: true,
+          selectedFolderIds: new Set([id]),
+          selectedIds: new Set<string>(),
+        });
+      } else {
+        set({
+          isSelecting: true,
+          selectedIds: new Set([id]),
+          selectedFolderIds: new Set<string>(),
+        });
+      }
     },
 
     toggleSelection: (id) => {
@@ -361,15 +415,33 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       } else {
         next.add(id);
       }
-      if (next.size === 0) {
+      if (next.size === 0 && get().selectedFolderIds.size === 0) {
         set({ isSelecting: false, selectedIds: next });
       } else {
         set({ selectedIds: next });
       }
     },
 
+    toggleFolderSelection: (id) => {
+      const next = new Set(get().selectedFolderIds);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      if (next.size === 0 && get().selectedIds.size === 0) {
+        set({ isSelecting: false, selectedFolderIds: next });
+      } else {
+        set({ selectedFolderIds: next });
+      }
+    },
+
     exitSelectionMode: () => {
-      set({ isSelecting: false, selectedIds: new Set<string>() });
+      set({
+        isSelecting: false,
+        selectedIds: new Set<string>(),
+        selectedFolderIds: new Set<string>(),
+      });
     },
 
     // ─── Selector'lar ─────────────────────────────────────────────────

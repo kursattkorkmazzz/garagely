@@ -20,10 +20,10 @@ type GalleryFolderPickerModalProps = {
   /** Modal başlığı — "Klasörü Taşı" veya "Dosyayı Taşı" */
   title: string;
   /**
-   * Seçilmesi engellenen klasör ID'si (taşınan klasörün kendisi).
+   * Seçilmesi engellenen klasör ID'leri (taşınan klasörlerin kendileri).
    * Döngüsel referansı önler.
    */
-  excludeFolderId?: string | null;
+  excludeFolderIds?: string[];
   onSelect: (folderId: string | null) => void;
   onClose: () => void;
 };
@@ -31,7 +31,7 @@ type GalleryFolderPickerModalProps = {
 export function GalleryFolderPickerModal({
   visible,
   title,
-  excludeFolderId,
+  excludeFolderIds = [],
   onSelect,
   onClose,
 }: GalleryFolderPickerModalProps) {
@@ -172,7 +172,7 @@ export function GalleryFolderPickerModal({
               </View>
             }
             renderItem={({ item }) => {
-              const isExcluded = item.id === excludeFolderId;
+              const isExcluded = excludeFolderIds.includes(item.id);
               return (
                 <Pressable
                   onPress={() => !isExcluded && navigateInto(item)}

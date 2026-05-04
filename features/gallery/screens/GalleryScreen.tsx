@@ -139,6 +139,8 @@ export function GalleryScreen() {
   const [moveFolderTarget, setMoveFolderTarget] = useState<string | null>(null);
   // assetId taşınacak asset; null = modal kapalı
   const [moveAssetTarget, setMoveAssetTarget] = useState<string | null>(null);
+  // toplu taşıma picker
+  const [bulkMovePickerVisible, setBulkMovePickerVisible] = useState(false);
 
   // ─── Klasör handlers ─────────────────────────────────────────────
   const handleLongPressFolder = (id: string) => {
@@ -150,9 +152,10 @@ export function GalleryScreen() {
         sections: [
           {
             data: [
-              { key: "rename", label: t("itemActions.rename"), icon: "Pencil" },
-              { key: "move",   label: t("folders.moveFolder"), icon: "FolderInput" },
-              { key: "delete", label: t("itemActions.delete"), icon: "Trash2" },
+              { key: "select", label: t("itemActions.select"),  icon: "CheckSquare" },
+              { key: "rename", label: t("itemActions.rename"),  icon: "Pencil" },
+              { key: "move",   label: t("folders.moveFolder"),  icon: "FolderInput" },
+              { key: "delete", label: t("itemActions.delete"),  icon: "Trash2" },
             ],
           },
         ],
@@ -162,7 +165,9 @@ export function GalleryScreen() {
             label={item.label as string}
             onPress={() => {
               SheetManager.hide("select-sheet");
-              if (item.key === "rename") {
+              if (item.key === "select") {
+                store.enterSelectionMode(id, "folder");
+              } else if (item.key === "rename") {
                 setRenameFolderTarget({ id, name: folder.name });
               } else if (item.key === "move") {
                 setMoveFolderTarget(id);
@@ -284,10 +289,13 @@ export function GalleryScreen() {
   };
 
   const handleSelect = (id: string) => store.toggleSelection(id);
+  const handleSelectFolder = (id: string) => store.toggleFolderSelection(id);
+
+  const totalSelected = store.selectedIds.size + store.selectedFolderIds.size;
 
   const handleDeleteSelected = () => {
     Alert.alert(
-      t("selection.deleteConfirmTitle", { count: store.selectedIds.size }),
+      t("selection.deleteConfirmTitle", { count: totalSelected }),
       t("selection.deleteConfirmMessage"),
       [
         { text: t("selection.cancel"), style: "cancel" },
@@ -298,6 +306,25 @@ export function GalleryScreen() {
         },
       ],
     );
+  };
+
+  // ─── Bulk move handler ────────────────────────────────────────────
+  const handleBulkMove = () => setBulkMovePickerVisible(true);
+
+  const handleBulkMoveSelect = async (targetFolderId: string | null) => {
+    setBulkMovePickerVisible(false);
+    try {
+      await store.moveSelected(targetFolderId);
+    } catch (err) {
+      if (
+        err instanceof AppError &&
+        err.errorCode === MediaFolderErrors.CIRCULAR_REFERENCE
+      ) {
+        Alert.alert("", t("folders.errors.circularReference"));
+      } else {
+        handleUIError(err);
+      }
+    }
   };
 
   // ─── Move asset handler ───────────────────────────────────────────
@@ -425,6 +452,9 @@ export function GalleryScreen() {
               folders={store.subFolders}
               onPressFolder={(id) => store.navigateToFolder(id)}
               onLongPressFolder={handleLongPressFolder}
+              isSelecting={store.isSelecting}
+              selectedFolderIds={store.selectedFolderIds}
+              onSelectFolder={handleSelectFolder}
             />
           </>
         )}
@@ -468,7 +498,8 @@ export function GalleryScreen() {
 
       {/* Seçim action bar */}
       <GallerySelectionBar
-        selectedCount={store.selectedIds.size}
+        selectedCount={totalSelected}
+        onMove={handleBulkMove}
         onDelete={handleDeleteSelected}
         onCancel={store.exitSelectionMode}
       />
@@ -528,7 +559,7 @@ export function GalleryScreen() {
       <GalleryFolderPickerModal
         visible={moveFolderTarget !== null}
         title={t("folders.moveFolder")}
-        excludeFolderId={moveFolderTarget}
+        excludeFolderIds={moveFolderTarget ? [moveFolderTarget] : []}
         onSelect={handleMoveFolderSelect}
         onClose={() => setMoveFolderTarget(null)}
       />
@@ -539,6 +570,15 @@ export function GalleryScreen() {
         title={t("folders.moveAsset")}
         onSelect={handleMoveAssetSelect}
         onClose={() => setMoveAssetTarget(null)}
+      />
+
+      {/* Toplu taşıma picker */}
+      <GalleryFolderPickerModal
+        visible={bulkMovePickerVisible}
+        title={t("selection.moveTitle", { count: totalSelected })}
+        excludeFolderIds={Array.from(store.selectedFolderIds)}
+        onSelect={handleBulkMoveSelect}
+        onClose={() => setBulkMovePickerVisible(false)}
       />
     </View>
   );
