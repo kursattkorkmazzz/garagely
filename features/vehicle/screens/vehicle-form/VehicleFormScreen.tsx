@@ -2,13 +2,17 @@ import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { ImagePicker } from "@/components/image-picker/image-picker";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
+import { AppField } from "@/components/ui/app-field/app-field";
+import { AppFieldError } from "@/components/ui/app-field/app-field-error";
+import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
+import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
+import { AppFieldSeperator } from "@/components/ui/app-field/app-field-seperator";
 import {
   AppInputAddon,
   AppInputField,
   AppInputGroup,
   AppInputText,
 } from "@/components/ui/app-input";
-import { AppText } from "@/components/ui/app-text";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
 import { useCurrencySheet } from "@/hooks/use-currency-sheet";
@@ -194,10 +198,7 @@ function VehicleFormFields() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <AppText style={styles.sectionHeader}>
-          {t("sections.coverPhoto")}
-        </AppText>
-        <View style={styles.imagePickerContainer}>
+        <AppFieldGroup label={t("sections.coverPhoto")}>
           <ImagePicker
             allowsMultipleSelection={false}
             selectionLimit={1}
@@ -206,12 +207,10 @@ function VehicleFormFields() {
             shape="rectangle"
             mediaTypes={["images"]}
           />
-        </View>
+        </AppFieldGroup>
+
         {/* Basic Info */}
-        <AppText style={styles.sectionHeader}>
-          {t("sections.basicInfo")}
-        </AppText>
-        <View style={styles.fieldGroup}>
+        <AppFieldGroup label={t("sections.basicInfo")}>
           <VehicleFormField
             label={t("fields.brand")}
             placeholder={t("placeholders.brand")}
@@ -221,6 +220,7 @@ function VehicleFormFields() {
             error={touched.brand ? errors.brand : undefined}
             autoCapitalize="words"
           />
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.model")}
             placeholder={t("placeholders.model")}
@@ -230,6 +230,7 @@ function VehicleFormFields() {
             error={touched.model ? errors.model : undefined}
             autoCapitalize="words"
           />
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.year")}
             placeholder={t("placeholders.year")}
@@ -240,6 +241,7 @@ function VehicleFormFields() {
             keyboardType="number-pad"
             maxLength={4}
           />
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.plate")}
             placeholder={t("placeholders.plate")}
@@ -249,6 +251,7 @@ function VehicleFormFields() {
             error={touched.plate ? errors.plate : undefined}
             autoCapitalize="characters"
           />
+          <AppFieldSeperator />
           <VehicleFormField
             label={t("fields.color")}
             placeholder={t("placeholders.color")}
@@ -258,13 +261,10 @@ function VehicleFormFields() {
             error={touched.color ? errors.color : undefined}
             autoCapitalize="words"
           />
-        </View>
+        </AppFieldGroup>
 
         {/* Vehicle Details */}
-        <AppText style={styles.sectionHeader}>
-          {t("sections.vehicleDetails")}
-        </AppText>
-        <View style={styles.fieldGroup}>
+        <AppFieldGroup label={t("sections.vehicleDetails")}>
           <EnumPickerRow
             label={t("fields.fuelType")}
             value={values.fuelType ? t(`fuelType.${values.fuelType}`) : ""}
@@ -289,17 +289,12 @@ function VehicleFormFields() {
             error={touched.bodyType ? errors.bodyType : undefined}
             onPress={showBodyTypeSheet}
           />
-        </View>
+        </AppFieldGroup>
 
         {/* Purchase Info */}
-        <AppText style={styles.sectionHeader}>
-          {t("sections.purchaseInfo")}
-        </AppText>
-        <View style={styles.fieldGroup}>
-          <View style={styles.fieldWrapper}>
-            <AppText style={styles.fieldLabel}>
-              {t("fields.purchaseAmount")}
-            </AppText>
+        <AppFieldGroup label={t("sections.purchaseInfo")}>
+          <AppField>
+            <AppFieldLabel>{t("fields.purchaseAmount")}</AppFieldLabel>
             <AppInputGroup
               error={!!(touched.purchaseAmount && errors.purchaseAmount)}
             >
@@ -325,23 +320,17 @@ function VehicleFormFields() {
                 </Pressable>
               </AppInputAddon>
             </AppInputGroup>
-            {touched.purchaseAmount && errors.purchaseAmount ? (
-              <AppText style={styles.errorText}>
-                {errors.purchaseAmount}
-              </AppText>
-            ) : null}
-          </View>
-
-          <View style={styles.fieldWrapper}>
-            <AppText style={styles.fieldLabel}>
-              {t("fields.purchaseDate")}
-            </AppText>
+            {errors.purchaseAmount && (
+              <AppFieldError>{errors.purchaseAmount}</AppFieldError>
+            )}
+          </AppField>
+          <AppField>
+            <AppFieldLabel> {t("fields.purchaseDate")}</AppFieldLabel>
             <AppInputGroup>
               <AppInputField placeholder="— (coming soon)" editable={false} />
             </AppInputGroup>
-          </View>
-        </View>
-
+          </AppField>
+        </AppFieldGroup>
         <AppButton
           variant="primary"
           size="lg"
@@ -376,19 +365,19 @@ function VehicleFormField({
   ...rest
 }: VehicleFormFieldProps) {
   return (
-    <View style={styles.fieldWrapper}>
-      <AppText style={styles.fieldLabel}>{label}</AppText>
-      <AppInputGroup error={!!error}>
+    <AppField>
+      <AppFieldLabel>{label}</AppFieldLabel>
+      <AppInputGroup>
         <AppInputField
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
-          onBlur={onBlur as () => void}
+          onBlur={onBlur}
           {...rest}
         />
       </AppInputGroup>
-      {error ? <AppText style={styles.errorText}>{error}</AppText> : null}
-    </View>
+      {error ? <AppFieldError>{error}</AppFieldError> : null}
+    </AppField>
   );
 }
 
@@ -434,11 +423,12 @@ const styles = StyleSheet.create((theme) => ({
   scroll: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingHorizontal: theme.spacing.md,
   },
   content: {
     paddingBottom: theme.spacing.xxl,
     paddingTop: theme.spacing.md,
-    gap: theme.spacing.xs,
+    gap: theme.spacing.md,
   },
   loadingContainer: {
     flex: 1,
@@ -454,51 +444,10 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.xs,
     textTransform: "uppercase" as const,
   },
-  fieldGroup: {
-    marginHorizontal: theme.spacing.md,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    overflow: "hidden",
-    gap: 0,
-  },
-  imagePickerContainer: {
-    paddingHorizontal: theme.spacing.md,
-  },
-  fieldWrapper: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    gap: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  fieldLabel: {
-    ...theme.typography.caption,
-    color: theme.colors.mutedForeground,
-  },
-  pickerRow: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    justifyContent: "space-between" as const,
-    minHeight: 44,
-    paddingHorizontal: theme.spacing.sm,
-    borderWidth: 1,
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.background,
-  },
-  pickerValue: {
-    ...theme.typography.bodyMedium,
-    flex: 1,
-  },
   currencyAddon: {
     flexDirection: "row" as const,
     alignItems: "center" as const,
     gap: theme.spacing.xxs,
-  },
-  errorText: {
-    ...theme.typography.caption,
-    color: theme.colors.destructive,
   },
   submitButton: {
     marginHorizontal: theme.spacing.md,
