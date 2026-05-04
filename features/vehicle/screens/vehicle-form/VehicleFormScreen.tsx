@@ -6,10 +6,9 @@ import { AppField } from "@/components/ui/app-field/app-field";
 import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
 import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
-import { AppFieldSeperator } from "@/components/ui/app-field/app-field-seperator";
 import { AppInputField, AppInputGroup } from "@/components/ui/app-input";
-import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleCoverPhotoField } from "@/features/vehicle/components/VehicleCoverPhotoField";
+import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
 import { useI18n } from "@/i18n";
 import { APP_HEADER_HEIGHT } from "@/layouts/header/app-header";
@@ -59,7 +58,8 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
     VehicleService.getById(id).then((vehicle) => {
       if (vehicle) {
         setInitialValues(vehicleToFormValues(vehicle));
-        previousCoverPhotoAssetIdRef.current = vehicle.coverPhotoAssetId ?? null;
+        previousCoverPhotoAssetIdRef.current =
+          vehicle.coverPhotoAssetId ?? null;
       }
       setLoadingVehicle(false);
     });
@@ -229,7 +229,7 @@ function VehicleFormFields() {
             error={touched.brand ? errors.brand : undefined}
             autoCapitalize="words"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.model")}
             placeholder={t("placeholders.model")}
@@ -239,7 +239,7 @@ function VehicleFormFields() {
             error={touched.model ? errors.model : undefined}
             autoCapitalize="words"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.year")}
             placeholder={t("placeholders.year")}
@@ -250,7 +250,7 @@ function VehicleFormFields() {
             keyboardType="number-pad"
             maxLength={4}
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.plate")}
             placeholder={t("placeholders.plate")}
@@ -260,7 +260,7 @@ function VehicleFormFields() {
             error={touched.plate ? errors.plate : undefined}
             autoCapitalize="characters"
           />
-          <AppFieldSeperator />
+
           <VehicleFormField
             label={t("fields.color")}
             placeholder={t("placeholders.color")}
@@ -316,7 +316,7 @@ function VehicleFormFields() {
             }
             error={errors.purchaseAmount}
           />
-          <AppFieldSeperator />
+
           <AppField>
             <AppFieldLabel>{t("fields.purchaseDate")}</AppFieldLabel>
             <AppInputGroup>
