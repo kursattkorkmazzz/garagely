@@ -5,7 +5,9 @@ import { AppToggle } from "@/components/ui/app-toggle";
 import Icon from "@/components/ui/icon";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleService } from "@/features/vehicle/service/vehicle.service";
+import { formatDateTime } from "@/components/ui/app-date-picker/date-time-utils";
 import { useI18n } from "@/i18n";
+import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import { useVehicleStore } from "@/stores/vehicle.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { Image } from "expo-image";
@@ -22,6 +24,7 @@ export function VehicleDetailScreen({ id }: VehicleDetailScreenProps) {
   const { t } = useI18n("vehicle");
   const { theme } = useUnistyles();
   const { activeVehicleId, setActiveVehicle } = useVehicleStore();
+  const { timezone, language } = useUserPreferencesStore();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -165,9 +168,7 @@ export function VehicleDetailScreen({ id }: VehicleDetailScreenProps) {
                 label={t("fields.purchaseDate")}
                 icon="Calendar"
                 iconColor={theme.colors.primary}
-                selectedValue={new Date(
-                  vehicle.purchaseDate,
-                ).toLocaleDateString()}
+                selectedValue={formatDateTime(vehicle.purchaseDate, timezone, language)}
               />
             ) : null}
           </AppListGroup>

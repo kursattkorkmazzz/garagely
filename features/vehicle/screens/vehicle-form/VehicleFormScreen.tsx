@@ -324,7 +324,7 @@ function VehicleFormFields() {
             label={t("fields.purchaseDate")}
             value={values.purchaseDate}
             onChange={(utcMs) => setFieldValue("purchaseDate", utcMs)}
-            mode="date"
+            mode="datetime"
             error={touched.purchaseDate ? errors.purchaseDate : undefined}
           />
         </AppFieldGroup>

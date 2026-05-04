@@ -9,15 +9,30 @@ export type DateParts = {
   minute: number;
 };
 
-export function utcToLocal(utcMs: number, tz: string): DateParts {
-  const d = dayjs.utc(utcMs).tz(tz);
+function intlParts(utcMs: number, tz: string) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(new Date(utcMs));
+  const get = (type: string) =>
+    parseInt(parts.find((p) => p.type === type)?.value ?? "0", 10);
   return {
-    year: d.year(),
-    month: d.month() + 1,
-    day: d.date(),
-    hour: d.hour(),
-    minute: d.minute(),
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour: get("hour"),
+    minute: get("minute"),
   };
+}
+
+export function utcToLocal(utcMs: number, tz: string): DateParts {
+  return intlParts(utcMs, tz);
 }
 
 export function localToUtc(parts: DateParts, tz: string): number {
@@ -33,18 +48,16 @@ export function daysInMonth(year: number, month: number): number {
   return dayjs(`${year}-${String(month).padStart(2, "0")}-01`).daysInMonth();
 }
 
-export function formatDate(utcMs: number, tz: string, lang: Language): string {
-  const d = dayjs.utc(utcMs).tz(tz);
-  const dd = String(d.date()).padStart(2, "0");
-  const mm = String(d.month() + 1).padStart(2, "0");
-  const yyyy = d.year();
-  if (lang === Languages.TR) return `${dd}/${mm}/${yyyy}`;
-  return `${dd}/${mm}/${yyyy}`;
+export function formatDate(utcMs: number, tz: string, _lang: Language): string {
+  const { day, month, year } = intlParts(utcMs, tz);
+  const dd = String(day).padStart(2, "0");
+  const mm = String(month).padStart(2, "0");
+  return `${dd}/${mm}/${year}`;
 }
 
 export function formatTime(utcMs: number, tz: string): string {
-  const d = dayjs.utc(utcMs).tz(tz);
-  return `${String(d.hour()).padStart(2, "0")}:${String(d.minute()).padStart(2, "0")}`;
+  const { hour, minute } = intlParts(utcMs, tz);
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
 export function formatDateTime(

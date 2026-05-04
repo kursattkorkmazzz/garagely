@@ -1,25 +1,19 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { daysInMonth, localToUtc, utcToLocal } from "./date-time-utils";
+import { daysInMonth, type DateParts } from "./date-time-utils";
 import { ScrollDrum } from "./scroll-drum";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
 const YEARS = Array.from({ length: 201 }, (_, i) => String(1900 + i));
 
 type AppDatePickerProps = {
-  utcMs: number;
-  timezone: string;
-  onChange: (utcMs: number) => void;
+  parts: DateParts;
+  onChange: (parts: DateParts) => void;
 };
 
-export function AppDatePicker({ utcMs, timezone, onChange }: AppDatePickerProps) {
-  const parts = useMemo(() => utcToLocal(utcMs, timezone), [utcMs, timezone]);
-
-  const [localMonth, setLocalMonth] = useState(parts.month);
-  const [localYear, setLocalYear] = useState(parts.year);
-
-  const maxDays = daysInMonth(localYear, localMonth);
+export function AppDatePicker({ parts, onChange }: AppDatePickerProps) {
+  const maxDays = daysInMonth(parts.year, parts.month);
   const days = useMemo(
     () => Array.from({ length: maxDays }, (_, i) => String(i + 1).padStart(2, "0")),
     [maxDays],
@@ -28,23 +22,21 @@ export function AppDatePicker({ utcMs, timezone, onChange }: AppDatePickerProps)
   const clampedDay = Math.min(parts.day, maxDays);
 
   const handleDayChange = (index: number) => {
-    onChange(localToUtc({ ...parts, day: index + 1, month: localMonth, year: localYear }, timezone));
+    onChange({ ...parts, day: index + 1 });
   };
 
   const handleMonthChange = (index: number) => {
     const newMonth = index + 1;
-    const newMaxDays = daysInMonth(localYear, newMonth);
+    const newMaxDays = daysInMonth(parts.year, newMonth);
     const safeDay = Math.min(clampedDay, newMaxDays);
-    setLocalMonth(newMonth);
-    onChange(localToUtc({ ...parts, day: safeDay, month: newMonth, year: localYear }, timezone));
+    onChange({ ...parts, day: safeDay, month: newMonth });
   };
 
   const handleYearChange = (index: number) => {
     const newYear = 1900 + index;
-    const newMaxDays = daysInMonth(newYear, localMonth);
+    const newMaxDays = daysInMonth(newYear, parts.month);
     const safeDay = Math.min(clampedDay, newMaxDays);
-    setLocalYear(newYear);
-    onChange(localToUtc({ ...parts, day: safeDay, month: localMonth, year: newYear }, timezone));
+    onChange({ ...parts, day: safeDay, year: newYear });
   };
 
   return (
@@ -57,13 +49,13 @@ export function AppDatePicker({ utcMs, timezone, onChange }: AppDatePickerProps)
       <View style={styles.divider} />
       <ScrollDrum
         items={MONTHS}
-        selectedIndex={localMonth - 1}
+        selectedIndex={parts.month - 1}
         onIndexChange={handleMonthChange}
       />
       <View style={styles.divider} />
       <ScrollDrum
         items={YEARS}
-        selectedIndex={localYear - 1900}
+        selectedIndex={parts.year - 1900}
         onIndexChange={handleYearChange}
       />
     </View>

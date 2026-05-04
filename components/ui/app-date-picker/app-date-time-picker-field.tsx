@@ -24,12 +24,15 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { AppDatePicker } from "./app-date-picker";
 import { AppTimePicker } from "./app-time-picker";
 import {
+  type DateParts,
   datePlaceholder,
   dateTimePlaceholder,
   formatDate,
   formatDateTime,
   formatTime,
+  localToUtc,
   timePlaceholder,
+  utcToLocal,
 } from "./date-time-utils";
 
 export type DateTimePickerMode = "time" | "date" | "datetime";
@@ -58,24 +61,26 @@ export function AppDateTimePickerField({
   const { timezone, language } = useUserPreferencesStore();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [localUtcMs, setLocalUtcMs] = useState<number>(value ?? NOW());
+  const [localParts, setLocalParts] = useState<DateParts>(() =>
+    utcToLocal(value ?? NOW(), timezone),
+  );
   const [activeTab, setActiveTab] = useState<"date" | "time">("date");
 
   const openModal = () => {
-    setLocalUtcMs(value ?? NOW());
+    setLocalParts(utcToLocal(value ?? NOW(), timezone));
     setActiveTab("date");
     setIsOpen(true);
   };
 
   const closeModal = () => setIsOpen(false);
 
-  const handleChange = (utcMs: number) => {
-    setLocalUtcMs(utcMs);
-    onChange(utcMs);
+  const handlePartsChange = (parts: DateParts) => {
+    setLocalParts(parts);
+    onChange(localToUtc(parts, timezone));
   };
 
-  const handleDateChange = (utcMs: number) => {
-    handleChange(utcMs);
+  const handleDatePartsChange = (parts: DateParts) => {
+    handlePartsChange(parts);
     if (mode === "datetime") {
       setTimeout(() => setActiveTab("time"), 500);
     }
@@ -152,31 +157,27 @@ export function AppDateTimePickerField({
                   <View style={styles.pickerArea}>
                     <AppTabPanel value="date">
                       <AppDatePicker
-                        utcMs={localUtcMs}
-                        timezone={timezone}
-                        onChange={handleDateChange}
+                        parts={localParts}
+                        onChange={handleDatePartsChange}
                       />
                     </AppTabPanel>
                     <AppTabPanel value="time">
                       <AppTimePicker
-                        utcMs={localUtcMs}
-                        timezone={timezone}
-                        onChange={handleChange}
+                        parts={localParts}
+                        onChange={handlePartsChange}
                       />
                     </AppTabPanel>
                   </View>
                 </AppTab>
               ) : mode === "date" ? (
                 <AppDatePicker
-                  utcMs={localUtcMs}
-                  timezone={timezone}
-                  onChange={handleChange}
+                  parts={localParts}
+                  onChange={handlePartsChange}
                 />
               ) : (
                 <AppTimePicker
-                  utcMs={localUtcMs}
-                  timezone={timezone}
-                  onChange={handleChange}
+                  parts={localParts}
+                  onChange={handlePartsChange}
                 />
               )}
 
