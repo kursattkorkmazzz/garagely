@@ -44,7 +44,13 @@ export function AppColorPickerField({
     setIsOpen(true);
   };
 
-  const closeModal = () => setIsOpen(false);
+  const closeModal = () => {
+    if (!HEX_REGEX.test(hexText)) {
+      setHexText(value);
+      onChange(value);
+    }
+    setIsOpen(false);
+  };
 
   const handlePickerChange = (hex: string) => {
     setHexText(hex.toUpperCase());
@@ -54,13 +60,13 @@ export function AppColorPickerField({
   const handleTextChange = (text: string) => {
     const upper = text.toUpperCase();
     setHexText(upper);
+    onChange(upper);
     if (HEX_REGEX.test(upper)) {
-      onChange(upper);
       pickerRef.current?.setColor(upper, 300);
     }
   };
 
-  const isError = !!error || (hexText.length > 1 && !HEX_REGEX.test(hexText));
+  const isError = !!error;
 
   return (
     <AppField>
