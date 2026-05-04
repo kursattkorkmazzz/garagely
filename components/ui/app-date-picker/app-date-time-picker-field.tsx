@@ -131,8 +131,9 @@ export function AppDateTimePickerField({
         onRequestClose={closeModal}
       >
         <GestureHandlerRootView style={styles.gestureRoot}>
-          <Pressable style={styles.backdrop} onPress={closeModal}>
-            <Pressable style={styles.modalCard} onPress={() => {}}>
+          <View style={styles.backdrop}>
+            <Pressable style={styles.backdropTap} onPress={closeModal} />
+            <View style={styles.modalCard}>
               <AppText style={styles.modalTitle}>{modalTitle}</AppText>
 
               {mode === "datetime" ? (
@@ -187,8 +188,8 @@ export function AppDateTimePickerField({
               >
                 {t("dateTimePicker.done")}
               </AppButton>
-            </Pressable>
-          </Pressable>
+            </View>
+          </View>
         </GestureHandlerRootView>
       </Modal>
     </AppField>
@@ -205,6 +206,9 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     padding: theme.spacing.xl,
+  },
+  backdropTap: {
+    ...StyleSheet.absoluteFillObject,
   },
   modalCard: {
     width: "100%",

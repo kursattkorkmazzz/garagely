@@ -3,6 +3,7 @@ import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { MoneyInputField } from "@/components/money-input-field/money-input-field";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
+import { AppDateTimePickerField } from "@/components/ui/app-date-picker/app-date-time-picker-field";
 import { AppField } from "@/components/ui/app-field/app-field";
 import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldGroup } from "@/components/ui/app-field/app-field-group";
@@ -319,12 +320,13 @@ function VehicleFormFields() {
             error={errors.purchaseAmount}
           />
 
-          <AppField>
-            <AppFieldLabel>{t("fields.purchaseDate")}</AppFieldLabel>
-            <AppInputGroup>
-              <AppInputField placeholder="— (coming soon)" editable={false} />
-            </AppInputGroup>
-          </AppField>
+          <AppDateTimePickerField
+            label={t("fields.purchaseDate")}
+            value={values.purchaseDate}
+            onChange={(utcMs) => setFieldValue("purchaseDate", utcMs)}
+            mode="date"
+            error={touched.purchaseDate ? errors.purchaseDate : undefined}
+          />
         </AppFieldGroup>
 
         <AppButton
