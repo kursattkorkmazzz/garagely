@@ -1,4 +1,6 @@
 import { initializeDatabase } from "@/db/db";
+import { UserPreferencesService } from "@/features/user-preferences/user-preferences.service";
+import { getDeviceTimezone } from "@/shared/timezone";
 import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import { AsyncStates, useAsyncState } from "@/utils/hooks/use-async-state";
 import { useEffect } from "react";
@@ -17,8 +19,14 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
         useUserPreferencesStore
           .getState()
           .load()
-          .then(() => {
+          .then(async () => {
             console.log("[+] User preferences loaded succesffully.");
+            const prefs = await UserPreferencesService.getOrCreate();
+            if (prefs.timezone === "UTC") {
+              const deviceTz = getDeviceTimezone();
+              await UserPreferencesService.update({ timezone: deviceTz });
+              useUserPreferencesStore.setState({ timezone: deviceTz });
+            }
           })
           .catch((err) => {
             console.log(

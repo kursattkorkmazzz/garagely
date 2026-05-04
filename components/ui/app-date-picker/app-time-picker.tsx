@@ -1,49 +1,55 @@
-import { HOURS_24 } from "@/components/ui/app-date-picker/constants/hours";
-import { Minutes } from "@/components/ui/app-date-picker/constants/minute";
-import { AppText } from "@/components/ui/app-text";
-import { ScrollView, View } from "react-native";
+import { useMemo } from "react";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { localToUtc, utcToLocal } from "./date-time-utils";
+import { ScrollDrum } from "./scroll-drum";
 
-export function AppTimePicker() {
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+
+type AppTimePickerProps = {
+  utcMs: number;
+  timezone: string;
+  onChange: (utcMs: number) => void;
+};
+
+export function AppTimePicker({ utcMs, timezone, onChange }: AppTimePickerProps) {
+  const parts = useMemo(() => utcToLocal(utcMs, timezone), [utcMs, timezone]);
+
+  const handleHourChange = (index: number) => {
+    onChange(localToUtc({ ...parts, hour: index }, timezone));
+  };
+
+  const handleMinuteChange = (index: number) => {
+    onChange(localToUtc({ ...parts, minute: index }, timezone));
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContainerContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {HOURS_24.map((hour) => (
-          <AppText key={hour}>{hour}</AppText>
-        ))}
-      </ScrollView>
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContainerContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {Minutes.map((minute) => (
-          <AppText key={minute}>{minute}</AppText>
-        ))}
-      </ScrollView>
+      <ScrollDrum
+        items={HOURS}
+        selectedIndex={parts.hour}
+        onIndexChange={handleHourChange}
+      />
+      <View style={styles.colon} />
+      <ScrollDrum
+        items={MINUTES}
+        selectedIndex={parts.minute}
+        onIndexChange={handleMinuteChange}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    display: "flex",
     flexDirection: "row",
-    maxHeight: 150,
-  },
-  scrollContainer: {
-    display: "flex",
-    flexDirection: "column",
-    padding: theme.spacing.xs,
-  },
-  scrollContainerContent: {
-    display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    gap: theme.spacing.sm,
+  },
+  colon: {
+    width: 1,
+    height: 40,
+    backgroundColor: theme.colors.border,
   },
 }));

@@ -4,6 +4,7 @@ import { CurrencyTypes, type CurrencyType } from "@/shared/currency";
 import { DistanceTypes, type DistanceType } from "@/shared/distance";
 import { Languages, type Language } from "@/shared/languages";
 import { AppThemeTypes, type AppThemeType } from "@/shared/theme";
+import { type TimezoneString } from "@/shared/timezone";
 import { VolumeTypes, type VolumeType } from "@/shared/volume";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
@@ -14,6 +15,7 @@ interface UserPreferencesState {
   distanceUnit: DistanceType;
   currency: CurrencyType;
   volumeUnit: VolumeType;
+  timezone: TimezoneString;
   isLoaded: boolean;
 }
 
@@ -24,6 +26,7 @@ interface UserPreferencesActions {
   setDistanceUnit: (v: DistanceType) => Promise<void>;
   setCurrency: (v: CurrencyType) => Promise<void>;
   setVolumeUnit: (v: VolumeType) => Promise<void>;
+  setTimezone: (v: TimezoneString) => Promise<void>;
 }
 
 export const useUserPreferencesStore = create<
@@ -34,6 +37,7 @@ export const useUserPreferencesStore = create<
   distanceUnit: DistanceTypes.KM,
   currency: CurrencyTypes.TRY,
   volumeUnit: VolumeTypes.L,
+  timezone: "UTC",
   isLoaded: false,
 
   load: async () => {
@@ -48,6 +52,7 @@ export const useUserPreferencesStore = create<
       distanceUnit: prefs.distanceUnit,
       currency: prefs.currency,
       volumeUnit: prefs.volumeUnit,
+      timezone: prefs.timezone,
       isLoaded: true,
     });
   },
@@ -79,5 +84,10 @@ export const useUserPreferencesStore = create<
   setVolumeUnit: async (volumeUnit) => {
     set({ volumeUnit });
     await UserPreferencesService.update({ volumeUnit });
+  },
+
+  setTimezone: async (timezone) => {
+    set({ timezone });
+    await UserPreferencesService.update({ timezone });
   },
 }));

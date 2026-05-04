@@ -1,6 +1,7 @@
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 import "@/components/sheets/sheets";
+import "@/utils/dayjs";
 import { AppToast } from "@/components/ui/app-toast/app-toast";
 import { viewDB } from "@/db/db";
 import { DatabaseProvider } from "@/db/hooks/database-provider";

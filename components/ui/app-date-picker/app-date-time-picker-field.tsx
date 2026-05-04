@@ -1,0 +1,227 @@
+import { AppField } from "@/components/ui/app-field/app-field";
+import { AppFieldError } from "@/components/ui/app-field/app-field-error";
+import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
+import {
+  AppInputAddon,
+  AppInputField,
+  AppInputGroup,
+} from "@/components/ui/app-input";
+import { AppButton } from "@/components/ui/app-button";
+import { AppText } from "@/components/ui/app-text";
+import Icon from "@/components/ui/icon";
+import {
+  AppTab,
+  AppTabList,
+  AppTabPanel,
+  AppTabTrigger,
+} from "@/components/ui/app-tab";
+import { useI18n } from "@/i18n";
+import { useUserPreferencesStore } from "@/stores/user-preferences.store";
+import { useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Modal, Pressable, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { AppDatePicker } from "./app-date-picker";
+import { AppTimePicker } from "./app-time-picker";
+import {
+  datePlaceholder,
+  dateTimePlaceholder,
+  formatDate,
+  formatDateTime,
+  formatTime,
+  timePlaceholder,
+} from "./date-time-utils";
+
+export type DateTimePickerMode = "time" | "date" | "datetime";
+
+type AppDateTimePickerFieldProps = {
+  label: string;
+  value: number | null;
+  onChange: (utcMs: number) => void;
+  mode: DateTimePickerMode;
+  error?: string;
+  placeholder?: string;
+};
+
+const NOW = () => Date.now();
+
+export function AppDateTimePickerField({
+  label,
+  value,
+  onChange,
+  mode,
+  error,
+  placeholder,
+}: AppDateTimePickerFieldProps) {
+  const { t } = useI18n("components");
+  const { theme } = useUnistyles();
+  const { timezone, language } = useUserPreferencesStore();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [localUtcMs, setLocalUtcMs] = useState<number>(value ?? NOW());
+  const [activeTab, setActiveTab] = useState<"date" | "time">("date");
+
+  const openModal = () => {
+    setLocalUtcMs(value ?? NOW());
+    setActiveTab("date");
+    setIsOpen(true);
+  };
+
+  const closeModal = () => setIsOpen(false);
+
+  const handleChange = (utcMs: number) => {
+    setLocalUtcMs(utcMs);
+    onChange(utcMs);
+  };
+
+  const handleDateChange = (utcMs: number) => {
+    handleChange(utcMs);
+    if (mode === "datetime") {
+      setTimeout(() => setActiveTab("time"), 500);
+    }
+  };
+
+  const displayValue = value != null
+    ? mode === "time"
+      ? formatTime(value, timezone)
+      : mode === "date"
+      ? formatDate(value, timezone, language)
+      : formatDateTime(value, timezone, language)
+    : null;
+
+  const placeholderText = placeholder ?? (
+    mode === "time"
+      ? timePlaceholder(language)
+      : mode === "date"
+      ? datePlaceholder(language)
+      : dateTimePlaceholder(language)
+  );
+
+  const modalTitle =
+    mode === "time"
+      ? t("dateTimePicker.titleTime")
+      : mode === "date"
+      ? t("dateTimePicker.titleDate")
+      : t("dateTimePicker.titleDatetime");
+
+  const leftIcon = mode === "time" ? "Clock" : "Calendar";
+
+  return (
+    <AppField>
+      <AppFieldLabel>{label}</AppFieldLabel>
+      <Pressable onPress={openModal}>
+        <AppInputGroup error={!!error} disabled>
+          <AppInputAddon position="left">
+            <Icon name={leftIcon} size={16} color={theme.colors.mutedForeground} />
+          </AppInputAddon>
+          <AppInputField
+            value={displayValue ?? ""}
+            placeholder={placeholderText}
+            editable={false}
+            pointerEvents="none"
+          />
+        </AppInputGroup>
+      </Pressable>
+      {error ? <AppFieldError>{error}</AppFieldError> : null}
+
+      <Modal
+        visible={isOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <GestureHandlerRootView style={styles.gestureRoot}>
+          <Pressable style={styles.backdrop} onPress={closeModal}>
+            <Pressable style={styles.modalCard} onPress={() => {}}>
+              <AppText style={styles.modalTitle}>{modalTitle}</AppText>
+
+              {mode === "datetime" ? (
+                <AppTab
+                  value={activeTab}
+                  onChange={(v) => setActiveTab(v as "date" | "time")}
+                >
+                  <AppTabList>
+                    <AppTabTrigger value="date">
+                      {t("dateTimePicker.tabDate")}
+                    </AppTabTrigger>
+                    <AppTabTrigger value="time">
+                      {t("dateTimePicker.tabTime")}
+                    </AppTabTrigger>
+                  </AppTabList>
+                  <View style={styles.pickerArea}>
+                    <AppTabPanel value="date">
+                      <AppDatePicker
+                        utcMs={localUtcMs}
+                        timezone={timezone}
+                        onChange={handleDateChange}
+                      />
+                    </AppTabPanel>
+                    <AppTabPanel value="time">
+                      <AppTimePicker
+                        utcMs={localUtcMs}
+                        timezone={timezone}
+                        onChange={handleChange}
+                      />
+                    </AppTabPanel>
+                  </View>
+                </AppTab>
+              ) : mode === "date" ? (
+                <AppDatePicker
+                  utcMs={localUtcMs}
+                  timezone={timezone}
+                  onChange={handleChange}
+                />
+              ) : (
+                <AppTimePicker
+                  utcMs={localUtcMs}
+                  timezone={timezone}
+                  onChange={handleChange}
+                />
+              )}
+
+              <AppButton
+                variant="primary"
+                size="md"
+                onPress={closeModal}
+                style={styles.doneButton}
+              >
+                {t("dateTimePicker.done")}
+              </AppButton>
+            </Pressable>
+          </Pressable>
+        </GestureHandlerRootView>
+      </Modal>
+    </AppField>
+  );
+}
+
+const styles = StyleSheet.create((theme) => ({
+  gestureRoot: {
+    flex: 1,
+  },
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: theme.spacing.xl,
+  },
+  modalCard: {
+    width: "100%",
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.lg,
+  },
+  modalTitle: {
+    ...theme.typography.heading4,
+    color: theme.colors.foreground,
+    textAlign: "center",
+  },
+  pickerArea: {
+    marginTop: theme.spacing.md,
+  },
+  doneButton: {
+    marginTop: theme.spacing.xs,
+  },
+}));

@@ -8,5 +8,13 @@
   "colorPicker": {
     "title": "Pick a Color",
     "done": "Done"
+  },
+  "dateTimePicker": {
+    "titleTime": "Select Time",
+    "titleDate": "Select Date",
+    "titleDatetime": "Select Date & Time",
+    "done": "Done",
+    "tabDate": "Date",
+    "tabTime": "Time"
   }
 }

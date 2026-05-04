@@ -1,11 +1,19 @@
-import { AppTimePicker } from "@/components/ui/app-date-picker/app-time-picker";
+import { AppDateTimePickerField } from "@/components/ui/app-date-picker/app-date-time-picker-field";
+import { useState } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 export default function ShowcaseScreen() {
+  const [value, setValue] = useState<number | null>(null);
+
   return (
     <View style={styles.container}>
-      <AppTimePicker />
+      <AppDateTimePickerField
+        label="Tarih ve Saat"
+        value={value}
+        onChange={setValue}
+        mode="datetime"
+      />
     </View>
   );
 }

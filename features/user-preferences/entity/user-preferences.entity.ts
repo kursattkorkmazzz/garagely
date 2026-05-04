@@ -3,6 +3,7 @@ import { CurrencyTypes, type CurrencyType } from "@/shared/currency";
 import { DistanceTypes, type DistanceType } from "@/shared/distance";
 import { Languages, type Language } from "@/shared/languages";
 import { AppThemeTypes, type AppThemeType } from "@/shared/theme";
+import { type TimezoneString } from "@/shared/timezone";
 import { VolumeTypes, type VolumeType } from "@/shared/volume";
 import { Column, Entity } from "typeorm";
 
@@ -25,4 +26,7 @@ export class UserPreferences extends BaseEntity {
 
   @Column({ type: "text", default: VolumeTypes.L })
   volumeUnit!: VolumeType;
+
+  @Column({ type: "text", default: "UTC" })
+  timezone!: TimezoneString;
 }

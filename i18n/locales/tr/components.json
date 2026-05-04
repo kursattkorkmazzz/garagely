@@ -8,5 +8,13 @@
   "colorPicker": {
     "title": "Renk Seç",
     "done": "Tamam"
+  },
+  "dateTimePicker": {
+    "titleTime": "Saat Seç",
+    "titleDate": "Tarih Seç",
+    "titleDatetime": "Tarih ve Saat Seç",
+    "done": "Tamam",
+    "tabDate": "Tarih",
+    "tabTime": "Saat"
   }
 }
