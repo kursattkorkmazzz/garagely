@@ -91,7 +91,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       await AssetService.pruneOrphanedAssets();
 
       const [assets, recent, subFolders] = await Promise.all([
-        AssetService.getAll(PAGE_SIZE, 0),
+        AssetService.getByFolder(null, PAGE_SIZE, 0),
         AssetService.getRecent(RECENT_LIMIT),
         MediaFolderService.getRootFolders(),
       ]);
@@ -119,9 +119,11 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       if (isLoadingMore || !hasMore) return;
       set({ isLoadingMore: true });
 
-      const assets = currentFolderId
-        ? await AssetService.getByFolder(currentFolderId, PAGE_SIZE, page * PAGE_SIZE)
-        : await AssetService.getAll(PAGE_SIZE, page * PAGE_SIZE);
+      const assets = await AssetService.getByFolder(
+        currentFolderId,
+        PAGE_SIZE,
+        page * PAGE_SIZE,
+      );
 
       set((s) => ({
         assetsById: {
@@ -141,9 +143,7 @@ export const useGalleryStore = create<GalleryState & GalleryActions>()(
       set({ isLoading: true, isSelecting: false, selectedIds: new Set() });
 
       const [assets, subFolders, folderPath] = await Promise.all([
-        folderId
-          ? AssetService.getByFolder(folderId, PAGE_SIZE, 0)
-          : AssetService.getAll(PAGE_SIZE, 0),
+        AssetService.getByFolder(folderId, PAGE_SIZE, 0),
         folderId
           ? MediaFolderService.getChildren(folderId)
           : MediaFolderService.getRootFolders(),
