@@ -16,5 +16,24 @@
     "done": "Done",
     "tabDate": "Date",
     "tabTime": "Time"
+  },
+  "mediaPicker": {
+    "pickFromLibrary": "Upload from Device",
+    "takePhoto": "Take Photo",
+    "selectFromGallery": "Select from App Gallery",
+    "uploadWarningTitle": "File will be added to Gallery",
+    "uploadWarningMessage": "Files you take or upload will also be added to the app's gallery.",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "pickerTitle": "Select Media"
+  },
+  "mediaGallery": {
+    "addMedia": "Add",
+    "setCover": "Set as Cover",
+    "removeMedia": "Remove",
+    "preview": "Preview",
+    "coverBadge": "Cover",
+    "emptyTitle": "No media yet",
+    "emptySub": "Tap to add a photo or video"
   }
 }

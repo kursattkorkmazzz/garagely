@@ -1,0 +1,29 @@
+{
+  "management": {
+    "title": "Tags",
+    "empty": "No tags yet. Tags appear here as you add them across the app.",
+    "scopeUsageCount": "{{count}} tag",
+    "scopeUsageCount_plural": "{{count}} tags"
+  },
+  "actions": {
+    "rename": "Rename",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete Tag",
+    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This will remove it from everywhere it's used.",
+    "deleteConfirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "input": {
+    "addNewPlaceholder": "Type to add a new tag",
+    "addButton": "Add",
+    "selectedTitle": "Selected",
+    "suggestionsTitle": "Suggestions",
+    "emptySuggestions": "No tag suggestions yet.",
+    "emptySelected": "No tags selected."
+  },
+  "rename": {
+    "title": "Rename Tag",
+    "placeholder": "New name",
+    "save": "Save"
+  }
+}

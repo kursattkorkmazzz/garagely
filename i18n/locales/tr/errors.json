@@ -4,5 +4,10 @@
   "NETWORK_ERROR": "Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
   "UNKNOWN_ERROR": "Bilinmeyen bir hata oluştu. Lütfen destek ekibine haber verin ve daha sonra tekrar deneyin.",
 
-  "PLATE_NUMBER_EXISTS": "Bu plaka numarasına sahip bir araç zaten var. Lütfen plaka numarasını kontrol edin ve tekrar deneyin."
+  "PLATE_NUMBER_EXISTS": "Bu plaka numarasına sahip bir araç zaten var. Lütfen plaka numarasını kontrol edin ve tekrar deneyin.",
+
+  "TAG_NOT_FOUND": "Etiket bulunamadı.",
+  "TAG_NAME_INVALID": "Lütfen geçerli bir etiket adı girin.",
+  "TAG_NAME_TOO_LONG": "Etiket adı çok uzun.",
+  "TAG_NAME_ALREADY_EXISTS": "Bu kapsamda aynı isimde bir etiket zaten var."
 }

@@ -16,5 +16,24 @@
     "done": "Tamam",
     "tabDate": "Tarih",
     "tabTime": "Saat"
+  },
+  "mediaPicker": {
+    "pickFromLibrary": "Cihazdan Yükle",
+    "takePhoto": "Fotoğraf Çek",
+    "selectFromGallery": "Uygulama Galerisinden Seç",
+    "uploadWarningTitle": "Dosya Galeriye Eklenecek",
+    "uploadWarningMessage": "Yüklediğin veya çektiğin dosyalar uygulama galerisine de eklenir.",
+    "continue": "Devam Et",
+    "cancel": "İptal",
+    "pickerTitle": "Medya Seç"
+  },
+  "mediaGallery": {
+    "addMedia": "Ekle",
+    "setCover": "Kapak Yap",
+    "removeMedia": "Kaldır",
+    "preview": "Önizle",
+    "coverBadge": "Kapak",
+    "emptyTitle": "Henüz medya yok",
+    "emptySub": "Fotoğraf veya video eklemek için dokun"
   }
 }

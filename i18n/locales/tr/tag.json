@@ -1,0 +1,29 @@
+{
+  "management": {
+    "title": "Etiketler",
+    "empty": "Henüz etiket yok. Uygulamada etiket ekledikçe burada listelenir.",
+    "scopeUsageCount": "{{count}} etiket",
+    "scopeUsageCount_plural": "{{count}} etiket"
+  },
+  "actions": {
+    "rename": "Yeniden Adlandır",
+    "delete": "Sil",
+    "deleteConfirmTitle": "Etiketi Sil",
+    "deleteConfirmMessage": "\"{{name}}\" etiketini silmek istediğine emin misin? Tüm kullanım yerlerinden kaldırılacak.",
+    "deleteConfirm": "Sil",
+    "cancel": "İptal"
+  },
+  "input": {
+    "addNewPlaceholder": "Yeni etiket için yaz",
+    "addButton": "Ekle",
+    "selectedTitle": "Seçili",
+    "suggestionsTitle": "Öneriler",
+    "emptySuggestions": "Henüz etiket önerisi yok.",
+    "emptySelected": "Etiket seçilmedi."
+  },
+  "rename": {
+    "title": "Etiketi Yeniden Adlandır",
+    "placeholder": "Yeni ad",
+    "save": "Kaydet"
+  }
+}

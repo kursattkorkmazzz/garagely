@@ -6,7 +6,7 @@ import { MediaFolderService } from "@/features/asset/service/media-folder.servic
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { useI18n } from "@/i18n";
 import { Image } from "expo-image";
-import { ChevronRight, FolderOpen, X } from "lucide-react-native/icons";
+import { ChevronRight, FolderOpen, Play, X } from "lucide-react-native/icons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,11 +19,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+export type GalleryAssetPickerFilter = "image" | "video" | "image-or-video";
+
 type GalleryAssetPickerModalProps = {
   visible: boolean;
   title: string;
   onSelect: (asset: AssetEntity) => void;
   onClose: () => void;
+  filter?: GalleryAssetPickerFilter; // default: "image"
 };
 
 const COLUMN_COUNT = 3;
@@ -33,6 +36,7 @@ export function GalleryAssetPickerModal({
   title,
   onSelect,
   onClose,
+  filter = "image",
 }: GalleryAssetPickerModalProps) {
   const { t } = useI18n("gallery");
   const { theme } = useUnistyles();
@@ -56,7 +60,13 @@ export function GalleryAssetPickerModal({
         AssetService.getByFolder(folderId, 100, 0),
       ]);
       setSubFolders(folders);
-      setAssets(assetList.filter((a) => a.type === AssetTypes.IMAGE));
+      setAssets(
+        assetList.filter((a) => {
+          if (filter === "image") return a.type === AssetTypes.IMAGE;
+          if (filter === "video") return a.type === AssetTypes.VIDEO;
+          return a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO;
+        }),
+      );
       setCurrentFolderId(folderId);
     } finally {
       setIsLoading(false);
@@ -209,6 +219,7 @@ export function GalleryAssetPickerModal({
               }
 
               const asset = entry.item as AssetEntity;
+              const isVideo = asset.type === AssetTypes.VIDEO;
               return (
                 <Pressable
                   onPress={() => handleSelectAsset(asset)}
@@ -219,14 +230,26 @@ export function GalleryAssetPickerModal({
                       height: itemSize,
                       borderRadius: theme.radius.md,
                       overflow: "hidden",
+                      backgroundColor: theme.colors.muted,
                     },
                   ]}
                 >
-                  <Image
-                    source={{ uri: asset.fullPath }}
-                    style={styles.assetImage}
-                    contentFit="cover"
-                  />
+                  {!isVideo ? (
+                    <Image
+                      source={{ uri: asset.fullPath }}
+                      style={styles.assetImage}
+                      contentFit="cover"
+                    />
+                  ) : (
+                    <View style={styles.videoFallback}>
+                      <Play size={28} color={theme.colors.foreground} />
+                    </View>
+                  )}
+                  {isVideo && (
+                    <View style={styles.videoBadge}>
+                      <Play size={12} color="#fff" />
+                    </View>
+                  )}
                 </Pressable>
               );
             }}
@@ -310,10 +333,28 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
   },
   // Asset cell
-  assetCell: {},
+  assetCell: {
+    position: "relative",
+  },
   assetImage: {
     width: "100%",
     height: "100%",
+  },
+  videoFallback: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  videoBadge: {
+    position: "absolute",
+    right: 4,
+    bottom: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   // Empty / loading
   centered: {

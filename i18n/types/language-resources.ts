@@ -8,6 +8,7 @@ import en_gallery from "@/i18n/locales/en/gallery.json";
 import en_garage from "@/i18n/locales/en/garage.json";
 import en_languages from "@/i18n/locales/en/languages.json";
 import en_settings from "@/i18n/locales/en/settings.json";
+import en_tag from "@/i18n/locales/en/tag.json";
 import en_theme from "@/i18n/locales/en/theme.json";
 import en_units from "@/i18n/locales/en/units.json";
 import en_vehicle from "@/i18n/locales/en/vehicle.json";
@@ -20,6 +21,7 @@ import tr_gallery from "@/i18n/locales/tr/gallery.json";
 import tr_garage from "@/i18n/locales/tr/garage.json";
 import tr_languages from "@/i18n/locales/tr/languages.json";
 import tr_settings from "@/i18n/locales/tr/settings.json";
+import tr_tag from "@/i18n/locales/tr/tag.json";
 import tr_theme from "@/i18n/locales/tr/theme.json";
 import tr_units from "@/i18n/locales/tr/units.json";
 import tr_vehicle from "@/i18n/locales/tr/vehicle.json";
@@ -37,6 +39,7 @@ export const LanguageResources = {
     vehicle: en_vehicle,
     components: en_components,
     gallery: en_gallery,
+    tag: en_tag,
   },
   [Languages.TR]: {
     common: tr_common,
@@ -50,5 +53,6 @@ export const LanguageResources = {
     vehicle: tr_vehicle,
     components: tr_components,
     gallery: tr_gallery,
+    tag: tr_tag,
   },
 } as const;

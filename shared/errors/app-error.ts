@@ -1,6 +1,7 @@
 import { AssetError } from "@/features/asset/errors/asset.errors";
 import { MediaFolderError } from "@/features/asset/errors/media-folder.errors";
 import { StorageError } from "@/features/asset/errors/storage.errors";
+import { TagError } from "@/features/tag/errors/tag.errors";
 import { VehicleError } from "@/features/vehicle/errors/vehicle.errors";
 import { GlobalError } from "@/shared/errors/global.errors";
 
@@ -9,7 +10,8 @@ export type AppErrorCode =
   | StorageError
   | AssetError
   | MediaFolderError
-  | VehicleError;
+  | VehicleError
+  | TagError;
 
 export class AppError {
   message?: string;

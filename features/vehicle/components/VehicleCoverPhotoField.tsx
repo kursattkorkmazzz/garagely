@@ -1,15 +1,10 @@
-import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
-import { SelectItem } from "@/components/sheets/components/SelectItem";
+import { useMediaPicker } from "@/components/media-picker/use-media-picker";
 import { AppText } from "@/components/ui/app-text";
-import { GalleryAssetPickerModal } from "@/features/gallery/components/GalleryAssetPickerModal";
 import { useI18n } from "@/i18n";
-import { useGalleryStore } from "@/stores/gallery.store";
-import { handleUIError } from "@/utils/handle-ui-error";
 import { Image } from "expo-image";
 import { ImagePlus, Pencil } from "lucide-react-native/icons";
-import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
-import { SheetManager } from "react-native-actions-sheet";
+import { useMemo } from "react";
+import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 type VehicleCoverPhotoFieldProps = {
@@ -23,81 +18,39 @@ export function VehicleCoverPhotoField({
 }: VehicleCoverPhotoFieldProps) {
   const { t } = useI18n("vehicle");
   const { theme } = useUnistyles();
-  const galleryStore = useGalleryStore();
-  const [pickerVisible, setPickerVisible] = useState(false);
 
-  const pickedImageState = usePickedImage({
-    allowsMultipleSelection: false,
-    maxSelectionLimit: 1,
+  const labels = useMemo(
+    () => ({
+      pickFromLibrary: t("coverPhoto.pickFromLibrary"),
+      takePhoto: t("coverPhoto.takePhoto"),
+      selectFromGallery: t("coverPhoto.selectFromGallery"),
+      uploadWarningTitle: t("coverPhoto.uploadWarningTitle"),
+      uploadWarningMessage: t("coverPhoto.uploadWarningMessage"),
+      continueText: t("coverPhoto.continue"),
+      cancelText: t("coverPhoto.cancel"),
+      pickerTitle: t("coverPhoto.pickerTitle"),
+    }),
+    [t],
+  );
+
+  const { open, Modal } = useMediaPicker({
+    kind: "image",
+    multiple: false,
+    aspect: [16, 9],
+    allowsEditing: true,
+    labels,
   });
 
-  const openActionSheet = () => {
-    SheetManager.show("select-sheet", {
-      payload: {
-        sections: [
-          {
-            data: [
-              { key: "library", label: t("coverPhoto.pickFromLibrary") },
-              { key: "camera", label: t("coverPhoto.takePhoto") },
-              { key: "gallery", label: t("coverPhoto.selectFromGallery") },
-            ],
-          },
-        ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        renderItem: ({ item }: any) => (
-          <SelectItem
-            label={item.label as string}
-            onPress={() => {
-              SheetManager.hide("select-sheet");
-              if (item.key === "library") handleUploadFromSource("library");
-              if (item.key === "camera") handleUploadFromSource("camera");
-              if (item.key === "gallery") setPickerVisible(true);
-            }}
-          />
-        ),
-      },
+  const handleOpen = () => {
+    open((assets) => {
+      const a = assets[0];
+      if (a) onUploadComplete(a.id, a.fullPath);
     });
-  };
-
-  const handleUploadFromSource = (source: "library" | "camera") => {
-    Alert.alert(
-      t("coverPhoto.uploadWarningTitle"),
-      t("coverPhoto.uploadWarningMessage"),
-      [
-        { text: t("coverPhoto.cancel"), style: "cancel" },
-        {
-          text: t("coverPhoto.continue"),
-          onPress: () => doUpload(source),
-        },
-      ],
-    );
-  };
-
-  const doUpload = async (source: "library" | "camera") => {
-    const pickerOpts = {
-      allowsEditing: true,
-      aspect: [16, 9] as [number, number],
-      mediaTypes: ["images"] as ("images" | "videos" | "livePhotos")[],
-    };
-
-    const uris =
-      source === "library"
-        ? await pickedImageState.pickImageFromLibrary(pickerOpts)
-        : await pickedImageState.pickImageFromCamera(pickerOpts);
-
-    if (!uris?.[0]) return;
-
-    try {
-      const asset = await galleryStore.uploadImageToRoot(uris[0]);
-      onUploadComplete(asset.id, asset.fullPath);
-    } catch (err) {
-      handleUIError(err);
-    }
   };
 
   return (
     <>
-      <Pressable onPress={openActionSheet} style={styles.container}>
+      <Pressable onPress={handleOpen} style={styles.container}>
         <View
           style={[
             styles.photoBox,
@@ -115,10 +68,9 @@ export function VehicleCoverPhotoField({
                 style={styles.image}
                 contentFit="cover"
               />
-              {/* Edit overlay — sağ alt köşe */}
               <View style={styles.editOverlay}>
                 <Pressable
-                  onPress={openActionSheet}
+                  onPress={handleOpen}
                   style={[
                     styles.editPill,
                     { backgroundColor: theme.colors.card },
@@ -152,16 +104,7 @@ export function VehicleCoverPhotoField({
           )}
         </View>
       </Pressable>
-
-      <GalleryAssetPickerModal
-        visible={pickerVisible}
-        title={t("coverPhoto.pickerTitle")}
-        onSelect={(asset) => {
-          onUploadComplete(asset.id, asset.fullPath);
-          setPickerVisible(false);
-        }}
-        onClose={() => setPickerVisible(false)}
-      />
+      {Modal}
     </>
   );
 }
@@ -181,7 +124,6 @@ const styles = StyleSheet.create((theme) => ({
     width: "100%",
     height: "100%",
   },
-  // Edit pill — sağ alt
   editOverlay: {
     position: "absolute",
     bottom: theme.spacing.sm,
@@ -204,7 +146,6 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.caption,
     fontWeight: "600",
   },
-  // Placeholder
   placeholder: {
     flex: 1,
     alignItems: "center",

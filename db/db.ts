@@ -1,6 +1,7 @@
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
 import { ImageMetadataEntity } from "@/features/asset/entity/metadata/image-metadata.entity";
 import { MediaFolderEntity } from "@/features/asset/entity/media-folder.entity";
+import { Tag } from "@/features/tag/entity/tag.entity";
 import { UserPreferences } from "@/features/user-preferences/entity/user-preferences.entity";
 import { Vehicle } from "@/features/vehicle/entity/vehicle.entity";
 import * as SQLite from "expo-sqlite";
@@ -24,7 +25,7 @@ const SqliteDataSource = new DataSource({
     undefined: "ignore",
   },
 
-  entities: [UserPreferences, Vehicle, AssetEntity, MediaFolderEntity, ImageMetadataEntity],
+  entities: [UserPreferences, Vehicle, AssetEntity, MediaFolderEntity, ImageMetadataEntity, Tag],
 });
 //TODO: Remove this at production, only for drizzle studio
 export const viewDB = SQLite.openDatabaseSync("garagely.db");
