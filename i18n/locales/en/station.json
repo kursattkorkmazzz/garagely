@@ -1,0 +1,83 @@
+{
+  "addStation": "Add Station",
+  "editStation": "Edit Station",
+  "noStations": "No stations yet",
+  "noStationsSub": "Add your first station to get started",
+  "deleteConfirmTitle": "Delete station",
+  "deleteConfirmMessage": "Are you sure you want to delete this station?",
+  "delete": "Delete",
+  "cancel": "Cancel",
+
+  "filters": {
+    "all": "All"
+  },
+
+  "type": {
+    "GAS_STATION": "Gas Station",
+    "MECHANIC": "Mechanic",
+    "CAR_WASH": "Car Wash",
+    "INSPECTION": "Inspection",
+    "AUTHORIZED_SERVICE": "Authorized Service",
+    "PARKING": "Parking"
+  },
+
+  "fields": {
+    "name": "Name",
+    "type": "Type",
+    "brand": "Brand",
+    "address": "Address",
+    "city": "City",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "phone": "Phone",
+    "website": "Website",
+    "notes": "Notes",
+    "rating": "Rating",
+    "isFavorite": "Favorite",
+    "tags": "Tags"
+  },
+
+  "placeholders": {
+    "name": "e.g. Shell Levent",
+    "brand": "e.g. Shell",
+    "address": "Street, building no.",
+    "city": "e.g. Istanbul",
+    "latitude": "41.0082",
+    "longitude": "28.9784",
+    "phone": "+90 ...",
+    "website": "https://...",
+    "notes": "Anything you want to remember"
+  },
+
+  "sections": {
+    "media": "Photos & Videos",
+    "basicInfo": "Basic Info",
+    "location": "Location",
+    "contact": "Contact",
+    "rating": "Rating & Tags",
+    "notes": "Notes"
+  },
+
+  "errors": {
+    "name": "Name is required",
+    "type": "Type is required",
+    "ratingRange": "Rating must be between 1 and 5",
+    "latitudeRange": "Latitude must be between -90 and 90",
+    "longitudeRange": "Longitude must be between -180 and 180"
+  },
+
+  "actions": {
+    "save": "Save",
+    "create": "Create"
+  },
+
+  "media": {
+    "addLabel": "Add",
+    "setCover": "Set as Cover",
+    "removeMedia": "Remove",
+    "preview": "Preview",
+    "coverBadge": "Cover",
+    "emptyTitle": "No media yet",
+    "emptySub": "Add photos or videos"
+  }
+}

@@ -11,6 +11,7 @@ export const TranslationNamespaces = {
   COMPONENTS: "components",
   GALLERY: "gallery",
   TAG: "tag",
+  STATION: "station",
 } as const;
 
 export type TranslationNamespace =

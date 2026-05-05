@@ -1,0 +1,83 @@
+{
+  "addStation": "İstasyon Ekle",
+  "editStation": "İstasyonu Düzenle",
+  "noStations": "Henüz istasyon yok",
+  "noStationsSub": "Başlamak için ilk istasyonunu ekle",
+  "deleteConfirmTitle": "İstasyonu sil",
+  "deleteConfirmMessage": "Bu istasyonu silmek istediğine emin misin?",
+  "delete": "Sil",
+  "cancel": "İptal",
+
+  "filters": {
+    "all": "Tümü"
+  },
+
+  "type": {
+    "GAS_STATION": "Akaryakıt",
+    "MECHANIC": "Tamirci",
+    "CAR_WASH": "Yıkamacı",
+    "INSPECTION": "Muayene",
+    "AUTHORIZED_SERVICE": "Yetkili Servis",
+    "PARKING": "Otopark"
+  },
+
+  "fields": {
+    "name": "İsim",
+    "type": "Tür",
+    "brand": "Marka",
+    "address": "Adres",
+    "city": "Şehir",
+    "latitude": "Enlem",
+    "longitude": "Boylam",
+    "phone": "Telefon",
+    "website": "Web Sitesi",
+    "notes": "Notlar",
+    "rating": "Puan",
+    "isFavorite": "Favori",
+    "tags": "Etiketler"
+  },
+
+  "placeholders": {
+    "name": "ör. Shell Levent",
+    "brand": "ör. Shell",
+    "address": "Sokak, bina no.",
+    "city": "ör. İstanbul",
+    "latitude": "41.0082",
+    "longitude": "28.9784",
+    "phone": "+90 ...",
+    "website": "https://...",
+    "notes": "Hatırlamak istediğin her şey"
+  },
+
+  "sections": {
+    "media": "Fotoğraf ve Video",
+    "basicInfo": "Temel Bilgiler",
+    "location": "Konum",
+    "contact": "İletişim",
+    "rating": "Puan ve Etiketler",
+    "notes": "Notlar"
+  },
+
+  "errors": {
+    "name": "İsim zorunludur",
+    "type": "Tür zorunludur",
+    "ratingRange": "Puan 1 ile 5 arasında olmalı",
+    "latitudeRange": "Enlem -90 ile 90 arasında olmalı",
+    "longitudeRange": "Boylam -180 ile 180 arasında olmalı"
+  },
+
+  "actions": {
+    "save": "Kaydet",
+    "create": "Oluştur"
+  },
+
+  "media": {
+    "addLabel": "Ekle",
+    "setCover": "Kapak Yap",
+    "removeMedia": "Kaldır",
+    "preview": "Önizle",
+    "coverBadge": "Kapak",
+    "emptyTitle": "Henüz medya yok",
+    "emptySub": "Fotoğraf veya video ekle"
+  }
+}
