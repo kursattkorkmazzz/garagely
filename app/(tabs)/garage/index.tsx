@@ -52,14 +52,6 @@ export default function GaragePage() {
           onPress={() => onAppItemClickHandler("vehicles")}
         />
         <AppListItem
-          icon="Wrench"
-          iconColor="#f59e0b"
-          label={t("stationsAndRepairmen")}
-          sub={t("stationsAndRepairmenSub")}
-          chevron
-          onPress={() => router.push("/garage/station")}
-        />
-        <AppListItem
           icon="Disc2"
           iconColor="#0bf5d2"
           label={"Tires"}
