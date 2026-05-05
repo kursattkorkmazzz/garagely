@@ -13,6 +13,7 @@ import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import ct from "countries-and-timezones";
 import Constants from "expo-constants";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
@@ -278,6 +279,17 @@ export default function SettingsPage() {
           chevron
           onPress={openTimezoneSheet}
           iconColor="#10b981"
+        />
+      </AppListGroup>
+
+      <AppListSectionHeader title={t("data")} />
+      <AppListGroup>
+        <AppListItem
+          icon="Tag"
+          label={t("tags")}
+          chevron
+          iconColor="#a855f7"
+          onPress={() => router.push("/(tabs)/settings/tags")}
         />
       </AppListGroup>
 

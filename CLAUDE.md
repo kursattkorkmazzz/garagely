@@ -67,16 +67,26 @@ app/
 └── (tabs)/
     ├── _layout.tsx                    → Tabs (Showcase | Garage | Settings)
     ├── showcase/index.tsx             → component showcase
-    ├── settings.tsx                   → user preferences screen
+    ├── settings/
+    │   ├── _layout.tsx                → Stack (slide_from_right)
+    │   ├── index.tsx                  → user preferences screen
+    │   └── tags/
+    │       ├── index.tsx              → TagManagementScreen (scope list)
+    │       └── [scope].tsx            → TagScopeScreen (per-scope rename/delete)
     └── garage/
         ├── _layout.tsx                → Stack navigator (slide_from_bottom animation)
-        ├── index.tsx                  → GarageScreen (vehicle list)
+        ├── index.tsx                  → GarageScreen (links to vehicles, stations, gallery)
         ├── gallery/index.tsx          → GalleryScreen
-        └── vehicle/
-            ├── index.tsx              → vehicle list
+        ├── vehicle/
+        │   ├── index.tsx              → vehicle list
+        │   └── [id]/
+        │       ├── index.tsx          → vehicle detail screen (read-only)
+        │       └── vehicle-form.tsx   → create / edit vehicle wizard
+        └── station/
+            ├── index.tsx              → station list (filter chips + list)
             └── [id]/
-                ├── index.tsx          → vehicle detail screen (read-only)
-                └── vehicle-form.tsx   → create / edit vehicle wizard
+                ├── index.tsx          → station detail (cover hero + info groups + media grid)
+                └── station-form.tsx   → create / edit station form
 ```
 
 ### AppHeader
@@ -119,6 +129,17 @@ Actions: load, setTheme, setLanguage, setDistanceUnit, setCurrency, setVolumeUni
 Side effects: `setTheme` calls `UnistylesRuntime.setTheme()`; `setLanguage` calls `LocalizationService.changeLanguage()`. Both persist to SQLite via `UserPreferencesService`.
 
 `timezone` defaults to `"UTC"`. On first launch, `DatabaseProvider` detects this and auto-sets it to the device timezone via `getDeviceTimezone()` (`Intl.DateTimeFormat().resolvedOptions().timeZone`).
+
+### `useStationStore`
+
+```
+State:  stations[], isLoading, typeFilter (StationType | null)
+Actions:
+  load, create, update, delete, toggleFavorite,
+  setTypeFilter, getById, getFiltered
+```
+
+Stations are loaded via `useFocusEffect` on the list screen. `getFiltered()` applies `typeFilter` against the in-memory list.
 
 ### `useGalleryStore`
 
@@ -218,6 +239,41 @@ On update: if cover photo changed and previous one existed, Alert asks "Keep in 
 `VehicleFormValues` has two cover photo fields:
 - `coverPhotoAssetId: string | null` — saved to DB
 - `coverPhotoPreviewUri: string | null` — display only, not sent to service
+
+### `features/station`
+
+**Entity:** `Station` — name, type (`StationType` enum), brand, address, city, latitude, longitude, phone, website, notes, rating (1–5 nullable), isFavorite, `coverAssetId` (FK → assets), `media` (ManyToMany via `station_media_assets`), `tags` (ManyToMany via `station_tags_on_stations`). All FK joins use `ON DELETE CASCADE` semantics where applicable; `coverAssetId` uses `SET NULL`.
+
+**Types** (`features/station/types/station-type.ts`): `StationTypes` enum with 6 values — `GAS_STATION`, `MECHANIC`, `CAR_WASH`, `INSPECTION`, `AUTHORIZED_SERVICE`, `PARKING`. Each maps to a Lucide icon + theme color token in `STATION_TYPE_META` (`features/station/constants/station-type-meta.ts`).
+
+**Tag scope:** `stationTagScope(type)` → `"station:GAS_STATION"`. Tags are scoped per station type — switching the type field in the form clears the selected tag list. Resolver registered at app boot via `registerStationTagScope()` (`app/_layout.tsx`).
+
+**Service:** `StationService` — `getAll`, `getById` (loads `cover`, `media`, `tags` relations), `getByType`, `create(dto)`, `update(id, dto)`, `delete`, `setCover(id, assetId)` (validates assetId is in media list), `toggleFavorite`. Cover invariant enforced by `enforceCoverInvariant`: cover must be in media list; if media is empty cover is null; if cover not in media the first media item is used.
+
+**Screens:**
+
+- **`StationListScreen`** — horizontal `StationFilterChips` at top (All + 6 types). FlatList of `StationListItem`s. Each list item shows cover thumbnail (or type-tinted background icon), name, `type · brand · city` subline, favorite star.
+- **`StationDetailScreen`** — cover hero (16:9, falls back to type icon on tinted background), title section (name + type badge + brand + rating stars), favorite toggle, tag chips, location group (address/city/coordinates → opens Google Maps), contact group (phone → tel:, website → opens URL), notes box, "Other media" grid at bottom (excludes cover; tap opens URL).
+- **`StationFormScreen`** — Formik wizard. Sections: Media / Basic Info (name + type sheet + brand) / Location (address, city, lat, lng) / Contact (phone, website) / Rating & Tags (5-star toggle, favorite toggle, `TagInput` scoped to selected type) / Notes (multiline). Schema enforces lat/lng range and rating 1–5.
+
+**Form values:** `StationFormValues` keeps `media: MediaItem[]` + `coverAssetId` separate from DB. On save, `formValuesToDto` extracts `mediaAssetIds` array (preserves order). Tag selection has two arrays: `existingTagIds` and `newTagNames` (service calls `TagService.getOrCreate` for each new name).
+
+### `features/tag`
+
+Generic tag system reusable across features.
+
+**Entity:** `Tag` — `name`, `scope` (string formatted `<feature>:<sub-scope>`, e.g. `"station:MECHANIC"`). Unique per `(name, scope)` (case-sensitive in DB; case-insensitive in service via `LOWER()` query).
+
+**Service** (`TagService`): `getByScope`, `getById`, `getByIds`, `getOrCreate(name, scope)` (case-insensitive, normalizes whitespace), `rename(id, name)` (rejects sibling conflicts), `delete`, `listScopes()` returning `ScopeUsage[]` (raw `COUNT(*) GROUP BY scope`).
+
+**Scope registry** (`features/tag/scope-registry.ts`): runtime map of `featurePrefix → resolver(subScope)`. Each feature registers its resolver once at app boot. `resolveScopeLabel("station:MECHANIC")` → "Mechanic". `resolveScopePrefixLabel("station")` → "Station". Used by `TagManagementScreen` to render human-readable labels.
+
+**Components:**
+- `TagInput` — controlled component with two-array state (`selectedExistingIds` + `newTagNames`). Loads suggestions via `TagService.getByScope`. Submitting a draft case-insensitively matches against existing/new before adding. Renders selected chips (X to remove) and unselected suggestion chips (+ to add).
+
+**Screens:**
+- `TagManagementScreen` — entry point under Settings → Data → Tags. Lists scopes grouped by feature prefix with usage count.
+- `TagScopeScreen` — per-scope tag list with rename (modal) + delete (Alert confirm) actions.
 
 ### `features/asset`
 
@@ -570,6 +626,55 @@ Six composable sub-components for labeled form fields. Import each individually.
   </AppField>
 </AppFieldGroup>
 ```
+
+### Media Picker Hook (`components/media-picker/use-media-picker.tsx`)
+
+Reusable 3-source media picker. Shows a select sheet (Library / Camera / App Gallery), warns before library/camera uploads (so the user knows files land in app gallery), and uploads via `useGalleryStore.uploadImageToRoot` / `uploadVideoToRoot`.
+
+```tsx
+const { open, Modal } = useMediaPicker({
+  kind: "image" | "video" | "image-or-video",
+  multiple: false,
+  aspect: [16, 9],
+  allowsEditing: true,
+  labels: {
+    pickFromLibrary, takePhoto, selectFromGallery,
+    uploadWarningTitle, uploadWarningMessage,
+    continueText, cancelText, pickerTitle,
+  },
+});
+
+<Pressable onPress={() => open((assets) => { /* AssetEntity[] */ })} />
+{Modal /* must be rendered in the component tree */}
+```
+
+`Modal` wraps `GalleryAssetPickerModal`. Always render it once in the host component — `open()` toggles its visibility internally.
+
+### Media Gallery Field (`components/media-gallery-field/AppMediaGalleryField.tsx`)
+
+Multi-asset gallery with cover slot. Used by `StationFormScreen`. Replaces single-cover patterns when a feature needs N media items with one cover.
+
+```tsx
+<AppMediaGalleryField
+  value={mediaItems}              // MediaItem[] — { id, uri, type: "image" | "video" }
+  coverAssetId={coverId}          // string | null
+  onChange={(items, coverId) => { ... }}
+  labels={{
+    addMedia, setCover, removeMedia, preview, coverBadge,
+    emptyTitle, emptySub,
+    // forwarded to internal useMediaPicker
+    pickFromLibrary, takePhoto, selectFromGallery,
+    uploadWarningTitle, uploadWarningMessage,
+    continueText, cancelText, pickerTitle,
+  }}
+/>
+```
+
+**Invariants:**
+- First added item becomes cover when none exists
+- Removing the cover auto-promotes the next item
+- Cover slot rendered 16:9 above the grid; grid (3 columns) shows non-cover items + an Add tile
+- Item long press → action sheet: Set as Cover / Preview (Linking.openURL fallback) / Remove
 
 ### Money Input Field (`components/money-input-field/money-input-field.tsx`)
 

@@ -18,6 +18,9 @@ export default function GaragePage() {
       case "gallery":
         router.push("/(tabs)/garage/gallery");
         break;
+      case "stations":
+        router.push("/garage/station");
+        break;
       default:
         break;
     }
@@ -50,6 +53,7 @@ export default function GaragePage() {
           label={t("stationsAndRepairmen")}
           sub={t("stationsAndRepairmenSub")}
           chevron
+          onPress={() => onAppItemClickHandler("stations")}
         />
         <AppListItem
           icon="Disc2"
