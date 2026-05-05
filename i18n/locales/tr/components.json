@@ -21,6 +21,7 @@
     "pickFromLibrary": "Cihazdan Yükle",
     "takePhoto": "Fotoğraf Çek",
     "selectFromGallery": "Uygulama Galerisinden Seç",
+    "pickDocument": "PDF Belge Yükle",
     "uploadWarningTitle": "Dosya Galeriye Eklenecek",
     "uploadWarningMessage": "Yüklediğin veya çektiğin dosyalar uygulama galerisine de eklenir.",
     "continue": "Devam Et",

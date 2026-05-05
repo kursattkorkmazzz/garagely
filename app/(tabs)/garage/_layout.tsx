@@ -51,18 +51,26 @@ export default function GarageLayout({
         name="station/index"
         options={{
           headerShown: true,
-          header: (props) => (
-            <AppHeader
-              title={tStation("stations")}
-              icon="MapPin"
-              goBack
-              RightComponent={props.options.headerRight?.({
-                canGoBack: props.navigation.canGoBack(),
-                tintColor: props.options.headerTintColor,
-              })}
-              {...props}
-            />
-          ),
+          header: (props) => {
+            const params =
+              (props.route?.params as { type?: string } | undefined) ?? {};
+            const type = params.type;
+            const title = type
+              ? tStation(`type.${type}`)
+              : tStation("stations");
+            return (
+              <AppHeader
+                title={title}
+                icon="MapPin"
+                goBack
+                RightComponent={props.options.headerRight?.({
+                  canGoBack: props.navigation.canGoBack(),
+                  tintColor: props.options.headerTintColor,
+                })}
+                {...props}
+              />
+            );
+          },
         }}
       />
       <Stack.Screen

@@ -1,12 +1,14 @@
 import { usePickedImage } from "@/components/image-picker/hooks/use-picked-image";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
+import { AssetService } from "@/features/asset/service/asset.service";
 import {
   GalleryAssetPickerFilter,
   GalleryAssetPickerModal,
 } from "@/features/gallery/components/GalleryAssetPickerModal";
 import { useGalleryStore } from "@/stores/gallery.store";
 import { handleUIError } from "@/utils/handle-ui-error";
+import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useRef, useState } from "react";
 import { Alert } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
@@ -17,6 +19,7 @@ export type MediaPickerLabels = {
   pickFromLibrary: string;
   takePhoto: string;
   selectFromGallery: string;
+  pickDocument?: string;
   uploadWarningTitle: string;
   uploadWarningMessage: string;
   continueText: string;
@@ -29,6 +32,8 @@ export type UseMediaPickerOptions = {
   multiple?: boolean;
   aspect?: [number, number];
   allowsEditing?: boolean;
+  /** When true, an extra "Document" entry uploads a PDF via expo-document-picker. */
+  withDocument?: boolean;
   labels: MediaPickerLabels;
 };
 
@@ -49,7 +54,14 @@ const SHEET_ID = "select-sheet";
 export function useMediaPicker(
   options: UseMediaPickerOptions,
 ): UseMediaPickerResult {
-  const { kind, multiple = false, aspect, allowsEditing = false, labels } = options;
+  const {
+    kind,
+    multiple = false,
+    aspect,
+    allowsEditing = false,
+    withDocument = false,
+    labels,
+  } = options;
   const galleryStore = useGalleryStore();
   const pickerState = usePickedImage({
     allowsMultipleSelection: multiple,
@@ -59,8 +71,15 @@ export function useMediaPicker(
   const [pickerVisible, setPickerVisible] = useState(false);
   const callbackRef = useRef<((assets: AssetEntity[]) => void) | null>(null);
 
-  const galleryFilter: GalleryAssetPickerFilter =
-    kind === "image-or-video" ? "image-or-video" : kind;
+  const galleryFilter: GalleryAssetPickerFilter = withDocument
+    ? kind === "image-or-video"
+      ? "image-or-video-or-document"
+      : kind === "image"
+      ? "image-or-video-or-document" // allow user to pick docs from gallery too
+      : "image-or-video-or-document"
+    : kind === "image-or-video"
+    ? "image-or-video"
+    : kind;
 
   const mediaTypes: ("images" | "videos")[] =
     kind === "image"
@@ -125,20 +144,38 @@ export function useMediaPicker(
     [labels, runUpload],
   );
 
+  const handleUploadDocument = useCallback(async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "application/pdf",
+        multiple: false,
+        copyToCacheDirectory: true,
+      });
+      if (result.canceled || result.assets.length === 0) return;
+      const asset = await AssetService.uploadDocumentAsset(
+        result.assets[0].uri,
+        { folderId: null },
+      );
+      callbackRef.current?.([asset]);
+    } catch (err) {
+      handleUIError(err);
+    }
+  }, []);
+
   const open = useCallback(
     (callback: (assets: AssetEntity[]) => void) => {
       callbackRef.current = callback;
+      const data: { key: string; label: string }[] = [
+        { key: "library", label: labels.pickFromLibrary },
+        { key: "camera", label: labels.takePhoto },
+        { key: "gallery", label: labels.selectFromGallery },
+      ];
+      if (withDocument && labels.pickDocument) {
+        data.push({ key: "document", label: labels.pickDocument });
+      }
       SheetManager.show(SHEET_ID, {
         payload: {
-          sections: [
-            {
-              data: [
-                { key: "library", label: labels.pickFromLibrary },
-                { key: "camera", label: labels.takePhoto },
-                { key: "gallery", label: labels.selectFromGallery },
-              ],
-            },
-          ],
+          sections: [{ data }],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           renderItem: ({ item }: any) => (
             <SelectItem
@@ -148,13 +185,14 @@ export function useMediaPicker(
                 if (item.key === "library") handleUploadFromSource("library");
                 else if (item.key === "camera") handleUploadFromSource("camera");
                 else if (item.key === "gallery") setPickerVisible(true);
+                else if (item.key === "document") handleUploadDocument();
               }}
             />
           ),
         },
       });
     },
-    [handleUploadFromSource, labels],
+    [handleUploadFromSource, handleUploadDocument, labels, withDocument],
   );
 
   const Modal = (

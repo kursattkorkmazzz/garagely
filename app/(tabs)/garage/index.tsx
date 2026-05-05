@@ -18,12 +18,16 @@ export default function GaragePage() {
       case "gallery":
         router.push("/(tabs)/garage/gallery");
         break;
-      case "stations":
-        router.push("/garage/station");
-        break;
       default:
         break;
     }
+  };
+
+  const openStationsByType = (type: string) => {
+    router.push({
+      pathname: "/garage/station",
+      params: { type },
+    });
   };
 
   return (
@@ -53,7 +57,7 @@ export default function GaragePage() {
           label={t("stationsAndRepairmen")}
           sub={t("stationsAndRepairmenSub")}
           chevron
-          onPress={() => onAppItemClickHandler("stations")}
+          onPress={() => router.push("/garage/station")}
         />
         <AppListItem
           icon="Disc2"
@@ -72,6 +76,7 @@ export default function GaragePage() {
           label={t("fuelStation")}
           sub={t("fuelStationSub")}
           chevron
+          onPress={() => openStationsByType("GAS_STATION")}
         />
         <AppListItem
           icon="Wrench"
@@ -79,6 +84,7 @@ export default function GaragePage() {
           label={t("repairmanStation")}
           sub={t("repairmanStationSub")}
           chevron
+          onPress={() => openStationsByType("MECHANIC")}
         />
         <AppListItem
           icon="Droplets"
@@ -86,6 +92,7 @@ export default function GaragePage() {
           label={t("autoWashStation")}
           sub={t("autoWashStationSub")}
           chevron
+          onPress={() => openStationsByType("CAR_WASH")}
         />
         <AppListItem
           icon="ClipboardCheck"
@@ -93,6 +100,7 @@ export default function GaragePage() {
           label={t("inspectionStation")}
           sub={t("inspectionStationSub")}
           chevron
+          onPress={() => openStationsByType("INSPECTION")}
         />
         <AppListItem
           icon="ShieldCheck"
@@ -100,6 +108,7 @@ export default function GaragePage() {
           label={t("authorizedServiceStation")}
           sub={t("authorizedServiceStationSub")}
           chevron
+          onPress={() => openStationsByType("AUTHORIZED_SERVICE")}
         />
         <AppListItem
           icon="CircleParking"
@@ -107,6 +116,7 @@ export default function GaragePage() {
           label={t("autoParkingStation")}
           sub={t("autoParkingStationSub")}
           chevron
+          onPress={() => openStationsByType("PARKING")}
         />
       </AppListGroup>
 

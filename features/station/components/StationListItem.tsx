@@ -1,5 +1,5 @@
-import { BackgroundedIcon } from "@/components/list/backgrounded-icon";
 import { AppText } from "@/components/ui/app-text";
+import Icon from "@/components/ui/icon";
 import { STATION_TYPE_META } from "@/features/station/constants/station-type-meta";
 import { Station } from "@/features/station/entity/station.entity";
 import { useI18n } from "@/i18n";
@@ -37,11 +37,23 @@ export function StationListItem({ station, onPress }: StationListItemProps) {
         {cover ? (
           <Image
             source={{ uri: cover }}
-            style={[styles.cover, { borderRadius: theme.radius.md }]}
+            style={[styles.thumb, { borderRadius: theme.radius.md }]}
             contentFit="cover"
           />
         ) : (
-          <BackgroundedIcon icon={meta.icon} iconColor={tint} size={42} />
+          <View
+            style={[
+              styles.thumb,
+              {
+                borderRadius: theme.radius.md,
+                backgroundColor: theme.utils.withOpacity(tint, 0.14),
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+          >
+            <Icon name={meta.icon} color={tint} size={22} />
+          </View>
         )}
         <View style={styles.labelStack}>
           <View style={styles.titleRow}>
@@ -82,7 +94,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing.md - 2,
   },
-  cover: {
+  thumb: {
     width: 42,
     height: 42,
   },

@@ -109,11 +109,13 @@ export function TagScopeScreen({ scope }: TagScopeScreenProps) {
           </AppText>
         }
         ListEmptyComponent={
-          <AppText
-            style={[styles.empty, { color: theme.colors.mutedForeground }]}
-          >
-            {t("management.empty")}
-          </AppText>
+          <View style={styles.emptyWrap}>
+            <AppText
+              style={[styles.empty, { color: theme.colors.mutedForeground }]}
+            >
+              {t("management.empty")}
+            </AppText>
+          </View>
         }
       />
 
@@ -199,10 +201,14 @@ const styles = StyleSheet.create((theme) => ({
   iconBtn: {
     padding: theme.spacing.xs,
   },
+  emptyWrap: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+    alignItems: "center",
+  },
   empty: {
     ...theme.typography.bodyMedium,
     textAlign: "center",
-    marginTop: theme.spacing.xl,
   },
   // modal
   modalRoot: {

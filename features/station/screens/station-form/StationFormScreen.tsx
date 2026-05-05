@@ -44,14 +44,19 @@ import { STATION_FORM_EMPTY, StationFormValues } from "./station-form.types";
 
 type StationFormScreenProps = {
   id: string;
+  initialType?: StationType;
 };
 
-export function StationFormScreen({ id }: StationFormScreenProps) {
+export function StationFormScreen({ id, initialType }: StationFormScreenProps) {
   const isNew = id === "new";
   const { t } = useI18n("station");
   const validationSchema = useMemo(() => createStationFormSchema(t), [t]);
-  const [initialValues, setInitialValues] =
-    useState<StationFormValues>(STATION_FORM_EMPTY);
+  const [initialValues, setInitialValues] = useState<StationFormValues>(
+    () =>
+      isNew && initialType
+        ? { ...STATION_FORM_EMPTY, type: initialType }
+        : STATION_FORM_EMPTY,
+  );
   const [loading, setLoading] = useState(!isNew);
 
   const { create, update } = useStationStore();
@@ -159,6 +164,7 @@ function StationFormFields({ isNew }: { isNew: boolean }) {
       pickFromLibrary: t("components:mediaPicker.pickFromLibrary"),
       takePhoto: t("components:mediaPicker.takePhoto"),
       selectFromGallery: t("components:mediaPicker.selectFromGallery"),
+      pickDocument: t("components:mediaPicker.pickDocument"),
       uploadWarningTitle: t("components:mediaPicker.uploadWarningTitle"),
       uploadWarningMessage: t("components:mediaPicker.uploadWarningMessage"),
       continueText: t("components:mediaPicker.continue"),
@@ -442,7 +448,13 @@ function stationToFormValues(s: Station): StationFormValues {
   const media: MediaItem[] = (s.media ?? []).map((a) => ({
     id: a.id,
     uri: a.fullPath,
-    type: a.type === AssetTypes.VIDEO ? "video" : "image",
+    type:
+      a.type === AssetTypes.VIDEO
+        ? "video"
+        : a.type === AssetTypes.DOCUMENT
+        ? "document"
+        : "image",
+    name: a.fullName,
   }));
   return {
     name: s.name,

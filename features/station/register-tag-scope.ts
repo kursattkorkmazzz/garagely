@@ -8,7 +8,8 @@ import { STATION_TAG_SCOPE_PREFIX } from "@/features/station/utils/station-tag-s
  */
 export function registerStationTagScope(): void {
   registerTagScope(STATION_TAG_SCOPE_PREFIX, (sub: string) => {
-    if (!sub) return i18n.t("station:addStation", { defaultValue: "Station" });
+    if (!sub)
+      return i18n.t("station:tagScopeLabel", { defaultValue: "Station Tags" });
     const label = i18n.t(`station:type.${sub}`, { defaultValue: sub });
     return label;
   });

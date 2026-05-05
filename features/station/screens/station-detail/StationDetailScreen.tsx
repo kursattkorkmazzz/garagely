@@ -1,6 +1,8 @@
 import { AppListGroup } from "@/components/list/list-group";
 import { AppListItem } from "@/components/list/list-item";
 import { AppBadge } from "@/components/ui/app-badge";
+import { AppImageViewer } from "@/components/ui/app-image-viewer";
+import { AppPdfViewer } from "@/components/ui/app-pdf-viewer";
 import { AppText } from "@/components/ui/app-text";
 import { AppToggle } from "@/components/ui/app-toggle";
 import Icon from "@/components/ui/icon";
@@ -13,7 +15,7 @@ import { useStationStore } from "@/stores/station.store";
 import { handleUIError } from "@/utils/handle-ui-error";
 import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
-import { Play, Star } from "lucide-react-native/icons";
+import { FileText, Play, Star } from "lucide-react-native/icons";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -34,6 +36,15 @@ export function StationDetailScreen({ id }: StationDetailScreenProps) {
   const toggleFavorite = useStationStore((s) => s.toggleFavorite);
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageViewer, setImageViewer] = useState<{
+    visible: boolean;
+    uri: string;
+  }>({ visible: false, uri: "" });
+  const [pdfViewer, setPdfViewer] = useState<{
+    visible: boolean;
+    uri: string;
+    label?: string;
+  }>({ visible: false, uri: "" });
 
   useFocusEffect(
     useCallback(() => {
@@ -261,10 +272,24 @@ export function StationDetailScreen({ id }: StationDetailScreenProps) {
           <View style={styles.mediaGrid}>
             {otherMedia.map((asset) => {
               const isVideo = asset.type === AssetTypes.VIDEO;
+              const isDocument = asset.type === AssetTypes.DOCUMENT;
+              const onPress = () => {
+                if (isDocument) {
+                  setPdfViewer({
+                    visible: true,
+                    uri: asset.fullPath,
+                    label: asset.fullName,
+                  });
+                } else if (!isVideo) {
+                  setImageViewer({ visible: true, uri: asset.fullPath });
+                } else {
+                  openLink(asset.fullPath);
+                }
+              };
               return (
                 <Pressable
                   key={asset.id}
-                  onPress={() => openLink(asset.fullPath)}
+                  onPress={onPress}
                   style={[
                     styles.mediaCell,
                     {
@@ -273,7 +298,23 @@ export function StationDetailScreen({ id }: StationDetailScreenProps) {
                     },
                   ]}
                 >
-                  {!isVideo ? (
+                  {isDocument ? (
+                    <View style={styles.videoFallback}>
+                      <FileText size={28} color={theme.colors.foreground} />
+                      <AppText
+                        numberOfLines={2}
+                        style={{
+                          color: theme.colors.foreground,
+                          fontSize: 10,
+                          textAlign: "center",
+                          paddingHorizontal: 4,
+                          marginTop: 4,
+                        }}
+                      >
+                        {asset.fullName}
+                      </AppText>
+                    </View>
+                  ) : !isVideo ? (
                     <Image
                       source={{ uri: asset.fullPath }}
                       style={styles.mediaImage}
@@ -289,12 +330,30 @@ export function StationDetailScreen({ id }: StationDetailScreenProps) {
                       <Play size={10} color="#fff" />
                     </View>
                   )}
+                  {isDocument && (
+                    <View style={styles.videoBadge}>
+                      <FileText size={10} color="#fff" />
+                    </View>
+                  )}
                 </Pressable>
               );
             })}
           </View>
         </View>
       ) : null}
+
+      <AppImageViewer
+        isVisible={imageViewer.visible}
+        images={imageViewer.uri ? [{ uri: imageViewer.uri }] : []}
+        onClose={() => setImageViewer({ visible: false, uri: "" })}
+      />
+
+      <AppPdfViewer
+        visible={pdfViewer.visible}
+        uri={pdfViewer.uri}
+        label={pdfViewer.label}
+        onClose={() => setPdfViewer({ visible: false, uri: "" })}
+      />
     </ScrollView>
   );
 }

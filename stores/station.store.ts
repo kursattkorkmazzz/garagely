@@ -21,7 +21,6 @@ interface StationActions {
   toggleFavorite: (id: string) => Promise<void>;
   setTypeFilter: (type: StationType | null) => void;
   getById: (id: string) => Station | null;
-  getFiltered: () => Station[];
 }
 
 export const useStationStore = create<StationState & StationActions>()(
@@ -65,11 +64,5 @@ export const useStationStore = create<StationState & StationActions>()(
     setTypeFilter: (type) => set({ typeFilter: type }),
 
     getById: (id) => get().stations.find((s) => s.id === id) ?? null,
-
-    getFiltered: () => {
-      const { stations, typeFilter } = get();
-      if (!typeFilter) return stations;
-      return stations.filter((s) => s.type === typeFilter);
-    },
   }),
 );

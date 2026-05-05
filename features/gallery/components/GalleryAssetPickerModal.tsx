@@ -6,7 +6,13 @@ import { MediaFolderService } from "@/features/asset/service/media-folder.servic
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { useI18n } from "@/i18n";
 import { Image } from "expo-image";
-import { ChevronRight, FolderOpen, Play, X } from "lucide-react-native/icons";
+import {
+  ChevronRight,
+  FileText,
+  FolderOpen,
+  Play,
+  X,
+} from "lucide-react-native/icons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,7 +25,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-export type GalleryAssetPickerFilter = "image" | "video" | "image-or-video";
+export type GalleryAssetPickerFilter =
+  | "image"
+  | "video"
+  | "document"
+  | "image-or-video"
+  | "image-or-video-or-document";
 
 type GalleryAssetPickerModalProps = {
   visible: boolean;
@@ -64,7 +75,15 @@ export function GalleryAssetPickerModal({
         assetList.filter((a) => {
           if (filter === "image") return a.type === AssetTypes.IMAGE;
           if (filter === "video") return a.type === AssetTypes.VIDEO;
-          return a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO;
+          if (filter === "document") return a.type === AssetTypes.DOCUMENT;
+          if (filter === "image-or-video")
+            return a.type === AssetTypes.IMAGE || a.type === AssetTypes.VIDEO;
+          // image-or-video-or-document
+          return (
+            a.type === AssetTypes.IMAGE ||
+            a.type === AssetTypes.VIDEO ||
+            a.type === AssetTypes.DOCUMENT
+          );
         }),
       );
       setCurrentFolderId(folderId);
@@ -220,6 +239,7 @@ export function GalleryAssetPickerModal({
 
               const asset = entry.item as AssetEntity;
               const isVideo = asset.type === AssetTypes.VIDEO;
+              const isDocument = asset.type === AssetTypes.DOCUMENT;
               return (
                 <Pressable
                   onPress={() => handleSelectAsset(asset)}
@@ -234,7 +254,23 @@ export function GalleryAssetPickerModal({
                     },
                   ]}
                 >
-                  {!isVideo ? (
+                  {isDocument ? (
+                    <View style={styles.videoFallback}>
+                      <FileText size={28} color={theme.colors.foreground} />
+                      <AppText
+                        numberOfLines={2}
+                        style={{
+                          color: theme.colors.foreground,
+                          textAlign: "center",
+                          fontSize: 11,
+                          paddingHorizontal: 4,
+                          marginTop: 4,
+                        }}
+                      >
+                        {asset.fullName}
+                      </AppText>
+                    </View>
+                  ) : !isVideo ? (
                     <Image
                       source={{ uri: asset.fullPath }}
                       style={styles.assetImage}

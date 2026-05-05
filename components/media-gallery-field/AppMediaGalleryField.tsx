@@ -3,12 +3,20 @@ import {
   useMediaPicker,
 } from "@/components/media-picker/use-media-picker";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
+import { AppImageViewer } from "@/components/ui/app-image-viewer";
+import { AppPdfViewer } from "@/components/ui/app-pdf-viewer";
 import { AppText } from "@/components/ui/app-text";
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
 import { AssetTypes } from "@/features/asset/types/asset-type.type";
 import { Image } from "expo-image";
-import { ImagePlus, Play, Plus, Star } from "lucide-react-native/icons";
-import { useCallback } from "react";
+import {
+  FileText,
+  ImagePlus,
+  Play,
+  Plus,
+  Star,
+} from "lucide-react-native/icons";
+import { useCallback, useState } from "react";
 import { Linking, Pressable, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -18,7 +26,8 @@ const SHEET_ID = "select-sheet";
 export type MediaItem = {
   id: string;
   uri: string;
-  type: "image" | "video";
+  type: "image" | "video" | "document";
+  name?: string;
 };
 
 export type MediaGalleryLabels = MediaPickerLabels & {
@@ -41,6 +50,12 @@ export type AppMediaGalleryFieldProps = {
 
 const COLUMN_COUNT = 3;
 
+/** Pick the first non-document item to use as cover. Documents cannot be covers. */
+function pickFirstCoverable(items: MediaItem[]): string | null {
+  const first = items.find((m) => m.type !== "document");
+  return first ? first.id : null;
+}
+
 export function AppMediaGalleryField({
   value,
   coverAssetId,
@@ -49,57 +64,79 @@ export function AppMediaGalleryField({
 }: AppMediaGalleryFieldProps) {
   const { theme } = useUnistyles();
 
+  const [imageViewer, setImageViewer] = useState<{
+    visible: boolean;
+    uri: string;
+  }>({ visible: false, uri: "" });
+  const [pdfViewer, setPdfViewer] = useState<{
+    visible: boolean;
+    uri: string;
+    label?: string;
+  }>({ visible: false, uri: "" });
+
   const { open, Modal } = useMediaPicker({
     kind: "image-or-video",
     multiple: true,
+    withDocument: true,
     labels,
   });
 
   const handleAdd = useCallback(() => {
     open((assets: AssetEntity[]) => {
-      // Yeni eklenenler en başta
       const newItems: MediaItem[] = assets.map((a) => ({
         id: a.id,
         uri: a.fullPath,
-        type: a.type === AssetTypes.VIDEO ? "video" : "image",
+        type:
+          a.type === AssetTypes.VIDEO
+            ? "video"
+            : a.type === AssetTypes.DOCUMENT
+            ? "document"
+            : "image",
+        name: a.fullName,
       }));
-      // Mevcutla ID seti üzerinden duplicate filtrele
       const existingIds = new Set(value.map((v) => v.id));
       const merged = [
         ...newItems.filter((n) => !existingIds.has(n.id)),
         ...value,
       ];
-      // Cover null'sa, yeni eklenen ilk media cover olur
-      const nextCover =
-        coverAssetId == null && newItems.length > 0
-          ? newItems[0].id
-          : coverAssetId;
+      // Cover: if none, pick first coverable from merged list. Documents skipped.
+      const nextCover = coverAssetId ?? pickFirstCoverable(merged);
       onChange(merged, nextCover);
     });
   }, [coverAssetId, onChange, open, value]);
 
-  const handleSetCover = (id: string) => {
-    onChange(value, id);
+  const handleSetCover = (item: MediaItem) => {
+    if (item.type === "document") return; // documents cannot be cover
+    onChange(value, item.id);
   };
 
   const handleRemove = (id: string) => {
     const next = value.filter((v) => v.id !== id);
     let nextCover = coverAssetId;
     if (coverAssetId === id) {
-      nextCover = next.length > 0 ? next[0].id : null;
+      nextCover = pickFirstCoverable(next);
     }
     onChange(next, nextCover);
   };
 
   const handlePreview = (item: MediaItem) => {
-    // Bu sürümde minimal — system player / image viewer
-    Linking.openURL(item.uri).catch(() => {});
+    if (item.type === "image") {
+      setImageViewer({ visible: true, uri: item.uri });
+    } else if (item.type === "document") {
+      setPdfViewer({ visible: true, uri: item.uri, label: item.name });
+    } else {
+      // video — fall back to system player via Linking
+      Linking.openURL(item.uri).catch(() => {});
+    }
   };
 
   const showItemActions = (item: MediaItem) => {
     const isCover = item.id === coverAssetId;
+    const isDocument = item.type === "document";
     const data: { key: string; label: string }[] = [];
-    if (!isCover) data.push({ key: "cover", label: labels.setCover });
+    if (!isCover && !isDocument) {
+      data.push({ key: "cover", label: labels.setCover });
+    }
     data.push({ key: "preview", label: labels.preview });
     data.push({ key: "remove", label: labels.removeMedia });
 
@@ -112,7 +149,7 @@ export function AppMediaGalleryField({
             label={opt.label as string}
             onPress={() => {
               SheetManager.hide(SHEET_ID);
-              if (opt.key === "cover") handleSetCover(item.id);
+              if (opt.key === "cover") handleSetCover(item);
               else if (opt.key === "preview") handlePreview(item);
               else if (opt.key === "remove") handleRemove(item.id);
             }}
@@ -212,6 +249,21 @@ export function AppMediaGalleryField({
                 style={styles.cellImage}
                 contentFit="cover"
               />
+            ) : item.type === "document" ? (
+              <View style={styles.docFallback}>
+                <FileText size={24} color={theme.colors.foreground} />
+                {item.name ? (
+                  <AppText
+                    numberOfLines={2}
+                    style={[
+                      styles.docName,
+                      { color: theme.colors.foreground },
+                    ]}
+                  >
+                    {item.name}
+                  </AppText>
+                ) : null}
+              </View>
             ) : (
               <View style={styles.videoFallback}>
                 <Play size={24} color={theme.colors.foreground} />
@@ -220,6 +272,11 @@ export function AppMediaGalleryField({
             {item.type === "video" && (
               <View style={styles.videoBadge}>
                 <Play size={10} color="#fff" />
+              </View>
+            )}
+            {item.type === "document" && (
+              <View style={styles.videoBadge}>
+                <FileText size={10} color="#fff" />
               </View>
             )}
           </Pressable>
@@ -248,6 +305,19 @@ export function AppMediaGalleryField({
       </View>
 
       {Modal}
+
+      <AppImageViewer
+        isVisible={imageViewer.visible}
+        images={imageViewer.uri ? [{ uri: imageViewer.uri }] : []}
+        onClose={() => setImageViewer({ visible: false, uri: "" })}
+      />
+
+      <AppPdfViewer
+        visible={pdfViewer.visible}
+        uri={pdfViewer.uri}
+        label={pdfViewer.label}
+        onClose={() => setPdfViewer({ visible: false, uri: "" })}
+      />
     </View>
   );
 }
@@ -316,6 +386,18 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  docFallback: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    gap: 4,
+  },
+  docName: {
+    ...theme.typography.caption,
+    fontSize: 10,
+    textAlign: "center",
   },
   videoBadge: {
     position: "absolute",

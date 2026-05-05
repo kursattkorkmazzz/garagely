@@ -136,6 +136,7 @@ export class StationService {
       dto.newTagNames,
     );
 
+    const coverEntity = cover ? media.find((m) => m.id === cover) ?? null : null;
     const station = repo.create({
       name,
       type: dto.type,
@@ -150,6 +151,7 @@ export class StationService {
       rating,
       isFavorite: dto.isFavorite ?? false,
       coverAssetId: cover,
+      cover: coverEntity,
       media,
       tags,
     });
@@ -194,10 +196,16 @@ export class StationService {
     ) {
       const nextCover =
         dto.coverAssetId !== undefined ? dto.coverAssetId : existing.coverAssetId;
-      existing.coverAssetId = StationService.enforceCoverInvariant(
+      const finalCoverId = StationService.enforceCoverInvariant(
         existing.media ?? [],
         nextCover ?? null,
       );
+      existing.coverAssetId = finalCoverId;
+      // Also clear/sync the relation field — TypeORM otherwise reuses the
+      // previously loaded relation and writes the old FK back on save.
+      existing.cover = finalCoverId
+        ? (existing.media ?? []).find((m) => m.id === finalCoverId) ?? null
+        : null;
     }
 
     if (dto.existingTagIds !== undefined || dto.newTagNames !== undefined) {
@@ -237,10 +245,14 @@ export class StationService {
       }
     }
 
-    station.coverAssetId = StationService.enforceCoverInvariant(
+    const finalCoverId = StationService.enforceCoverInvariant(
       station.media ?? [],
       assetId,
     );
+    station.coverAssetId = finalCoverId;
+    station.cover = finalCoverId
+      ? (station.media ?? []).find((m) => m.id === finalCoverId) ?? null
+      : null;
     await repo.save(station);
     return (await repo.findOne({ where: { id }, relations: STATION_RELATIONS }))!;
   }

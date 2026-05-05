@@ -1,5 +1,6 @@
 {
   "stations": "İstasyonlar",
+  "tagScopeLabel": "İstasyon Etiketleri",
   "addStation": "İstasyon Ekle",
   "editStation": "İstasyonu Düzenle",
   "noStations": "Henüz istasyon yok",

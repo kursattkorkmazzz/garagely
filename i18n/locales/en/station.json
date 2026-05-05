@@ -1,5 +1,6 @@
 {
   "stations": "Stations",
+  "tagScopeLabel": "Station Tags",
   "addStation": "Add Station",
   "editStation": "Edit Station",
   "noStations": "No stations yet",

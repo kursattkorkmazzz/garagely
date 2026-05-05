@@ -1,19 +1,19 @@
 import { AppText } from "@/components/ui/app-text";
 import Icon from "@/components/ui/icon";
-import { StationFilterChips } from "@/features/station/components/StationFilterChips";
 import { StationListItem } from "@/features/station/components/StationListItem";
 import { useI18n } from "@/i18n";
 import { useStationStore } from "@/stores/station.store";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FlatList, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 export function StationListScreen() {
   const { t } = useI18n("station");
-  const { isLoading, load, typeFilter, setTypeFilter, getFiltered } =
-    useStationStore();
-  const stations = getFiltered();
+  const stations = useStationStore((s) => s.stations);
+  const typeFilter = useStationStore((s) => s.typeFilter);
+  const isLoading = useStationStore((s) => s.isLoading);
+  const load = useStationStore((s) => s.load);
 
   useFocusEffect(
     useCallback(() => {
@@ -21,22 +21,26 @@ export function StationListScreen() {
     }, [load]),
   );
 
+  const filtered = useMemo(() => {
+    if (!typeFilter) return stations;
+    return stations.filter((s) => s.type === typeFilter);
+  }, [stations, typeFilter]);
+
   const openDetail = (id: string) => {
     router.push({ pathname: "/garage/station/[id]", params: { id } });
   };
 
   return (
     <View style={styles.root}>
-      <StationFilterChips value={typeFilter} onChange={setTypeFilter} />
       <FlatList
-        data={stations}
+        data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <StationListItem station={item} onPress={openDetail} />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={
-          stations.length === 0 ? styles.emptyContainer : styles.container
+          filtered.length === 0 ? styles.emptyContainer : styles.container
         }
         ListEmptyComponent={
           isLoading ? null : (
@@ -64,7 +68,7 @@ const styles = StyleSheet.create((theme) => ({
   separator: {
     height: 1,
     backgroundColor: theme.colors.border,
-    marginLeft: theme.spacing.md + 40 + theme.spacing.md,
+    marginLeft: theme.spacing.md + 42 + theme.spacing.md,
   },
   container: {
     paddingVertical: theme.spacing.sm,
