@@ -79,7 +79,7 @@
     "location": "Location",
     "contact": "Contact",
     "rating": "Rating & Tags",
-    "notes": "Notes"
+    "other": "Other"
   },
 
   "errors": {

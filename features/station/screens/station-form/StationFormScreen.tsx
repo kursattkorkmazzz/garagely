@@ -1,9 +1,9 @@
+import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import {
   AppMediaGalleryField,
   MediaGalleryLabels,
   MediaItem,
 } from "@/components/media-gallery-field/AppMediaGalleryField";
-import { EnumPickerRow } from "@/components/enum-picker-row/enum-picker-row";
 import { SelectItem } from "@/components/sheets/components/SelectItem";
 import { AppButton } from "@/components/ui/app-button";
 import { AppField } from "@/components/ui/app-field/app-field";
@@ -51,11 +51,10 @@ export function StationFormScreen({ id, initialType }: StationFormScreenProps) {
   const isNew = id === "new";
   const { t } = useI18n("station");
   const validationSchema = useMemo(() => createStationFormSchema(t), [t]);
-  const [initialValues, setInitialValues] = useState<StationFormValues>(
-    () =>
-      isNew && initialType
-        ? { ...STATION_FORM_EMPTY, type: initialType }
-        : STATION_FORM_EMPTY,
+  const [initialValues, setInitialValues] = useState<StationFormValues>(() =>
+    isNew && initialType
+      ? { ...STATION_FORM_EMPTY, type: initialType }
+      : STATION_FORM_EMPTY,
   );
   const [loading, setLoading] = useState(!isNew);
 
@@ -220,12 +219,16 @@ function StationFormFields({ isNew }: { isNew: boolean }) {
             value={values.name}
             onChangeText={handleChange("name")}
             onBlur={handleBlur("name")}
-            error={touched.name ? (errors.name as string | undefined) : undefined}
+            error={
+              touched.name ? (errors.name as string | undefined) : undefined
+            }
           />
           <EnumPickerRow
             label={t("fields.type")}
             value={values.type ? t(`type.${values.type}`) : ""}
-            error={touched.type ? (errors.type as string | undefined) : undefined}
+            error={
+              touched.type ? (errors.type as string | undefined) : undefined
+            }
             onPress={showTypeSheet}
           />
           <StationField
@@ -347,7 +350,7 @@ function StationFormFields({ isNew }: { isNew: boolean }) {
         </AppFieldGroup>
 
         {/* Notes */}
-        <AppFieldGroup label={t("sections.notes")}>
+        <AppFieldGroup label={t("sections.other")}>
           <AppField>
             <AppFieldLabel>{t("fields.notes")}</AppFieldLabel>
             <AppInputGroup>
@@ -434,7 +437,9 @@ function RatingField({
           >
             <Star
               size={28}
-              color={filled ? theme.colors.primary : theme.colors.mutedForeground}
+              color={
+                filled ? theme.colors.primary : theme.colors.mutedForeground
+              }
               fill={filled ? theme.colors.primary : "transparent"}
             />
           </Pressable>
@@ -452,8 +457,8 @@ function stationToFormValues(s: Station): StationFormValues {
       a.type === AssetTypes.VIDEO
         ? "video"
         : a.type === AssetTypes.DOCUMENT
-        ? "document"
-        : "image",
+          ? "document"
+          : "image",
     name: a.fullName,
   }));
   return {
@@ -462,9 +467,12 @@ function stationToFormValues(s: Station): StationFormValues {
     brand: s.brand ?? "",
     address: s.address ?? "",
     city: s.city ?? "",
-    latitude: s.latitude !== null && s.latitude !== undefined ? String(s.latitude) : "",
+    latitude:
+      s.latitude !== null && s.latitude !== undefined ? String(s.latitude) : "",
     longitude:
-      s.longitude !== null && s.longitude !== undefined ? String(s.longitude) : "",
+      s.longitude !== null && s.longitude !== undefined
+        ? String(s.longitude)
+        : "",
     phone: s.phone ?? "",
     website: s.website ?? "",
     notes: s.notes ?? "",
