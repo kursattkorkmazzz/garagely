@@ -118,12 +118,15 @@ export function VehicleFormScreen({ id }: VehicleFormScreenProps) {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      <VehicleFormFields />
+      <VehicleFormFields isNew={isNew} />
     </Formik>
   );
 }
 
-function VehicleFormFields() {
+type VehicleFormFieldsProps = {
+  isNew: boolean;
+};
+function VehicleFormFields({ isNew }: VehicleFormFieldsProps) {
   const {
     values,
     errors,
@@ -336,7 +339,7 @@ function VehicleFormFields() {
           onPress={() => handleSubmit()}
           style={styles.submitButton}
         >
-          {t("addVehicle")}
+          {isNew ? t("addVehicle") : t("save")}
         </AppButton>
       </ScrollView>
     </KeyboardAvoidingView>

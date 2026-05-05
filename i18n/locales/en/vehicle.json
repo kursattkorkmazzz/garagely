@@ -3,7 +3,7 @@
   "editVehicle": "Edit Vehicle",
   "noVehicles": "No vehicles yet",
   "noVehiclesSub": "Add your first vehicle to get started",
-
+  "save": "Save",
   "fields": {
     "brand": "Brand",
     "model": "Model",

@@ -3,7 +3,7 @@
   "editVehicle": "Aracı Düzenle",
   "noVehicles": "Henüz araç yok",
   "noVehiclesSub": "Başlamak için ilk aracını ekle",
-
+  "save": "Kaydet",
   "fields": {
     "brand": "Marka",
     "model": "Model",
