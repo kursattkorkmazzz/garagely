@@ -11,7 +11,29 @@
   "cancel": "İptal",
 
   "filters": {
-    "all": "Tümü"
+    "all": "Tümü",
+    "title": "Filtrele",
+    "button": "Filtrele",
+    "ratingRange": "Puan Aralığı",
+    "ratingMin": "En az",
+    "ratingMax": "En çok",
+    "includeUnrated": "Puansızları da göster",
+    "favoritesOnly": "Sadece favorilerim",
+    "withMediaOnly": "Sadece medyası olanlar",
+    "apply": "Uygula",
+    "reset": "Sıfırla",
+    "emptyFiltered": "Filtreye uygun istasyon yok",
+    "emptyFilteredSub": "Filtreleri değiştirmeyi veya sıfırlamayı dene",
+    "clearFilters": "Filtreleri Temizle"
+  },
+
+  "sort": {
+    "title": "Sırala",
+    "button": "Sırala",
+    "createdAt_desc": "Yeni → Eski",
+    "rating_desc": "Puan: Yüksek → Düşük",
+    "rating_asc": "Puan: Düşük → Yüksek",
+    "favorites_first": "Önce Favorilerim"
   },
 
   "type": {

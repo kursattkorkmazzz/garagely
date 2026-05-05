@@ -2,6 +2,10 @@ import { GetGaragelyDatabase } from "@/db/db";
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
 import { Station } from "@/features/station/entity/station.entity";
 import { StationErrors } from "@/features/station/errors/station.errors";
+import {
+  StationPage,
+  StationQuery,
+} from "@/features/station/types/station-query";
 import { StationType } from "@/features/station/types/station-type";
 import { Tag } from "@/features/tag/entity/tag.entity";
 import { TagService } from "@/features/tag/service/tag.service";
@@ -67,6 +71,87 @@ export class StationService {
   static async getById(id: string): Promise<Station | null> {
     const repo = await StationService.repo();
     return repo.findOne({ where: { id }, relations: STATION_RELATIONS });
+  }
+
+  /**
+   * Paginated query with filters + sorting. All work happens DB-side via
+   * QueryBuilder so we don't load the full table just to filter in memory.
+   *
+   * Returns `limit` items at most plus a `hasMore` flag (we fetch limit+1
+   * rows to detect the boundary without a separate COUNT query).
+   */
+  static async query({
+    filters,
+    sort,
+    limit,
+    offset,
+  }: StationQuery): Promise<StationPage> {
+    const repo = await StationService.repo();
+
+    const qb = repo
+      .createQueryBuilder("s")
+      .leftJoinAndSelect("s.cover", "cover")
+      .leftJoin("s.media", "m")
+      .groupBy("s.id");
+
+    if (filters.type) {
+      qb.andWhere("s.type = :type", { type: filters.type });
+    }
+    if (filters.favoritesOnly) {
+      qb.andWhere("s.isFavorite = 1");
+    }
+    if (filters.withMediaOnly) {
+      qb.andHaving("COUNT(m.id) > 0");
+    }
+
+    const hasRangeFilter =
+      filters.ratingMin != null || filters.ratingMax != null;
+    if (hasRangeFilter) {
+      const min = filters.ratingMin ?? 1;
+      const max = filters.ratingMax ?? 5;
+      if (filters.includeUnrated) {
+        qb.andWhere(
+          "(s.rating IS NULL OR (s.rating >= :rmin AND s.rating <= :rmax))",
+          { rmin: min, rmax: max },
+        );
+      } else {
+        qb.andWhere(
+          "s.rating IS NOT NULL AND s.rating >= :rmin AND s.rating <= :rmax",
+          { rmin: min, rmax: max },
+        );
+      }
+    }
+
+    // expo-sqlite has no NULLS LAST clause — emulate it by sorting on a
+    // synthetic "is null" expression as the primary key first.
+    switch (sort) {
+      case "rating_asc":
+        qb.orderBy("CASE WHEN s.rating IS NULL THEN 1 ELSE 0 END", "ASC")
+          .addOrderBy("s.rating", "ASC")
+          .addOrderBy("s.createdAt", "DESC");
+        break;
+      case "rating_desc":
+        qb.orderBy("CASE WHEN s.rating IS NULL THEN 1 ELSE 0 END", "ASC")
+          .addOrderBy("s.rating", "DESC")
+          .addOrderBy("s.createdAt", "DESC");
+        break;
+      case "favorites_first":
+        qb.orderBy("s.isFavorite", "DESC").addOrderBy("s.createdAt", "DESC");
+        break;
+      case "createdAt_desc":
+      default:
+        qb.orderBy("s.createdAt", "DESC");
+        break;
+    }
+    // Stable tiebreaker so pagination doesn't shuffle rows between pages
+    qb.addOrderBy("s.id", "DESC");
+
+    qb.offset(offset).limit(limit + 1);
+
+    const rows = await qb.getMany();
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    return { items, hasMore };
   }
 
   static async getByType(type: StationType): Promise<Station[]> {

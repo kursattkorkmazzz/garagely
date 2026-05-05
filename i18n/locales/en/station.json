@@ -11,7 +11,29 @@
   "cancel": "Cancel",
 
   "filters": {
-    "all": "All"
+    "all": "All",
+    "title": "Filters",
+    "button": "Filter",
+    "ratingRange": "Rating Range",
+    "ratingMin": "Min",
+    "ratingMax": "Max",
+    "includeUnrated": "Include unrated",
+    "favoritesOnly": "Favorites only",
+    "withMediaOnly": "With media only",
+    "apply": "Apply",
+    "reset": "Reset",
+    "emptyFiltered": "No stations match your filters",
+    "emptyFilteredSub": "Try adjusting or clearing your filters",
+    "clearFilters": "Clear Filters"
+  },
+
+  "sort": {
+    "title": "Sort",
+    "button": "Sort",
+    "createdAt_desc": "Newest → Oldest",
+    "rating_desc": "Rating: High → Low",
+    "rating_asc": "Rating: Low → High",
+    "favorites_first": "Favorites First"
   },
 
   "type": {

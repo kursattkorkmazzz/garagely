@@ -18,12 +18,17 @@ export default function StationListRoute() {
       ? (typeParamRaw as StationType)
       : null;
 
-  const setTypeFilter = useStationStore((s) => s.setTypeFilter);
+  const resetFilters = useStationStore((s) => s.resetFilters);
+  const setFilters = useStationStore((s) => s.setFilters);
 
-  // Sync route -> store on mount / param change
+  // Route -> store sync. Entering a type-scoped list resets all filters and
+  // applies just `type` so users get a clean slate per entry point.
+  // setFilters triggers load(); the loadToken in the store ensures the
+  // resetFilters() load is superseded so we don't fire two queries.
   useEffect(() => {
-    setTypeFilter(type);
-  }, [type, setTypeFilter]);
+    resetFilters();
+    if (type) setFilters({ type });
+  }, [type, resetFilters, setFilters]);
 
   useEffect(() => {
     appHeader.setHeaderRight(
