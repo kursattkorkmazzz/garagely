@@ -64,6 +64,52 @@ export default function GaragePage() {
         />
       </AppListGroup>
 
+      <AppListSectionHeader title={t("stationSection")} />
+      <AppListGroup>
+        <AppListItem
+          icon="Fuel"
+          iconColor="#ef4444"
+          label={t("fuelStation")}
+          sub={t("fuelStationSub")}
+          chevron
+        />
+        <AppListItem
+          icon="Wrench"
+          iconColor="#8b5cf6"
+          label={t("repairmanStation")}
+          sub={t("repairmanStationSub")}
+          chevron
+        />
+        <AppListItem
+          icon="Droplets"
+          iconColor="#06b6d4"
+          label={t("autoWashStation")}
+          sub={t("autoWashStationSub")}
+          chevron
+        />
+        <AppListItem
+          icon="ClipboardCheck"
+          iconColor="#0ea5e9"
+          label={t("inspectionStation")}
+          sub={t("inspectionStationSub")}
+          chevron
+        />
+        <AppListItem
+          icon="ShieldCheck"
+          iconColor="#f97316"
+          label={t("authorizedServiceStation")}
+          sub={t("authorizedServiceStationSub")}
+          chevron
+        />
+        <AppListItem
+          icon="CircleParking"
+          iconColor="#f97316"
+          label={t("autoParkingStation")}
+          sub={t("autoParkingStationSub")}
+          chevron
+        />
+      </AppListGroup>
+
       <AppListSectionHeader title={t("expenseSection")} />
       <AppListGroup>
         <AppListItem
