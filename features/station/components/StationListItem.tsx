@@ -73,6 +73,18 @@ export function StationListItem({ station, onPress }: StationListItemProps) {
           </AppText>
         </View>
       </View>
+      {station.rating != null && (
+        <View style={styles.ratingPill}>
+          <Star
+            size={12}
+            color={theme.colors.primary}
+            fill={theme.colors.primary}
+          />
+          <AppText style={[styles.ratingText, { color: theme.colors.foreground }]}>
+            {station.rating}
+          </AppText>
+        </View>
+      )}
       <ChevronRight color={theme.colors.muted} size={18} />
     </Pressable>
   );
@@ -115,5 +127,15 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.rowSub,
     color: theme.colors.mutedForeground,
     marginTop: 2,
+  },
+  ratingPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginRight: theme.spacing.xs,
+  },
+  ratingText: {
+    ...theme.typography.caption,
+    fontWeight: "600",
   },
 }));

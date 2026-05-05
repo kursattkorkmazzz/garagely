@@ -3,8 +3,8 @@ import { AppListItem } from "@/components/list/list-item";
 import { AppText } from "@/components/ui/app-text";
 import Icon from "@/components/ui/icon";
 import {
-  resolveScopePrefixLabel,
   resolveScopeLabel,
+  resolveScopePrefixLabel,
 } from "@/features/tag/scope-registry";
 import { ScopeUsage, TagService } from "@/features/tag/service/tag.service";
 import { useI18n } from "@/i18n";
@@ -109,6 +109,7 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     gap: theme.spacing.sm,
     paddingTop: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyText: {
     ...theme.typography.bodyMedium,
