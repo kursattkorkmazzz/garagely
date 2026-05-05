@@ -1,3 +1,4 @@
+import { AppButton } from "@/components/ui/app-button";
 import { AppField } from "@/components/ui/app-field/app-field";
 import { AppFieldError } from "@/components/ui/app-field/app-field-error";
 import { AppFieldLabel } from "@/components/ui/app-field/app-field-label";
@@ -6,20 +7,19 @@ import {
   AppInputField,
   AppInputGroup,
 } from "@/components/ui/app-input";
-import { AppButton } from "@/components/ui/app-button";
-import { AppText } from "@/components/ui/app-text";
-import Icon from "@/components/ui/icon";
 import {
   AppTab,
   AppTabList,
   AppTabPanel,
   AppTabTrigger,
 } from "@/components/ui/app-tab";
+import { AppText } from "@/components/ui/app-text";
+import Icon from "@/components/ui/icon";
 import { useI18n } from "@/i18n";
 import { useUserPreferencesStore } from "@/stores/user-preferences.store";
 import { useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modal, Pressable, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { AppDatePicker } from "./app-date-picker";
 import { AppTimePicker } from "./app-time-picker";
@@ -81,33 +81,31 @@ export function AppDateTimePickerField({
 
   const handleDatePartsChange = (parts: DateParts) => {
     handlePartsChange(parts);
-    if (mode === "datetime") {
-      setTimeout(() => setActiveTab("time"), 500);
-    }
   };
 
-  const displayValue = value != null
-    ? mode === "time"
-      ? formatTime(value, timezone)
-      : mode === "date"
-      ? formatDate(value, timezone, language)
-      : formatDateTime(value, timezone, language)
-    : null;
+  const displayValue =
+    value != null
+      ? mode === "time"
+        ? formatTime(value, timezone)
+        : mode === "date"
+          ? formatDate(value, timezone, language)
+          : formatDateTime(value, timezone, language)
+      : null;
 
-  const placeholderText = placeholder ?? (
-    mode === "time"
+  const placeholderText =
+    placeholder ??
+    (mode === "time"
       ? timePlaceholder(language)
       : mode === "date"
-      ? datePlaceholder(language)
-      : dateTimePlaceholder(language)
-  );
+        ? datePlaceholder(language)
+        : dateTimePlaceholder(language));
 
   const modalTitle =
     mode === "time"
       ? t("dateTimePicker.titleTime")
       : mode === "date"
-      ? t("dateTimePicker.titleDate")
-      : t("dateTimePicker.titleDatetime");
+        ? t("dateTimePicker.titleDate")
+        : t("dateTimePicker.titleDatetime");
 
   const leftIcon = mode === "time" ? "Clock" : "Calendar";
 
@@ -117,7 +115,11 @@ export function AppDateTimePickerField({
       <Pressable onPress={openModal}>
         <AppInputGroup error={!!error} disabled>
           <AppInputAddon position="left">
-            <Icon name={leftIcon} size={16} color={theme.colors.mutedForeground} />
+            <Icon
+              name={leftIcon}
+              size={16}
+              color={theme.colors.mutedForeground}
+            />
           </AppInputAddon>
           <AppInputField
             value={displayValue ?? ""}
