@@ -36,6 +36,9 @@ No test suite is configured. Always run `npx tsc --noEmit` after changes to veri
 | PDF viewer     | `react-native-pdf` + `react-native-blob-util`   |
 | File system    | `expo-file-system` (new API: `File`, `Directory`, `Paths`) |
 | Gestures       | `react-native-gesture-handler` + `react-native-reanimated` |
+| Date/time      | `dayjs` + `dayjs/plugin/utc` + `dayjs/plugin/timezone` |
+| Timezones      | `countries-and-timezones`                       |
+| Color picker   | `reanimated-color-picker`                       |
 
 ### Data Flow
 
@@ -71,7 +74,9 @@ app/
         ├── gallery/index.tsx          → GalleryScreen
         └── vehicle/
             ├── index.tsx              → vehicle list
-            └── [id]/vehicle-form.tsx  → create / edit vehicle wizard
+            └── [id]/
+                ├── index.tsx          → vehicle detail screen (read-only)
+                └── vehicle-form.tsx   → create / edit vehicle wizard
 ```
 
 ### AppHeader
@@ -89,6 +94,8 @@ app/
 />
 ```
 
+**Layout rule:** Left side (back arrow + icon + title) is wrapped in `flex: 1` with `numberOfLines={1}` truncation. `RightComponent` has `flexShrink: 0` — never overlaps the title.
+
 ---
 
 ## State Stores (`stores/`)
@@ -105,11 +112,13 @@ Actions: load, create, update, delete, setActiveVehicle, getActiveVehicle
 ### `useUserPreferencesStore`
 
 ```
-State:  theme, language, distanceUnit, currency, volumeUnit, isLoaded
-Actions: load, setTheme, setLanguage, setDistanceUnit, setCurrency, setVolumeUnit
+State:  theme, language, distanceUnit, currency, volumeUnit, timezone, isLoaded
+Actions: load, setTheme, setLanguage, setDistanceUnit, setCurrency, setVolumeUnit, setTimezone
 ```
 
 Side effects: `setTheme` calls `UnistylesRuntime.setTheme()`; `setLanguage` calls `LocalizationService.changeLanguage()`. Both persist to SQLite via `UserPreferencesService`.
+
+`timezone` defaults to `"UTC"`. On first launch, `DatabaseProvider` detects this and auto-sets it to the device timezone via `getDeviceTimezone()` (`Intl.DateTimeFormat().resolvedOptions().timeZone`).
 
 ### `useGalleryStore`
 
@@ -180,11 +189,15 @@ DDD-inspired structure. Each feature owns: entity, errors, service, types, (opti
 
 ### `features/vehicle`
 
-**Entity:** `Vehicle` — brand, model, year, plate (unique), color (hex), transmissionType, bodyType, fuelType, purchase (Money embedded), purchaseDate, coverPhotoAssetId (nullable FK → assets).
+**Entity:** `Vehicle` — brand, model, year, plate (unique), color (hex), transmissionType, bodyType, fuelType, purchase (Money embedded), purchaseDate (UTC ms integer), coverPhotoAssetId (nullable FK → assets).
 
 **Service:** `VehicleService` — `getAll`, `getById` (loads `coverPhoto` relation), `create(dto)`, `update(id, dto)`, `delete(id)`.
 
-**Screen:** `VehicleFormScreen` — Formik wizard with `createVehicleFormSchema(t)`. Each step uses `useFormikContext<VehicleFormState>()`.
+**Screens:**
+
+- **`VehicleDetailScreen`** (`features/vehicle/screens/vehicle-detail/`) — read-only detail view. Header has Pencil (edit) and Trash2 (delete) icon buttons. Shows cover photo hero, active vehicle toggle, specs group (fuel/transmission/body/color), purchase info group. Uses `useFocusEffect` to reload data when returning from edit. Displays `purchaseDate` with `formatDateTime(utcMs, timezone, language)`.
+
+- **`VehicleFormScreen`** (`features/vehicle/screens/vehicle-form/`) — Formik wizard. Each field section uses `useFormikContext<VehicleFormValues>()`. `purchaseDate` uses `AppDateTimePickerField` with `mode="datetime"`.
 
 **Cover Photo:** `VehicleCoverPhotoField` (`features/vehicle/components/`) — 16:9 photo field with 3 upload sources:
 - **Cihazdan Yükle / Kamera ile Çek** → shows warning Alert ("galeriye eklenecek") → on confirm: `galleryStore.uploadImageToRoot(uri)` → asset root'a yüklenir
@@ -336,7 +349,7 @@ SheetManager.show("select-sheet", {
 
 ### `features/user-preferences`
 
-`UserPreferences` entity stores theme, language, distanceUnit, currency, volumeUnit, activeVehicleId. `UserPreferencesService.getOrCreate()` always returns a record (creates default on first run).
+`UserPreferences` entity stores theme, language, distanceUnit, currency, volumeUnit, timezone, activeVehicleId. `UserPreferencesService.getOrCreate()` always returns a record (creates default on first run).
 
 ---
 
@@ -356,6 +369,147 @@ SheetManager.show("select-sheet", {
 | `AppImageViewer` | Full-screen image gallery with swipe and zoom |
 | `AppPdfViewer` | Full-screen PDF modal with page counter |
 | `icon.tsx` | `<Icon name="FolderOpen" size={20} color={...} />` — type-safe Lucide wrapper |
+
+### Color Picker (`components/color-picker/`)
+
+Two components for hex color selection using `reanimated-color-picker`.
+
+**`AppColorPicker`** — raw picker (Panel1 + HueSlider + optional OpacitySlider):
+```tsx
+<AppColorPicker
+  value="#FF0000"
+  onComplete={(hex) => console.log(hex)}
+  onChange={(hex) => console.log(hex)}   // optional, fires on drag
+  opacityEnabled={false}                 // default false
+  pickerRef={ref}                        // optional ColorPickerRef
+/>
+```
+
+**`AppColorPickerField`** — labeled form field with modal:
+```tsx
+<AppColorPickerField
+  label="Color"
+  value={values.color}
+  onChange={(hex) => {
+    setFieldValue("color", hex);
+    setFieldTouched("color", true, false);
+  }}
+  error={touched.color ? errors.color : undefined}
+/>
+```
+
+- Hex format: `#RRGGBB` or `#RRGGBBAA`
+- Text input accepts manual hex entry; picker and text stay in sync
+- Invalid hex: Formik always receives the value (for validation), but `pickerRef.setColor()` only fires on valid hex
+- Closing modal with invalid hex: resets to last valid value
+- **Modal must be wrapped in `GestureHandlerRootView`** — Modal renders outside the app tree, so gesture handling is disconnected without it
+
+### Date/Time Picker (`components/ui/app-date-picker/`)
+
+UTC-based date/time picker system. All values are stored and passed as **UTC milliseconds** (`number`).
+
+#### `AppDateTimePickerField`
+
+Main entry point. Centered modal with ScrollDrum pickers.
+
+```tsx
+<AppDateTimePickerField
+  label="Purchase Date"
+  value={values.purchaseDate}          // number | null (UTC ms)
+  onChange={(utcMs) => setFieldValue("purchaseDate", utcMs)}
+  mode="datetime"                      // "date" | "time" | "datetime"
+  error={touched.purchaseDate ? errors.purchaseDate : undefined}
+/>
+```
+
+- Reads `timezone` and `language` from `useUserPreferencesStore()` automatically
+- `datetime` mode: tabbed (Date / Time), auto-switches to Time tab 500ms after date selection
+- Modal backdrop: outer `View` + absolute `Pressable` backdrop tap target — inner card is a plain `View` so scroll gestures pass through unblocked
+- `onChange` fires immediately on every picker change; "Tamam" only closes the modal
+
+#### `AppDatePicker` / `AppTimePicker`
+
+Internal picker components. Accept `DateParts` directly — no UTC conversion inside:
+
+```ts
+type DateParts = { year, month, day, hour, minute }
+
+<AppDatePicker parts={localParts} onChange={(parts) => handlePartsChange(parts)} />
+<AppTimePicker parts={localParts} onChange={(parts) => handlePartsChange(parts)} />
+```
+
+UTC conversion (`localToUtc`) happens only at the `AppDateTimePickerField` boundary, not inside the pickers. This avoids timezone feedback loops.
+
+#### `ScrollDrum`
+
+Snap-scroll wheel picker used internally.
+
+```tsx
+<ScrollDrum
+  items={["00","01",..."23"]}
+  selectedIndex={selectedHour}
+  onIndexChange={(i) => setHour(i)}
+  itemHeight={44}      // default
+  visibleItems={5}     // default
+/>
+```
+
+- `snapToInterval={itemHeight}`, `decelerationRate="fast"`
+- Highlight band is absolutely positioned behind items
+- Programmatic scroll on `selectedIndex` change; `isScrollingByCode` ref prevents `onMomentumScrollEnd` feedback loop
+
+#### `date-time-utils.ts`
+
+```ts
+utcToLocal(utcMs, tz)       → DateParts   // uses Intl.DateTimeFormat
+localToUtc(parts, tz)       → number      // UTC ms, uses dayjs.tz
+daysInMonth(year, month)    → number
+formatDate(utcMs, tz, lang) → "DD/MM/YYYY"
+formatTime(utcMs, tz)       → "HH:MM"
+formatDateTime(utcMs, tz, lang) → "DD/MM/YYYY  HH:MM"
+datePlaceholder(lang)       → "GG/AA/YYYY" | "DD/MM/YYYY"
+timePlaceholder(lang)       → "SS:DD" | "HH:MM"
+```
+
+**Important:** `utcToLocal`, `formatDate`, `formatTime` use `Intl.DateTimeFormat.formatToParts()` — NOT `dayjs.utc().tz()`. The dayjs `.tz()` conversion (UTC→local display direction) is unreliable in React Native/Hermes. `localToUtc` (local→UTC, used for storage) still uses `dayjs.tz()` and works correctly.
+
+#### `utils/dayjs.ts`
+
+Global dayjs setup — imported once as a side effect in `app/_layout.tsx`:
+```ts
+import "@/utils/dayjs";
+```
+Extends dayjs with `utc` and `timezone` plugins. Always import dayjs from `@/utils/dayjs` (not from `dayjs` directly).
+
+### `AppTab` (`components/ui/app-tab/`)
+
+Shadcn-style tabbed container with animated underline indicator. Used inside `AppDateTimePickerField` for datetime mode.
+
+```tsx
+<AppTab value={activeTab} onChange={setActiveTab}>
+  <AppTabList>
+    <AppTabTrigger value="date">Date</AppTabTrigger>
+    <AppTabTrigger value="time">Time</AppTabTrigger>
+  </AppTabList>
+  <AppTabPanel value="date"><AppDatePicker .../></AppTabPanel>
+  <AppTabPanel value="time"><AppTimePicker .../></AppTabPanel>
+</AppTab>
+```
+
+- Active tab indicated by animated underline (Reanimated)
+- `AppTabPanel` only renders children when its `value` matches the active tab
+- Composed of 6 files: `app-tab.tsx`, `app-tab-list.tsx`, `app-tab-trigger.tsx`, `app-tab-panel.tsx`, `tab-context.ts`, `index.ts`
+
+### Timezone (`shared/timezone/`)
+
+```ts
+import { getAllTimezones, getDeviceTimezone, type TimezoneString } from "@/shared/timezone";
+
+getDeviceTimezone()   // → "Europe/Istanbul" (Intl.DateTimeFormat resolvedOptions)
+getAllTimezones()      // → Record<string, Timezone> from countries-and-timezones
+```
+
+`TimezoneString` = `string` (IANA format, e.g. `"Europe/Istanbul"`).
 
 ### Input System (`components/ui/app-input/`)
 
@@ -417,16 +571,6 @@ Six composable sub-components for labeled form fields. Import each individually.
 </AppFieldGroup>
 ```
 
-#### With description
-
-```tsx
-<AppField>
-  <AppFieldLabel>API Key</AppFieldLabel>
-  <AppInputGroup><AppInputField .../></AppInputGroup>
-  <AppFieldDescription>Used for third-party integrations.</AppFieldDescription>
-</AppField>
-```
-
 ### Money Input Field (`components/money-input-field/money-input-field.tsx`)
 
 Composite input for monetary values with inline currency picker.
@@ -467,6 +611,60 @@ Internally uses `AppField + AppFieldLabel + AppInputGroup + AppInputField + AppI
 ```
 
 Props: `label`, `icon` (Lucide name), `iconColor`, `sub` (subtitle), `selectedValue`, `trailing` (ReactNode), `chevron`, `destructive`, `first`, `last`.
+
+---
+
+## Sheets (`components/sheets/`)
+
+Two registered sheets. All sheets must be registered in `sheets.ts`.
+
+### `select-sheet`
+
+General-purpose selection sheet. Uses `SectionList` — suitable for small lists (< ~20 items).
+
+```ts
+SheetManager.show("select-sheet", {
+  payload: {
+    ListHeaderComponent: <AppText>Title</AppText>,
+    sections: [{ data: [{ key: "val", label: "Label" }] }],
+    renderItem: ({ item }) => (
+      <SelectItem
+        label={item.label}
+        selected={current === item.key}
+        onPress={() => { setValue(item.key); SheetManager.hide("select-sheet"); }}
+      />
+    ),
+  },
+});
+```
+
+### `timezone-sheet`
+
+Dedicated timezone picker. Uses `FlatList` with lazy-load pagination (PAGE_SIZE=50) and a search input. Suitable for the 500+ IANA timezone list.
+
+```ts
+SheetManager.show("timezone-sheet", {
+  payload: {
+    currentTimezone: timezone,          // currently selected IANA string
+    onSelect: (tz) => setTimezone(tz),  // callback on selection
+  },
+});
+```
+
+- Filters `countries-and-timezones` list: `!deprecated && !aliasOf`, sorted by `utcOffset`
+- Search filters by timezone name substring
+- Each item shows `name` + `description: "UTC +03:00"`
+
+### `SelectItem`
+
+```tsx
+<SelectItem
+  label="Europe/Istanbul"
+  description="UTC +03:00"   // optional subtitle
+  selected={true}
+  onPress={() => {}}
+/>
+```
 
 ---
 
@@ -609,6 +807,16 @@ t("folders.deleteConfirmMessage", { folderCount: 3, assetCount: 7 })
 
 Error code keys live in `errors.json`. `handleUIError` looks up `error.errorCode` in the `errors` namespace. Add new error codes there when adding new `AppErrorCode` values.
 
+### `components` namespace keys (relevant additions)
+
+```json
+"colorPicker": { "title": "Select Color", "done": "Done" }
+"dateTimePicker": {
+  "titleTime", "titleDate", "titleDatetime",
+  "done", "tabDate", "tabTime"
+}
+```
+
 ---
 
 ## Error System
@@ -710,6 +918,17 @@ import Icon from "@/components/ui/icon";
 
 ---
 
+## Known Gotchas
+
+- **`GestureHandlerRootView` inside Modal:** React Native `Modal` renders outside the app component tree. Any gesture-based component inside a Modal (color picker, scroll drums) must be wrapped in its own `GestureHandlerRootView` inside the Modal.
+
+- **Modal backdrop + scroll conflict:** A `Pressable` wrapping a modal card absorbs all touch events including scroll. Use a plain `View` for the card and an `absoluteFillObject` `Pressable` behind it for backdrop tap detection.
+
+- **dayjs.tz UTC→local display in React Native:** `dayjs.utc(ms).tz(tz)` is unreliable in Hermes for display. Use `Intl.DateTimeFormat.formatToParts()` instead (see `date-time-utils.ts`). `dayjs.tz(localString, tz).valueOf()` (local→UTC) works correctly and is used for storage.
+
+- **DatabaseProvider timing:** `dbInit.setState(SUCCESS)` fires before `load()` resolves. Components render with default store values (`timezone: "UTC"`) briefly. Zustand triggers re-renders once `load()` completes. Do not rely on store values being set in the first render frame.
+
+---
 
 ## Deprecated / Pending Cleanup
 
