@@ -288,8 +288,24 @@ export default function SettingsPage() {
           icon="Tag"
           label={t("tags")}
           chevron
-          iconColor="#a855f7"
+          iconColor="#8B5CF6"
           onPress={() => router.push("/(tabs)/settings/tags")}
+        />
+      </AppListGroup>
+
+      <AppListSectionHeader title={t("backupAndRestore")} />
+      <AppListGroup>
+        <AppListItem
+          icon="Upload"
+          label={t("backup")}
+          chevron
+          iconColor="#3B82F6"
+        />
+        <AppListItem
+          icon="Download"
+          label={t("restore")}
+          chevron
+          iconColor="#F59E0B"
         />
       </AppListGroup>
 

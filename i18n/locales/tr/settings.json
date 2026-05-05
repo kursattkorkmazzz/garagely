@@ -18,6 +18,10 @@
   "data": "Veri",
   "tags": "Etiketler",
 
+  "backupAndRestore": "Yedekleme ve Geri Yükleme",
+  "backup": "Yedekle",
+  "restore": "Geri Yükle",
+
   "informations": "Hakkında",
   "privacyPolicy": "Gizlilik Politikası",
   "termsOfService": "Koşullar ve Şartlar",

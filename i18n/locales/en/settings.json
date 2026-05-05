@@ -18,6 +18,10 @@
   "data": "Data",
   "tags": "Tags",
 
+  "backupAndRestore": "Backup and Restore",
+  "backup": "Backup",
+  "restore": "Restore",
+
   "informations": "About",
   "privacyPolicy": "Privacy Policy",
   "termsOfService": "Terms & Conditions",
