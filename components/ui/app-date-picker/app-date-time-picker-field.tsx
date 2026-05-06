@@ -115,17 +115,14 @@ export function AppDateTimePickerField({
       <Pressable onPress={openModal}>
         <AppInputGroup error={!!error} disabled>
           <AppInputAddon position="left">
-            <Icon
-              name={leftIcon}
-              size={16}
-              color={theme.colors.mutedForeground}
-            />
+            <Icon name={leftIcon} size={16} color={theme.colors.foreground} />
           </AppInputAddon>
           <AppInputField
             value={displayValue ?? ""}
             placeholder={placeholderText}
             editable={false}
             pointerEvents="none"
+            style={styles.field}
           />
         </AppInputGroup>
       </Pressable>
@@ -230,5 +227,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   doneButton: {
     marginTop: theme.spacing.xs,
+  },
+  field: {
+    color: theme.colors.foreground,
   },
 }));
